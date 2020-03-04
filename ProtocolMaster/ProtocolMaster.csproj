@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AForge" Version="2.2.5" />
+    <PackageReference Include="AForge.Video" Version="2.2.5" />
+    <PackageReference Include="AForge.Video.DirectShow" Version="2.2.5" />
+    <PackageReference Include="Google.Apis" Version="1.44.0" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.44.0" />
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.44.0.1863" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProtocolMasterLib\ProtocolMasterLib.csproj" />
+  </ItemGroup>
+
+</Project>

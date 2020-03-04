@@ -1,0 +1,125 @@
+﻿<Window x:Class="ProtocolMasterGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ProtocolMasterGUI"
+        mc:Ignorable="d"
+        Title="ProtocolMaster" WindowState="Maximized" Width="900" Height="500"
+        Closed="Window_Closed">
+    <!--Styles-->
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="0,5,0,5"/>
+        </Style>
+        <Style TargetType="ToolBar">
+            <Setter Property="MinWidth" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToolBarTray}}, Path=ActualWidth}"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="ToolHeader">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="SlateGray"/>
+            <Setter Property="Margin" Value="0,0,5,0"/>
+        </Style>
+        <Style TargetType="ToolBarTray">
+            <Setter Property="IsLocked" Value="True"/>
+        </Style>
+    </Window.Resources>
+
+    <!--Content-->
+    <Grid Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
+        <Grid Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Grid.RowSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+
+            <!--Google Drive Dockpanel-->
+            <DockPanel Grid.Column="0" Grid.RowSpan="1">
+                <!--Google Drive Toolbar-->
+                <ToolBarTray DockPanel.Dock="Top">
+                    <ToolBar>
+                        <TextBlock Style="{StaticResource ToolHeader}">Google Drive</TextBlock>
+                        <Button Content="Sign-In" Name="AccountButton" Click="Account_Click"/>
+                    </ToolBar>
+                </ToolBarTray>
+                <!--Google Drive Treeview-->
+                <TreeView  Name="treeView1" BorderThickness="0">
+                    <TreeViewItem Header="McIntyre">
+                        <TreeViewItem Header="VNS AFC Volume Exp"/>
+                    </TreeViewItem>
+                </TreeView>
+            </DockPanel>
+
+            <GridSplitter Grid.Column="1" Grid.RowSpan="1" HorizontalAlignment="Stretch"/>
+
+            <!--Camera/Video Dockpanel-->
+            <DockPanel Grid.Column="2" Grid.RowSpan="1">
+                <!--Camera/Video Toolbar-->
+                <ToolBarTray DockPanel.Dock="Top">
+                    <ToolBar>
+                        <TextBlock Style="{StaticResource ToolHeader}">Video Feed</TextBlock>
+                    </ToolBar>
+                </ToolBarTray>
+                <!--Camera/Video Content-->
+                <TextBlock>I am a video/camera of a booth and a rat!</TextBlock>
+            </DockPanel>
+
+            <GridSplitter Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Stretch"/>
+
+            <!--Properties Dockpanel-->
+            <DockPanel Grid.Column="4" Grid.RowSpan="1">
+                <ToolBarTray DockPanel.Dock="Top">
+                    <ToolBar>
+                        <TextBlock Style="{StaticResource ToolHeader}">Properties</TextBlock>
+                    </ToolBar>
+                </ToolBarTray>
+                <TextBlock Margin="5,5,5,5" >
+                        This is the properties panel! Hippity hoppity, click and edit properties!
+                </TextBlock>
+            </DockPanel>
+
+
+            <GridSplitter Grid.ColumnSpan="5" Grid.Row="1" HorizontalAlignment="Stretch"/>
+
+            <!--Timeline Dockpanel-->
+            <DockPanel Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3">
+                <!--Timeline Toolbar-->
+                <ToolBarTray DockPanel.Dock="Top">
+                    <ToolBar>
+                        <TextBlock Style="{StaticResource ToolHeader}">Timeline</TextBlock>
+                    </ToolBar>
+                </ToolBarTray>
+                <!--Timeline Content-->
+                <TextBlock>
+                        This will be a timeline, it's not done, but that is fine!
+                </TextBlock>
+            </DockPanel>
+
+            <!--Log Dockpanel-->
+            <DockPanel Grid.Column="4" Grid.Row="2" Grid.ColumnSpan="1">
+                <!--Log Toolbar-->
+                <ToolBarTray DockPanel.Dock="Top">
+                    <ToolBar>
+                        <TextBlock Style="{StaticResource ToolHeader}">Log</TextBlock>
+                    </ToolBar>
+                </ToolBarTray>
+                <!--Log Content-->
+                <TextBlock>
+                        This will be a Log, it's not done, but that is fine!
+                </TextBlock>
+            </DockPanel>
+        </Grid>
+
+
+    </Grid>
+</Window>
