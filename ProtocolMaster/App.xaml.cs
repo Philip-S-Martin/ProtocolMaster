@@ -3,96 +3,46 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Services;
-using Google.Apis.Util.Store;
+using ProtocolMaster.Component;
+using ProtocolMaster.Component.Google;
 
-using Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
-using System.Collections.Generic;
 
-namespace ProtocolMasterGUI
+namespace ProtocolMaster
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
-        UserCredential credential;
-        private DriveService service;
-        private FileDataStore store;
+        public static App Instance { get { return (App)Application.Current; }}
+        public static MainWindow Window { get { return (MainWindow)Application.Current.MainWindow; } }
+        public bool LoggedIn => Auth.Instance.isAuthenticated();
 
-        public bool LoggedIn
+        void App_Startup(object sender, StartupEventArgs e)
         {
-            get
-            {
-                return credential != null;
-            }
+            Log.Error("ProtocolMaster Starting up");
+            MainWindow = new MainWindow();
+            MainWindow.Show();
+            Log.Out("Application Data: " + Log.Instance.AppData);
         }
 
-
-        public async Task Login()
+        // Full Login Routine
+        public async Task LogIn()
         {
-            store = new FileDataStore("ProtocolMaster/Auth");
-            CancellationTokenSource cts = new CancellationTokenSource();
-            cts.CancelAfter(40000);
-
-            credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-               new ClientSecrets
-               {
-                   ClientId = "749421427281-78b926aib5kcphq6qu09jpvgj265quoc.apps.googleusercontent.com",
-                   ClientSecret = "A7UFlilq-VQTLgyKyfYKVcCY"
-               },
-               new[] { DriveService.Scope.DriveFile },
-               "user", cts.Token, store);
-
-            // Create the drive service.
-            service = new DriveService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Drive API Sample",
-            });
+            await Auth.Instance.Authenticate(Drive.Instance);
         }
 
-        public async Task Logout()
+        public async Task LogOut()
         {
-            credential = null;
-            service = null;
-            await store.ClearAsync();
-
+            await Auth.Instance.DeAuthenticate();
         }
 
-        public string[] test()
+        public async void Window_Closed()
         {
-            FilesResource.ListRequest listRequest = service.Files.List();
-            listRequest.PageSize = 20;
-            listRequest.Fields = "nextPageToken, files(id, name)";
-            listRequest.Q =
-                "mimeType = 'application/vnd.google-apps.folder' and " +
-                "'1GjWe_A_uB53MwC-xVp5KFpMXdPS38iJ7' in parents";
+            await Auth.Instance.DeAuthenticate();
 
-
-            FileList files = listRequest.Execute();
-
-            List<String> res = new List<string>();
-            Console.WriteLine("Files:");
-
-            if (files.Files.Count > 0)
-            {
-                foreach (var file in files.Files)
-                {
-                    res.Add(file.Name);
-                }
-            }
-            else
-            {
-                res.Add("No files found.");
-            }
-            return res.ToArray();
-        }
-        public void Window_Closed()
-        {
-            //store.ClearAsync();
+            Log.Error("ProtocolMaster Mainwindow Exited Gracefully");
+            Log.Instance.WriteFiles();
         }
     }
 }

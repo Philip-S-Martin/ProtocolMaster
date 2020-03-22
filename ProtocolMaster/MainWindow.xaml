@@ -1,9 +1,9 @@
-﻿<Window x:Class="ProtocolMasterGUI.MainWindow"
+﻿<Window x:Class="ProtocolMaster.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ProtocolMasterGUI"
+        xmlns:local="clr-namespace:ProtocolMaster"
         mc:Ignorable="d"
         Title="ProtocolMaster" WindowState="Maximized" Width="900" Height="500"
         Closed="Window_Closed">
@@ -28,28 +28,34 @@
     </Window.Resources>
 
     <!--Content-->
-    <Grid Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
-        <Grid Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Grid.RowSpan="2">
+    <Grid Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Grid.RowSpan="2">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+
+        <!--Left Grid-->
+        <Grid Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="3*" />
-                <RowDefinition Height="5" />
-                <RowDefinition Height="1*" />
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
 
             <!--Google Drive Dockpanel-->
-            <DockPanel Grid.Column="0" Grid.RowSpan="1">
+            <DockPanel Grid.Column="0" Grid.Row="0">
                 <!--Google Drive Toolbar-->
                 <ToolBarTray DockPanel.Dock="Top">
                     <ToolBar>
                         <TextBlock Style="{StaticResource ToolHeader}">Google Drive</TextBlock>
                         <Button Content="Sign-In" Name="AccountButton" Click="Account_Click"/>
+                        <Button Content="Refresh" Name="RefreshButton" Click="Refresh_Click"/>
                     </ToolBar>
                 </ToolBarTray>
                 <!--Google Drive Treeview-->
@@ -63,7 +69,7 @@
             <GridSplitter Grid.Column="1" Grid.RowSpan="1" HorizontalAlignment="Stretch"/>
 
             <!--Camera/Video Dockpanel-->
-            <DockPanel Grid.Column="2" Grid.RowSpan="1">
+            <DockPanel Grid.Column="2" Grid.Row="0" Grid.RowSpan="1">
                 <!--Camera/Video Toolbar-->
                 <ToolBarTray DockPanel.Dock="Top">
                     <ToolBar>
@@ -74,22 +80,7 @@
                 <TextBlock>I am a video/camera of a booth and a rat!</TextBlock>
             </DockPanel>
 
-            <GridSplitter Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Stretch"/>
-
-            <!--Properties Dockpanel-->
-            <DockPanel Grid.Column="4" Grid.RowSpan="1">
-                <ToolBarTray DockPanel.Dock="Top">
-                    <ToolBar>
-                        <TextBlock Style="{StaticResource ToolHeader}">Properties</TextBlock>
-                    </ToolBar>
-                </ToolBarTray>
-                <TextBlock Margin="5,5,5,5" >
-                        This is the properties panel! Hippity hoppity, click and edit properties!
-                </TextBlock>
-            </DockPanel>
-
-
-            <GridSplitter Grid.ColumnSpan="5" Grid.Row="1" HorizontalAlignment="Stretch"/>
+            <GridSplitter Grid.ColumnSpan="3" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch"/>
 
             <!--Timeline Dockpanel-->
             <DockPanel Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3">
@@ -104,21 +95,51 @@
                         This will be a timeline, it's not done, but that is fine!
                 </TextBlock>
             </DockPanel>
+        </Grid>
+
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
+
+
+        <!--Right Grid-->
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <!--Properties Dockpanel-->
+            <DockPanel Grid.Row="0">
+                <ToolBarTray DockPanel.Dock="Top">
+                    <ToolBar>
+                        <TextBlock Style="{StaticResource ToolHeader}">Properties</TextBlock>
+                    </ToolBar>
+                </ToolBarTray>
+                <TextBlock Margin="5,5,5,5" >
+                        This is the properties panel! Hippity hoppity, click and edit properties!
+                </TextBlock>
+            </DockPanel>
+
+            <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch"/>
 
             <!--Log Dockpanel-->
-            <DockPanel Grid.Column="4" Grid.Row="2" Grid.ColumnSpan="1">
+            <DockPanel Grid.Row="2">
                 <!--Log Toolbar-->
                 <ToolBarTray DockPanel.Dock="Top">
                     <ToolBar>
                         <TextBlock Style="{StaticResource ToolHeader}">Log</TextBlock>
+                        <Button Content="Open Folder" Name="LogFolderButton" Click="Log_Folder_Click"/>
+                        <Button Content="Test" Name="LogTest" Click="Log_Test"/>
                     </ToolBar>
                 </ToolBarTray>
                 <!--Log Content-->
-                <TextBlock>
-                        This will be a Log, it's not done, but that is fine!
-                </TextBlock>
+                <FlowDocumentReader Name="LogReader">
+                    <FlowDocument Name="LogDocument" FontFamily="Consolas" FontSize="12">
+
+                    </FlowDocument>
+                </FlowDocumentReader>
             </DockPanel>
         </Grid>
+
 
 
     </Grid>

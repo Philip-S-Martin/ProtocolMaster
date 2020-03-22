@@ -3,37 +3,31 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows;
-using ProtocolMasterLib;
-using AForge.Video;
-using AForge.Video.DirectShow;
-using Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
+using ProtocolMaster.Component;
+using ProtocolMaster.Component.Google;
 
-
-
-namespace ProtocolMasterGUI
+namespace ProtocolMaster
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        App app;
         public MainWindow()
         {
             InitializeComponent();
-            app = (App)App.Current;
         }
 
         // Account Sign-in/Sign-out
         private async void Account_Click(object sender, RoutedEventArgs e)
         {
-            if (app.LoggedIn)
+            if (App.Instance.LoggedIn)
             {
                 AccountButton.IsEnabled = false;
                 AccountButton.Content = "Signing-Out";
-                await app.Logout();
+                await App.Instance.LogOut();
                 AccountButton.Content = "Sign-In";
                 AccountButton.IsEnabled = true;
             }
@@ -43,7 +37,7 @@ namespace ProtocolMasterGUI
                 AccountButton.Content = "Opening Browser";
                 try
                 {
-                    await app.Login();
+                    await App.Instance.LogIn();
                 }
                 catch(OperationCanceledException)
                 {
@@ -56,12 +50,34 @@ namespace ProtocolMasterGUI
             }
         }
 
+        public void Refresh_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
+
+        // Log Functions
+        public void Log(string logString)
+        {
+            Paragraph addLog = new Paragraph();
+            addLog.Inlines.Add(logString);
+            LogDocument.Blocks.Add(addLog);
+            
+            addLog.BringIntoView();
+        }
+
+        public void Log_Folder_Click(object sender, RoutedEventArgs e)
+        {
+            ProtocolMaster.Component.Log.Instance.OpenFolder();
+        }
+        public void Log_Test(object sender, RoutedEventArgs e)
+        {
+            ProtocolMaster.Component.Log.Error("Test");
+        }
 
         // Window Closing Operations
         private void Window_Closed(object sender, EventArgs e)
         {
-            app.Window_Closed();
+            App.Instance.Window_Closed();
         }
     }
 }
