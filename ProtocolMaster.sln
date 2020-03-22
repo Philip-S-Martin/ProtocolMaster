@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtocolMasterLib", "ProtocolMasterLib\ProtocolMasterLib.csproj", "{4EA66595-213C-44D4-807E-BA0F09CB8792}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtocolMaster", "ProtocolMaster\ProtocolMaster.csproj", "{CE4D7148-D741-4ED7-95A1-DC1BD0532E1B}"
 EndProject
 Global
@@ -13,10 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4EA66595-213C-44D4-807E-BA0F09CB8792}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4EA66595-213C-44D4-807E-BA0F09CB8792}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4EA66595-213C-44D4-807E-BA0F09CB8792}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4EA66595-213C-44D4-807E-BA0F09CB8792}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CE4D7148-D741-4ED7-95A1-DC1BD0532E1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CE4D7148-D741-4ED7-95A1-DC1BD0532E1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE4D7148-D741-4ED7-95A1-DC1BD0532E1B}.Release|Any CPU.ActiveCfg = Release|Any CPU

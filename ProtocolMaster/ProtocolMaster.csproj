@@ -15,8 +15,4 @@
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.44.0.1863" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ProtocolMasterLib\ProtocolMasterLib.csproj" />
-  </ItemGroup>
-
 </Project>
