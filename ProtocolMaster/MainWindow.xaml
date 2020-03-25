@@ -6,37 +6,23 @@
         xmlns:local="clr-namespace:ProtocolMaster"
         mc:Ignorable="d"
         Title="ProtocolMaster" WindowState="Maximized" Width="900" Height="500"
+        Loaded="OnLoad"
         Closed="Window_Closed">
     <!--Styles-->
     <Window.Resources>
-        <Style TargetType="Button">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="0,5,0,5"/>
-        </Style>
-        <Style TargetType="ToolBar">
-            <Setter Property="MinWidth" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToolBarTray}}, Path=ActualWidth}"/>
-            <Setter Property="VerticalAlignment" Value="Top"/>
-        </Style>
-        <Style TargetType="TextBlock" x:Key="ToolHeader">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="SlateGray"/>
-            <Setter Property="Margin" Value="0,0,5,0"/>
-        </Style>
-        <Style TargetType="ToolBarTray">
-            <Setter Property="IsLocked" Value="True"/>
-        </Style>
     </Window.Resources>
 
     <!--Content-->
     <Grid Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Grid.RowSpan="2">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="641*"/>
+            <ColumnDefinition Width="75*"/>
             <ColumnDefinition Width="5" />
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="179*" />
         </Grid.ColumnDefinitions>
 
         <!--Left Grid-->
-        <Grid Grid.Column="0">
+        <Grid Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="5" />
@@ -48,96 +34,37 @@
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
 
-            <!--Google Drive Dockpanel-->
-            <DockPanel Grid.Column="0" Grid.Row="0">
-                <!--Google Drive Toolbar-->
-                <ToolBarTray DockPanel.Dock="Top">
-                    <ToolBar>
-                        <TextBlock Style="{StaticResource ToolHeader}">Google Drive</TextBlock>
-                        <Button Content="Sign-In" Name="AccountButton" Click="Account_Click"/>
-                        <Button Content="Refresh" Name="RefreshButton" Click="Refresh_Click"/>
-                    </ToolBar>
-                </ToolBarTray>
-                <!--Google Drive Treeview-->
-                <TreeView  Name="treeView1" BorderThickness="0">
-                    <TreeViewItem Header="McIntyre">
-                        <TreeViewItem Header="VNS AFC Volume Exp"/>
-                    </TreeViewItem>
-                </TreeView>
-            </DockPanel>
+            <!--Google Drive Pane-->
+            <Frame Name="DriveView" Grid.Column="0" Grid.Row="0"/>
 
             <GridSplitter Grid.Column="1" Grid.RowSpan="1" HorizontalAlignment="Stretch"/>
 
             <!--Camera/Video Dockpanel-->
-            <DockPanel Grid.Column="2" Grid.Row="0" Grid.RowSpan="1">
-                <!--Camera/Video Toolbar-->
-                <ToolBarTray DockPanel.Dock="Top">
-                    <ToolBar>
-                        <TextBlock Style="{StaticResource ToolHeader}">Video Feed</TextBlock>
-                    </ToolBar>
-                </ToolBarTray>
-                <!--Camera/Video Content-->
-                <TextBlock>I am a video/camera of a booth and a rat!</TextBlock>
-            </DockPanel>
+            <Frame Name="VideoView" Grid.Column="2" Grid.Row="0" Grid.RowSpan="1" Source="View/VideoPane.xaml"/>
 
             <GridSplitter Grid.ColumnSpan="3" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch"/>
 
             <!--Timeline Dockpanel-->
-            <DockPanel Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3">
-                <!--Timeline Toolbar-->
-                <ToolBarTray DockPanel.Dock="Top">
-                    <ToolBar>
-                        <TextBlock Style="{StaticResource ToolHeader}">Timeline</TextBlock>
-                    </ToolBar>
-                </ToolBarTray>
-                <!--Timeline Content-->
-                <TextBlock>
-                        This will be a timeline, it's not done, but that is fine!
-                </TextBlock>
-            </DockPanel>
+            <Frame Name="TimelineView" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" Source="View/TimelinePane.xaml"/>
         </Grid>
 
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
+        <GridSplitter Grid.Column="2" HorizontalAlignment="Stretch"/>
 
 
         <!--Right Grid-->
-        <Grid Grid.Column="2">
+        <Grid Grid.Column="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="2*"/>
                 <RowDefinition Height="5"/>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
             <!--Properties Dockpanel-->
-            <DockPanel Grid.Row="0">
-                <ToolBarTray DockPanel.Dock="Top">
-                    <ToolBar>
-                        <TextBlock Style="{StaticResource ToolHeader}">Properties</TextBlock>
-                    </ToolBar>
-                </ToolBarTray>
-                <TextBlock Margin="5,5,5,5" >
-                        This is the properties panel! Hippity hoppity, click and edit properties!
-                </TextBlock>
-            </DockPanel>
+            <Frame Name="PropertiesView" Grid.Row="0" Source="View/PropertiesPane.xaml"/>
 
             <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch"/>
 
             <!--Log Dockpanel-->
-            <DockPanel Grid.Row="2">
-                <!--Log Toolbar-->
-                <ToolBarTray DockPanel.Dock="Top">
-                    <ToolBar>
-                        <TextBlock Style="{StaticResource ToolHeader}">Log</TextBlock>
-                        <Button Content="Open Folder" Name="LogFolderButton" Click="Log_Folder_Click"/>
-                        <Button Content="Test" Name="LogTest" Click="Log_Test"/>
-                    </ToolBar>
-                </ToolBarTray>
-                <!--Log Content-->
-                <FlowDocumentReader Name="LogReader">
-                    <FlowDocument Name="LogDocument" FontFamily="Consolas" FontSize="12">
-
-                    </FlowDocument>
-                </FlowDocumentReader>
-            </DockPanel>
+            <Frame Name="LogView" Grid.Row="2"/>
         </Grid>
 
 

@@ -28,6 +28,7 @@ namespace ProtocolMaster.Component
 
         private readonly LogFile lfOut;
         private readonly LogFile lfErr;
+        public bool PrintErrors { get; set; }
 
         private Log()
         {
@@ -45,6 +46,8 @@ namespace ProtocolMaster.Component
             lfOut = new LogFile(logdata + timePrefix + "_Out.log");
             lfErr = new LogFile(logdata + timePrefix + "_Err.log");
 
+            PrintErrors = true;
+
             ArchiveOldest();
         }
         public static Log Instance
@@ -56,9 +59,23 @@ namespace ProtocolMaster.Component
         }
 
         public static void Error(string message) => Log.Instance._Error(message);
-        public void _Error(string message) => lfErr.Write(message);
+        public void _Error(string message)
+        {
+            lfErr.Write(message);
+            if (PrintErrors && App.Window != null && App.Window.Log != null)
+            {
+                App.Window.Log.Log(message.Replace("\t", "\n"));
+            }
+        }
         public static void Out(string message) => Log.Instance._Out(message);
-        public void _Out(string message) => lfOut.Write(message);
+        public void _Out(string message)
+        {
+            lfOut.Write(message);
+            if (PrintErrors && App.Window != null && App.Window.Log != null)
+            {
+                App.Window.Log.Log(message.Replace("\t", "\n"));
+            }
+        }
 
         public void WriteFiles()
         {

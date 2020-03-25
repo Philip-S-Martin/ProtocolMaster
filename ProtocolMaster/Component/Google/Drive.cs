@@ -94,6 +94,11 @@ namespace ProtocolMaster.Component.Google
             } while (result.IncompleteSearch.HasValue && result.IncompleteSearch.Equals(true));
             return list;
         }
+
+        public void CallbackPreBF(MarkupCallback callback)
+        {
+            root.CallbackPreBF(callback);
+        }
         #endregion
 
         // IService Implementation

@@ -12,16 +12,14 @@ namespace ProtocolMaster.Component
         private string filePath;
         private string tempPath;
         bool tempFail;
-        private bool toWindow;
 
-        public LogFile(string filePath, bool toWindow = true)
+        public LogFile(string filePath)
         {
             this.filePath = filePath;
-            this.toWindow = toWindow;
             buffer = new List<string>();
         }
 
-        public bool ToWindow { get => toWindow; set => toWindow = value; }
+        
 
         public void Write(string message, bool deepWrite = false)
         {
@@ -32,10 +30,7 @@ namespace ProtocolMaster.Component
 
             buffer.Add(output);
 
-            if (toWindow && App.Window != null)
-            {
-                App.Window.Log(output.Replace("\t", "\n"));
-            }
+            
             if (deepWrite || DateTime.Now.Ticks > writeAfter)
             {
                 WriteBuffer();

@@ -6,7 +6,7 @@ using Google.Apis.Auth.OAuth2;
 
 namespace ProtocolMaster.Component.Google
 {
-    public class Sheets : IService
+    public sealed class Sheets : IService
     {
         // IService Implementation
         private static string[] serviceTokens =
