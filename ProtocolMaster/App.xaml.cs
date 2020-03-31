@@ -29,7 +29,7 @@ namespace ProtocolMaster
         // Full Login Routine
         public async Task LogIn()
         {
-            await Auth.Instance.Authenticate(Drive.Instance);
+            await Auth.Instance.Authenticate(Drive.Instance, Sheets.Instance);
         }
 
         public async Task LogOut()

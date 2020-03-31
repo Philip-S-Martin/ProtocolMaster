@@ -15,10 +15,9 @@
     <!--Content-->
     <Grid Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Grid.RowSpan="2">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="641*"/>
-            <ColumnDefinition Width="75*"/>
+            <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="5" />
-            <ColumnDefinition Width="179*" />
+            <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
 
         <!--Left Grid-->
@@ -48,11 +47,11 @@
             <Frame Name="TimelineView" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" Source="View/TimelinePane.xaml"/>
         </Grid>
 
-        <GridSplitter Grid.Column="2" HorizontalAlignment="Stretch"/>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
 
 
         <!--Right Grid-->
-        <Grid Grid.Column="3">
+        <Grid Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="2*"/>
                 <RowDefinition Height="5"/>

@@ -10,9 +10,14 @@
     <PackageReference Include="AForge" Version="2.2.5" />
     <PackageReference Include="AForge.Video" Version="2.2.5" />
     <PackageReference Include="AForge.Video.DirectShow" Version="2.2.5" />
-    <PackageReference Include="Google.Apis" Version="1.44.0" />
-    <PackageReference Include="Google.Apis.Auth" Version="1.44.0" />
+    <PackageReference Include="Google.Apis" Version="1.44.1" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.44.1" />
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.44.0.1863" />
+    <PackageReference Include="Google.Apis.Sheets.v4" Version="1.44.1.1895" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Component\Model\" />
   </ItemGroup>
 
 </Project>

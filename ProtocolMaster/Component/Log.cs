@@ -12,8 +12,8 @@ namespace ProtocolMaster.Component
     public sealed class Log
     {
         private static readonly Log instance = new Log();
-        // Explicit static constructor to tell C# compiler  
-        // not to mark type as beforefieldinit  
+        // Explicit static constructor to tell C# compiler
+        // not to mark type as beforefieldinit
         static Log()
         {
         }
