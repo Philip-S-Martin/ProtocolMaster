@@ -10,7 +10,7 @@ namespace ProtocolMaster.Component.Google
 {
     public sealed class Drive : IService
     {
-        private static readonly Drive instance = new Drive(); 
+        private static readonly Drive instance = new Drive();
         static Drive()
         {
         }
@@ -24,21 +24,24 @@ namespace ProtocolMaster.Component.Google
                 return instance;
             }
         }
+
+
+        // Core Drive Functionality. 
+        // This all needs to be abstracted somewhere else (Model)
         const string ROOT_FOLDER_NAME = "ProtocolMaster";
         private TreeFile root;
         private DriveService service;
-
-        // Core Drive Functionality
         #region
         private void FindRoot()
         {
-            Log.Error("FindRoot(): FINDIND ROOT FOLDER");
+            Log.Error("FindRoot(): FINDING ROOT FOLDER");
             FilesResource.ListRequest listRequest = service.Files.List();
             listRequest.PageSize = 20;
-            listRequest.Fields = "nextPageToken, files(id, name)";
+            listRequest.Fields = "nextPageToken, files(id, name, mimeType)";
             listRequest.Q =
                 "mimeType = 'application/vnd.google-apps.folder' and " +
-                "name = '" + ROOT_FOLDER_NAME + "'";
+                "name = '" + ROOT_FOLDER_NAME + "' and" +
+                "trashed = false";
 
             FileList files = listRequest.Execute();
 
@@ -60,22 +63,27 @@ namespace ProtocolMaster.Component.Google
         }
         private void CreateRoot()
         {
-            root = new TreeFile(CreateFolder(ROOT_FOLDER_NAME));
+            root = null;
+            root = CreateFolder(ROOT_FOLDER_NAME);
         }
-        public File CreateFolder(string name, TreeFile parent = null)
+        public TreeFile CreateFolder(string name, TreeFile parent = null)
         {
             // Prepare the file
-            File newRoot = new File();
-            newRoot.Name = name;
-            newRoot.MimeType = "application/vnd.google-apps.folder";
+            File newFile = new File();
+            newFile.Name = name;
+            newFile.MimeType = "application/vnd.google-apps.folder";
+            if (parent == null)
+            {
+                parent = root;
+            }
             if (parent != null)
             {
-                newRoot.Parents = new List<string>() { parent.Id };
+                newFile.Parents = new List<string>() { parent.File.Id };
             }
             // Create the file on Google Server
-            FilesResource.CreateRequest create = service.Files.Create(newRoot);
-            create.Fields = "id";
-            return new TreeFile(create.Execute(), parent);
+            FilesResource.CreateRequest create = service.Files.Create(newFile);
+            create.Fields = "id, parents, mimeType, name";
+            return parent.AddChild(create.Execute());
         }
         public List<File> GetChildren(File parent)
         {
@@ -85,19 +93,28 @@ namespace ProtocolMaster.Component.Google
             {
                 FilesResource.ListRequest listRequest = service.Files.List();
                 listRequest.PageSize = 20;
-                listRequest.Fields = "nextPageToken, files(id, name)";
+                listRequest.Fields = "nextPageToken, files(id, name, mimeType, parents)";
                 listRequest.Q =
                     "mimeType = 'application/vnd.google-apps.folder' and " +
-                    "'" + parent.Id + "' in parents";
+                    "'" + parent.Id + "' in parents and" +
+                    "trashed = false";
                 result = listRequest.Execute();
                 list.AddRange(result.Files);
             } while (result.IncompleteSearch.HasValue && result.IncompleteSearch.Equals(true));
             return list;
         }
+        public void Refresh(MarkupCallback callback = null)
+        {
+            root = null;
+            FindRoot();
+            if (callback != null)
+                CallbackPreBF(callback);
+        }
 
         public void CallbackPreBF(MarkupCallback callback)
         {
-            root.CallbackPreBF(callback);
+            if(Auth.Instance.isAuthenticated())
+                root.CallbackPreBF(callback);
         }
         #endregion
 

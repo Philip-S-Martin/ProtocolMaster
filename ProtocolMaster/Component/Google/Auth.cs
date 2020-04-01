@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Util.Store;
 
-
 using File = Google.Apis.Drive.v3.Data.File;
 
 namespace ProtocolMaster.Component.Google
@@ -63,19 +62,16 @@ namespace ProtocolMaster.Component.Google
         
         private string[] CombineServiceTokens(IService[] services)
         {
-            string[] builderPrev;
-            string[] builderNext = services[0].ServiceTokens();
-            int merged = 1;
-            while (merged < services.Length)
+            List<string> builder = new List<string>();
+            foreach(IService service in services)
             {
-                builderPrev = builderNext;
-                builderNext = new string[builderPrev.Length + services[merged].ServiceTokens().Length];
-                builderPrev.CopyTo(builderNext, 0);
-                services[merged].ServiceTokens().CopyTo(builderNext, builderNext.Length);
-                merged++;
+                foreach(string token in service.ServiceTokens())
+                {
+                    builder.Add(token);
+                }
             }
             
-            return builderNext;
+            return builder.ToArray();
         }
 
         public async Task DeAuthenticate()

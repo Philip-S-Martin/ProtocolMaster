@@ -1,4 +1,5 @@
-﻿<Page x:Class="ProtocolMaster.View.DrivePane"
+﻿
+    <Page x:Class="ProtocolMaster.View.DrivePane"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -15,10 +16,12 @@
                     <TextBlock Style="{StaticResource ToolHeader}">Google Drive</TextBlock>
                     <Button Content="Sign-In" Name="AccountButton" Click="Account_Click"/>
                     <Button Content="Refresh" Name="RefreshButton" Click="Refresh_Click"/>
+                    <Button Content="New Folder" Name="FolderButton" Click="Folder_Click"/>
+                    <Button IsEnabled="False">Poop Button!</Button>
                 </ToolBar>
             </ToolBarTray>
             <!--Google Drive Treeview-->
-            <TreeView  Name="FileTree" BorderThickness="0">
+            <TreeView  Name="FileTree" BorderThickness="0" Background="White">
                 <TreeViewItem Header="McIntyre">
                     <TreeViewItem Header="VNS AFC Volume Exp"/>
                 </TreeViewItem>
