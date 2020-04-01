@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,10 +21,14 @@ namespace ProtocolMaster.View
     /// </summary>
     public partial class DrivePane : Page
     {
+        Dictionary<string, TreeViewItem> idDictionary;
+
         public DrivePane()
         {
+            idDictionary = new Dictionary<string, TreeViewItem>();
             InitializeComponent();
         }
+
 
         // Account Sign-in/Sign-out
         private async void Account_Click(object sender, RoutedEventArgs e)
@@ -53,26 +58,42 @@ namespace ProtocolMaster.View
                 AccountButton.Content = "Sign-Out";
                 AccountButton.IsEnabled = true;
             }
+            Refresh();
         }
 
         public void Refresh_Click(object sender, RoutedEventArgs e)
         {
+            Refresh();
+        }
+
+        public void Refresh()
+        {
             FileTree.Items.Clear();
+            idDictionary.Clear();
+            
             MarkupCallback callback = Display_Tree_Child;
-            Drive.Instance.CallbackPreBF(callback);
+            Drive.Instance.Refresh(callback);
+        }
+
+        public void Folder_Click(object sender, RoutedEventArgs e)
+        {
+            Drive.Instance.CreateFolder("New Folder").Callback(Display_Tree_Child);
         }
 
         public void Display_Tree_Child(string parentName, string name, string header)
         {
             TreeViewItem child = new TreeViewItem();
-            child.Resources.Add(name, "");
+            idDictionary.Add(name, child);
             child.Header = header;
 
             if (parentName != null)
             {
                 TreeViewItem parent;
-                parent = (TreeViewItem)FileTree.FindResource(parentName);
-                parent.Items.Add(child);
+                idDictionary.TryGetValue(parentName, out parent);
+                if(parent != null)
+                    parent.Items.Add(child);
+                else
+                    FileTree.Items.Add(child);
             }
             else
             {
