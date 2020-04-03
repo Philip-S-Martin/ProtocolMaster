@@ -20,4 +20,8 @@
     <Folder Include="Component\Model\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="System.IO.Compression" />
+  </ItemGroup>
+
 </Project>

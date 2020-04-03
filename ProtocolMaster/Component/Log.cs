@@ -58,7 +58,7 @@ namespace ProtocolMaster.Component
             }
         }
 
-        public static void Error(string message) => Log.Instance._Error(message);
+        public static void Error(string message) => App.Current.Dispatcher.Invoke(new Action(() => { Log.Instance._Error(message); })) ;
         public void _Error(string message)
         {
             lfErr.Write(message);
@@ -67,7 +67,7 @@ namespace ProtocolMaster.Component
                 App.Window.Log.Log(message.Replace("\t", "\n"));
             }
         }
-        public static void Out(string message) => Log.Instance._Out(message);
+        public static void Out(string message) => App.Current.Dispatcher.Invoke(new Action(() => { Log.Instance._Out(message); }));
         public void _Out(string message)
         {
             lfOut.Write(message);
