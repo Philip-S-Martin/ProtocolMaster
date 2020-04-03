@@ -30,7 +30,6 @@ namespace ProtocolMaster.Component
 
             buffer.Add(output);
 
-            
             if (deepWrite || DateTime.Now.Ticks > writeAfter)
             {
                 WriteBuffer();

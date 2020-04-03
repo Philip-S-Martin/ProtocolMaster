@@ -8,7 +8,7 @@ namespace ProtocolMaster.Component.Google
 {
     public interface IService
     {
-        internal string[] ServiceTokens();
-        internal void CreateService(UserCredential credential);
+        string[] ServiceTokens();
+        void CreateService(UserCredential credential);
     }
 }
