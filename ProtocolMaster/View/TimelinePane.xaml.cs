@@ -14,8 +14,8 @@ namespace ProtocolMaster.View
 
         public void ListDriver(string name)
         {
-            ComboBoxItem newDriver = new ComboBoxItem();
-            newDriver.Content = name;
+            MenuItem newDriver = new MenuItem();
+            newDriver.Header = name;
             DriverDropdown.Items.Add(newDriver);
         }
     }

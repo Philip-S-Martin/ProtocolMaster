@@ -22,7 +22,7 @@ namespace ProtocolMaster.Component.Drivers
 
         public static bool TryRemove(string targetPort)
         {
-
+            throw new NotImplementedException();
         }
 
         public static string[] AvailablePorts()
@@ -32,6 +32,7 @@ namespace ProtocolMaster.Component.Drivers
             {
                 // try to connect to each and identify it
             }
+            throw new NotImplementedException();
         }
     }
 }

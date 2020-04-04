@@ -8,13 +8,11 @@
       d:DesignHeight="900" d:DesignWidth="900"
       Title="VideoPane">
 
-    <DockPanel Background="White">
+    <DockPanel >
         <!--Camera/Video Toolbar-->
-        <ToolBarTray DockPanel.Dock="Top">
-            <ToolBar>
+        <Menu DockPanel.Dock="Top">
                 <TextBlock Style="{StaticResource ToolHeader}">Video Feed</TextBlock>
-            </ToolBar>
-        </ToolBarTray>
+        </Menu>
         <!--Camera/Video Content-->
         <TextBlock>I am a video/camera of a booth and a rat!</TextBlock>
     </DockPanel>

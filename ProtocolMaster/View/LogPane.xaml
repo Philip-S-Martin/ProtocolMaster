@@ -8,15 +8,13 @@
       d:DesignHeight="500" d:DesignWidth="500"
       Title="LogPane">
 
-    <DockPanel Background="White">
+    <DockPanel >
         <!--Log Toolbar-->
-        <ToolBarTray DockPanel.Dock="Top">
-            <ToolBar>
-                <TextBlock Style="{StaticResource ToolHeader}">Log</TextBlock>
-                <Button Content="Open Folder" Name="LogFolderButton" Click="Log_Folder_Click"/>
-                <Button Content="Test" Name="LogTest" Click="Log_Test"/>
-            </ToolBar>
-        </ToolBarTray>
+        <Menu DockPanel.Dock="Top">
+            <TextBlock Style="{StaticResource ToolHeader}">Log</TextBlock>
+            <MenuItem Header="Open Folder" Name="LogFolderButton" Click="Log_Folder_Click"/>
+            <MenuItem Header="Test" Name="LogTest" Click="Log_Test"/>
+        </Menu>
         <!--Log Content-->
         <FlowDocumentReader Name="LogReader">
             <FlowDocument Name="LogDocument" FontFamily="Consolas" FontSize="12">
