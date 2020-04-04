@@ -4,14 +4,15 @@
 #include "Process.h"
 #include "Input.h"
 
-#define FILE_SCHEDULINO 3
+#define FILE_SCHEDULINO 0
 
 /*
 Files are labeled as such for serial error output:
 
+00: Schedulino (.h and .ino)
 01: Input
 02: Process
-03: Schedulino (.h and .ino)
+03: States
 04: Globals
 */
 
