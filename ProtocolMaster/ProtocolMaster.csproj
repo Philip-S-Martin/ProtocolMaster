@@ -4,6 +4,15 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net48</TargetFramework>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>ProtocolMaster.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>C:\Users\phili\build\ProtocolMaster\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>C:\Users\phili\build\ProtocolMaster\net48</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,10 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Component\Model\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <Reference Include="System.ComponentModel.Composition">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.ComponentModel.Composition.dll</HintPath>
+    </Reference>
     <Reference Include="System.IO.Compression" />
   </ItemGroup>
 

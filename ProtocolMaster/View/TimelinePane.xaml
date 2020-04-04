@@ -13,6 +13,9 @@
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
                 <TextBlock Style="{StaticResource ToolHeader}">Timeline</TextBlock>
+                <ComboBox MinWidth="100" Name="DriverDropdown">
+                    
+                </ComboBox>
             </ToolBar>
         </ToolBarTray>
         <!--Timeline Content-->

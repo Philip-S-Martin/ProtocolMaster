@@ -8,7 +8,6 @@ void setup()
 {
   Serial.begin(9600);
   _Process_Reset();
-  Reply();
 }
 
 void loop()
