@@ -33,7 +33,7 @@ namespace ProtocolMaster
             Video = new VideoPane();
             DriveView.Navigate(Drive);
             LogView.Navigate(Log);
-            //PropertiesView.Navigate(Properties);
+            PropertiesView.Navigate(Properties);
             TimelineView.Navigate(Timeline);
             VideoView.Navigate(Video);
         }

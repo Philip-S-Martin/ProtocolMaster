@@ -17,7 +17,7 @@ void (*Process_Map_Functions[enum_state_count])() = {_Process_Setup, _Process_Ru
 // This processes the global state using the Process Map
 void Schedule_Process()
 {
-  for(byte i = 0; i < enum_state_count; i++)
+  for(char i = 0; i < enum_state_count; i++)
   {
     if(state == Process_Map_States[i])
     {
@@ -27,7 +27,7 @@ void Schedule_Process()
   }
   // If it made it to this point, the state is 
   // invalid because it is not in the map!
-  Error(FILE_PROCESS, 1, 0);
+  Error(FILE_PROCESS, 1);
 }
 
 void _Process_Setup()
@@ -40,13 +40,13 @@ void _Process_Running()
     run_time = time - run_offset;
   else
     run_time = UINT32_MAX - run_offset + time;
-  while(schedule.first < schedule.end && schedule.time[schedule.first] <= run_time)
+  while(schedule_first < schedule_end && schedule_time[schedule_first] <= run_time)
   {
-    digitalWrite(schedule.pin[schedule.first], schedule.state[schedule.first]);
-    schedule.time[schedule.first] = run_time;
-    schedule.first++;
+    digitalWrite(schedule_pin[schedule_first], schedule_state_get(schedule_first));
+    schedule_time[schedule_first] = run_time;
+    schedule_first++;
   }
-  if(schedule.first >= schedule.end)
+  if(schedule_first >= schedule_end)
   {
     _Process_Done();
   }
@@ -55,22 +55,21 @@ void _Process_Running()
 void _Process_Reset()
 {
   _Process_Done();
-  schedule.end = 0;
-  Capacity();
+  schedule_end = 0;
 }
 
 void _Process_Done()
 {
   Done();
-  for(schedule.first = 0; schedule.first < schedule.end; schedule.first++)
+  for(schedule_first = 0; schedule_first < schedule_end; schedule_first++)
   {
-    Report(schedule.first);
+    Report(schedule_first);
   }
-  schedule.first = 0;
+  schedule_first = 0;
   run_time = 0;
   run_offset = 0;
 
-  for(byte i = 2; i < 19; i++)
+  for(char i = 2; i < 19; i++)
   {
     pinMode(i, OUTPUT);
     digitalWrite(i, LOW);
