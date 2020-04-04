@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProtocolMaster.Component.Drivers
+namespace LegacyAFC
 {
-    class Schedulino
+    class Interpreter
     {
     }
 }
