@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtocolMaster", "ProtocolMaster\ProtocolMaster.csproj", "{CE4D7148-D741-4ED7-95A1-DC1BD0532E1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulinoDriver", "SchedulinoDriver\SchedulinoDriver.csproj", "{EDBA6B70-6719-4118-977D-F10BA534B394}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegacyAFC", "LegacyAFCInterpreter\LegacyAFC.csproj", "{3A9B768C-26DB-4505-991F-3A28A871DA40}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{CE4D7148-D741-4ED7-95A1-DC1BD0532E1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE4D7148-D741-4ED7-95A1-DC1BD0532E1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE4D7148-D741-4ED7-95A1-DC1BD0532E1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDBA6B70-6719-4118-977D-F10BA534B394}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDBA6B70-6719-4118-977D-F10BA534B394}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDBA6B70-6719-4118-977D-F10BA534B394}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDBA6B70-6719-4118-977D-F10BA534B394}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A9B768C-26DB-4505-991F-3A28A871DA40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A9B768C-26DB-4505-991F-3A28A871DA40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A9B768C-26DB-4505-991F-3A28A871DA40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A9B768C-26DB-4505-991F-3A28A871DA40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
