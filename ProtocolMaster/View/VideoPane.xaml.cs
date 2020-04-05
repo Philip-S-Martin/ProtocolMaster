@@ -52,7 +52,7 @@ namespace ProtocolMaster.View
             IpCameraUrl = "http://88.53.197.250/axis-cgi/mjpg/video.cgi?resolution=320×240";
             
             InitializeComponent();
-            this.Closing += (s, e) => (this.DataContext as IDisposable).Dispose();
+            //this.Closing += (s, e) => (this.DataContext as IDisposable).Dispose();
         }
 
 
