@@ -9,17 +9,18 @@
       Title="LogPane">
 
     <DockPanel >
-        <!--Log Toolbar-->
-        <Menu DockPanel.Dock="Top">
-            <TextBlock Style="{StaticResource ToolHeader}">Log</TextBlock>
-            <MenuItem Header="Open Folder" Name="LogFolderButton" Click="Log_Folder_Click"/>
-            <MenuItem Header="Test" Name="LogTest" Click="Log_Test"/>
-        </Menu>
+        <DockPanel DockPanel.Dock="Top" Style="{StaticResource Menu}">
+            <TextBlock Style="{StaticResource MenuHeader}" DockPanel.Dock="Top">Log</TextBlock>
+            <Menu>
+                <MenuItem Header="Open Folder" Name="LogFolderButton" Click="Log_Folder_Click"/>
+                <MenuItem Header="Test" Name="LogTest" Click="Log_Test"/>
+            </Menu>
+        </DockPanel>
         <!--Log Content-->
-        <FlowDocumentReader Name="LogReader">
+        <FlowDocumentScrollViewer Name="LogReader">
             <FlowDocument Name="LogDocument" FontFamily="Consolas" FontSize="12">
 
             </FlowDocument>
-        </FlowDocumentReader>
+        </FlowDocumentScrollViewer>
     </DockPanel>
 </Page>

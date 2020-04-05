@@ -10,9 +10,12 @@
 
     <DockPanel >
         <!--Camera/Video Toolbar-->
-        <Menu DockPanel.Dock="Top">
-                <TextBlock Style="{StaticResource ToolHeader}">Video Feed</TextBlock>
-        </Menu>
+        <DockPanel DockPanel.Dock="Top" Style="{StaticResource Menu}">
+            <TextBlock Style="{StaticResource MenuHeader}" DockPanel.Dock="Top">Video Feed</TextBlock>
+            <Menu>
+                <MenuItem Header="Menu Button"/>
+            </Menu>
+        </DockPanel>
         <!--Camera/Video Content-->
         <TextBlock>I am a video/camera of a booth and a rat!</TextBlock>
     </DockPanel>

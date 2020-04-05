@@ -10,12 +10,12 @@
 
     <DockPanel >
         <!--Timeline Toolbar-->
-        <Menu DockPanel.Dock="Top">
-            <TextBlock Style="{StaticResource ToolHeader}">Timeline</TextBlock>
-                <MenuItem Name="DriverDropdown" Header="Driver">
-
-                </MenuItem>
-        </Menu>
+        <DockPanel DockPanel.Dock="Top" Style="{StaticResource Menu}">
+            <TextBlock Style="{StaticResource MenuHeader}" DockPanel.Dock="Top">Timeline</TextBlock>
+            <Menu>
+                <MenuItem Name="DriverDropdown" Header="Driver"/>
+            </Menu>
+        </DockPanel>
         <!--Timeline Content-->
         <TextBlock>
                         This will be a timeline, it's not done, but that is fine!

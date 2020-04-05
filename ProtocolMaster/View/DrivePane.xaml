@@ -10,14 +10,16 @@
 
     <DockPanel>
         <!--Google Drive Toolbar-->
-        <Menu DockPanel.Dock="Top">
-            <TextBlock Style="{StaticResource ToolHeader}">Drive</TextBlock>
-            <MenuItem Header="Sign-In" Name="AccountButton" Click="Account_Click"/>
-            <MenuItem Header="Refresh" Name="RefreshButton" Click="Refresh_Click"/>
-            <MenuItem Header="New Folder" Name="FolderButton" Click="Folder_Click"/>
-        </Menu>
+        <DockPanel DockPanel.Dock="Top" Style="{StaticResource Menu}">
+            <TextBlock Style="{StaticResource MenuHeader}" DockPanel.Dock="Top">Drive</TextBlock>
+            <Menu>
+                <MenuItem Header="Sign-In" Name="AccountButton" Click="Account_Click"/>
+                <MenuItem Header="Refresh" Name="RefreshButton" Click="Refresh_Click"/>
+                <MenuItem Header="New Folder" Name="FolderButton" Click="Folder_Click"/>
+            </Menu>
+        </DockPanel>
         <!--Google Drive Treeview-->
-        <TreeView  Name="FileTree" BorderThickness="0" >
+        <TreeView  Name="FileTree" BorderThickness="0" Background="Transparent" >
             <TreeViewItem Header="McIntyre">
                 <TreeViewItem Header="VNS AFC Volume Exp"/>
             </TreeViewItem>
