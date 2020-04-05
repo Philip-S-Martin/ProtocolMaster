@@ -19,7 +19,7 @@ namespace ProtocolMaster.Component
             buffer = new List<string>();
         }
 
-        
+
 
         public void Write(string message, bool deepWrite = false)
         {

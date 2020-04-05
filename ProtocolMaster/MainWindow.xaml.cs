@@ -8,13 +8,15 @@ using System.Windows;
 using ProtocolMaster.Component;
 using ProtocolMaster.View;
 using ProtocolMaster.Component.Google;
+using MahApps.Metro.Controls;
+
 
 namespace ProtocolMaster
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         public DrivePane Drive { get; private set; }
         public LogPane Log { get; private set; }
@@ -33,7 +35,7 @@ namespace ProtocolMaster
             Video = new VideoPane();
             DriveView.Navigate(Drive);
             LogView.Navigate(Log);
-            PropertiesView.Navigate(Properties);
+            //PropertiesView.Navigate(Properties);
             TimelineView.Navigate(Timeline);
             VideoView.Navigate(Video);
         }

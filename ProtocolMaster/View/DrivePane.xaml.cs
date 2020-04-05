@@ -36,26 +36,28 @@ namespace ProtocolMaster.View
             if (App.Instance.LoggedIn)
             {
                 AccountButton.IsEnabled = false;
-                AccountButton.Content = "Signing-Out";
+                AccountButton.ToolTip = "Signing-Out";
                 await App.Instance.LogOut();
-                AccountButton.Content = "Sign-In";
+                AccountButton.Header = "Sign-In";
+                AccountButton.ToolTip = "Google Drive";
                 AccountButton.IsEnabled = true;
             }
             else
             {
                 AccountButton.IsEnabled = false;
-                AccountButton.Content = "Opening Browser";
+                AccountButton.ToolTip = "Opening Browser";
                 try
                 {
                     await App.Instance.LogIn();
                 }
                 catch (OperationCanceledException)
                 {
-                    AccountButton.Content = "Sign-In";
+                    AccountButton.Header = "Sign-In";
                     AccountButton.IsEnabled = true;
                     return;
                 }
-                AccountButton.Content = "Sign-Out";
+                AccountButton.Header = "Sign-Out";
+                AccountButton.ToolTip = "Google Drive";
                 AccountButton.IsEnabled = true;
             }
             Refresh();

@@ -8,13 +8,14 @@
       d:DesignHeight="300" d:DesignWidth="1200"
       Title="TimelinePane">
 
-    <DockPanel Background="White">
+    <DockPanel >
         <!--Timeline Toolbar-->
-        <ToolBarTray DockPanel.Dock="Top">
-            <ToolBar>
-                <TextBlock Style="{StaticResource ToolHeader}">Timeline</TextBlock>
-            </ToolBar>
-        </ToolBarTray>
+        <DockPanel DockPanel.Dock="Top" Style="{StaticResource Menu}">
+            <TextBlock Style="{StaticResource MenuHeader}" DockPanel.Dock="Top">Timeline</TextBlock>
+            <Menu>
+                <MenuItem Name="DriverDropdown" Header="Driver"/>
+            </Menu>
+        </DockPanel>
         <!--Timeline Content-->
         <TextBlock>
                         This will be a timeline, it's not done, but that is fine!
