@@ -29,8 +29,6 @@ namespace ProtocolMaster.View
             Paragraph addLog = new Paragraph();
             addLog.Inlines.Add(logString);
             LogDocument.Blocks.Add(addLog);
-
-            addLog.BringIntoView();
         }
 
         public void Log_Folder_Click(object sender, RoutedEventArgs e)
