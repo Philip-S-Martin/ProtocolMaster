@@ -36,7 +36,8 @@
     <SolidColorBrush x:Key="AccentColorBrush4" Color="{StaticResource AccentColor4}" options:Freeze="True" />
 
     <SolidColorBrush x:Key="WindowTitleColorBrush" Color="{StaticResource AccentColor}" options:Freeze="True" />
-
+    <SolidColorBrush x:Key="NonActiveWindowTitleColorBrush" Color="{StaticResource AccentColor}" options:Freeze="True" />
+    
     <LinearGradientBrush x:Key="ProgressBrush" StartPoint="1.002,0.5" EndPoint="0.001,0.5" options:Freeze="True">
         <GradientStop Offset="0" Color="{StaticResource HighlightColor}" />
         <GradientStop Offset="1" Color="{StaticResource AccentColor3}" />
@@ -64,7 +65,6 @@
     <SolidColorBrush x:Key="MahApps.Metro.Brushes.ToggleSwitchButton.ThumbIndicatorCheckedBrush.Win10" Color="{StaticResource IdealForegroundColor}" options:Freeze="True" />
 
     <Style x:Key="ContentGrid" TargetType="Grid">
-
         <Setter Property="Margin" Value="5"/>
         <Setter Property="Background" Value="{DynamicResource MenuBackgroundBrush}"/>
     </Style>
