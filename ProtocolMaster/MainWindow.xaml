@@ -1,24 +1,50 @@
-﻿<Window x:Class="ProtocolMaster.MainWindow"
+﻿<Controls:MetroWindow x:Class="ProtocolMaster.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ProtocolMaster"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ProtocolMaster"
-        mc:Ignorable="d"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         Title="ProtocolMaster" WindowState="Maximized" Width="900" Height="500"
         Loaded="OnLoad"
-        Closed="Window_Closed">
-    <!--Styles-->
-    <Window.Resources>
-    </Window.Resources>
+        Closed="Window_Closed"
+        mc:Ignorable="d">
+    <!--Controls-->
 
+    <Controls:MetroWindow.LeftWindowCommands>
+        <Controls:WindowCommands>
+            <Menu Margin="5,0,0,0">
+                <MenuItem Header="File" >
+                    <MenuItem Header="Drivers" IsEnabled="False" />
+                    <MenuItem Header="Interpreters" IsEnabled="False" />
+                </MenuItem>
+                <MenuItem Header="Google" >
+                    <TextBlock>Account:<TextBlock>Not logged in</TextBlock></TextBlock>
+                    <MenuItem Header="Sign-in" IsEnabled="False"/>
+                    <MenuItem Header="Refresh" IsEnabled="False"/>
+                </MenuItem>
+            </Menu>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.LeftWindowCommands>
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <Menu >
+                <MenuItem Header="Help">
+                    <MenuItem Header="Online Documentation" IsEnabled="False"/>
+                </MenuItem>
+            </Menu>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
     <!--Content-->
-    <Grid Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Grid.RowSpan="2">
+
+    <Grid Grid.RowSpan="2" Style="{StaticResource ContentGrid}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="5" />
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
+
+
 
         <!--Left Grid-->
         <Grid Grid.Column="0" Grid.ColumnSpan="2">
@@ -34,7 +60,7 @@
             </Grid.RowDefinitions>
 
             <!--Google Drive Pane-->
-            <Frame Name="DriveView" Grid.Column="0" Grid.Row="0"/>
+            <Frame Name="DriveView" Grid.Column="0" Grid.Row="0" Source="View/DrivePane.xaml"/>
 
             <GridSplitter Grid.Column="1" Grid.RowSpan="1" HorizontalAlignment="Stretch"/>
 
@@ -57,16 +83,17 @@
                 <RowDefinition Height="5"/>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
+
+
             <!--Properties Dockpanel-->
-            <Frame Name="PropertiesView" Grid.Row="0" Source="View/PropertiesPane.xaml"/>
+            <!--<Frame Name="PropertiesView" Grid.Row="0" Source="View/PropertiesPane.xaml"/>
 
-            <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch"/>
-
+            <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch"/>-->
             <!--Log Dockpanel-->
-            <Frame Name="LogView" Grid.Row="2"/>
+            <Frame Name="LogView" Grid.Row="0" Grid.RowSpan="3" Source="View/LogPane.xaml"/>
         </Grid>
 
 
 
     </Grid>
-</Window>
+</Controls:MetroWindow>

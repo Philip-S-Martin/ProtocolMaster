@@ -4,73 +4,96 @@
 #define FILE_GLOBALS 4
 
 // STATES
-const char enum_state_count = 3;
-typedef enum 
+const byte enum_state_count = 3;
+typedef enum
 {
-  SETUP,
+  SETUP = 0,
   RUNNING,
   RESET
 } enum_state;
 enum_state state = SETUP;
 
 // SCHEDULE
-unsigned long time = 0;
-unsigned long elapsed = 0;
+uint32_t time = 0;
+uint32_t elapsed = 0;
 
-unsigned long run_time = 0;
-unsigned long run_offset = 0;
-
-short schedule_first = 0;
-short schedule_end = 0;
+uint32_t run_time = 0;
+uint32_t run_offset = 0;
 
 #define SCHEDULE_MAX_EVENTS 192
-unsigned long schedule_time[SCHEDULE_MAX_EVENTS];
-unsigned char schedule_pin[SCHEDULE_MAX_EVENTS];
-char _schedule_state[SCHEDULE_MAX_EVENTS/8];
-
-void schedule_state_set(short i, bool value)
+typedef struct
 {
-  char flag = 1 << (i & 7);
-  i = i >> 3;
-  _schedule_state[i] = _schedule_state[i] & flag;
+  uint16_t first = 0;
+  uint16_t end = 0;
+  uint32_t time[SCHEDULE_MAX_EVENTS];
+  byte pin[SCHEDULE_MAX_EVENTS];
+  byte state[SCHEDULE_MAX_EVENTS];
+} schedule_data;
+schedule_data schedule;
+
+// SERIAL HELPERS
+
+void WriteBytes(uint32_t target)
+{
+  byte sendBuf[4];
+  sendBuf[3] = (byte) target & 255;
+  sendBuf[2] = (byte) (target >> 8) & 255;
+  sendBuf[1] = (byte) (target >> 16) & 255;
+  sendBuf[0] = (byte) (target >> 24) & 255;
+  Serial.write(sendBuf, 4);
 }
 
-bool schedule_state_get(short i)
+void WriteBytes(uint16_t target)
 {
-  char shift = (i & 7);
-  i = i >> 3;
-  return (_schedule_state[i] >> shift) & 1;
+  byte sendBuf[2];
+  sendBuf[1] = (byte) target & 255;
+  sendBuf[0] = (byte) (target >> 8) & 255;
+  Serial.write(sendBuf, 2);
+}
+
+void WriteBytes(byte target)
+{
+  Serial.write((byte)target);
 }
 
 // SERIAL IO
 
-void Error(byte file, short error)
+void Error(byte file, byte error, byte ext)
 {
-  Serial.write("E");
-  Serial.write(file);
-  Serial.write(error);
+  WriteBytes((byte)'E');
+  WriteBytes(file);
+  WriteBytes(error);
+  WriteBytes(ext);
 }
 
 void Reply()
 {
-  Serial.write("R");
-  Serial.write((byte)Serial.available());
+  WriteBytes((byte)'R');
+  WriteBytes((byte)Serial.available());
 }
 
 void Done()
 {
-  Serial.write("D");
-  Serial.write(run_time);
-  Serial.write(state);
+  WriteBytes((byte)'D');
+  WriteBytes(run_time);
+  WriteBytes((byte)state);
 }
 
-void Report(short index)
+void Report(uint16_t index)
 {
-  Serial.write("P");
-  Serial.write(index);
-  Serial.write(schedule_time[index]);
-  Serial.write(schedule_pin[index]);
-  Serial.write(schedule_state_get(index));
+  WriteBytes((byte)'P');
+  WriteBytes(index);
+  WriteBytes(schedule.time[index]);
+  WriteBytes(schedule.pin[index]);
+  WriteBytes(schedule.state[index]);
 }
+
+void Capacity()
+{
+  WriteBytes((byte)'C');
+  WriteBytes((byte)SCHEDULE_MAX_EVENTS);
+}
+
+
 
 #endif
