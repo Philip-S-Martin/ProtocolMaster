@@ -20,6 +20,19 @@
         </DockPanel>
         <!--Google Drive Treeview-->
         <TreeView  Name="FileTree" BorderThickness="0" Background="Transparent">
+            <TreeViewItem Header="Google Drive" Focusable="False"/>
+            <TreeViewItem Header="Local Folder" Focusable="False">
+                <TreeViewItem Header="example_protocols" Focusable="False">
+                    <TreeViewItem Header="NO-AFC"/>
+                    <TreeViewItem Header="PAC Day 1"/>
+                    <TreeViewItem Header="AFC Recordings"/>
+                </TreeViewItem>
+                <TreeViewItem Header="Philip's Protocols" Focusable="False">
+                    <TreeViewItem Header="Example a"/>
+                    <TreeViewItem Header="Example b"/>
+                    <TreeViewItem Header="Example c"/>
+                </TreeViewItem>
+            </TreeViewItem>
         </TreeView>
     </DockPanel>
 
