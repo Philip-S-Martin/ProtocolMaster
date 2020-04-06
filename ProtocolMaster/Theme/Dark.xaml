@@ -3,6 +3,7 @@
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                    xmlns:oxy="http://oxyplot.org/wpf"
                     mc:Ignorable="options">
     <!--<Style TargetType="Menu">
         <Setter Property="Background" Value="Black"/>
@@ -139,5 +140,23 @@
         <Setter Property="Padding" Value="2,1,2,1"/>
         <Setter Property="Background" Value="{StaticResource MenuBackgroundBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style TargetType="oxy:PlotView">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource BlackBrush}"/>
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="oxy:LinearAxis">
+        <Setter Property="TicklineColor" Value="{StaticResource BlackBrush}" />
+        <Setter Property="MajorGridlineColor" Value="{StaticResource BlackBrush}" />
+        <Setter Property="MinorGridlineColor" Value="{StaticResource BlackBrush}" />
+        <Setter Property="ExtraGridlineColor" Value="{StaticResource BlackBrush}" />
+        <Setter Property="AxislineColor" Value="{StaticResource BlackBrush}" />
+        <Setter Property="TitleColor" Value="{StaticResource BlackBrush}" />
+        <Setter Property="TextColor" Value="{StaticResource BlackBrush}" />
+        <Setter Property="TickStyle" Value="None" />
     </Style>
 </ResourceDictionary>
