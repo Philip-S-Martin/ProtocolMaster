@@ -16,10 +16,12 @@
             <Menu Margin="5,0,0,0">
                 <MenuItem Header="File" >
                     <MenuItem Header="Settings"/>
+                    <Separator/>
                     <MenuItem Header="Log Folder"/>
+                    <MenuItem Header="Protocols Folder"/>
+                    <Separator/>
                     <MenuItem Header="Interpreter Folder"/>
                     <MenuItem Header="Driver Folder"/>
-                    <MenuItem Header="Protocols Folder"/>
                 </MenuItem>
                 <MenuItem Header="Google" >
                     <MenuItem Header="Account: Not Logged in" IsEnabled="False"/>
