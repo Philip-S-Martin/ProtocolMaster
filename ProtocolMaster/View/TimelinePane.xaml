@@ -13,7 +13,18 @@
         <DockPanel DockPanel.Dock="Top" Style="{StaticResource Menu}">
             <TextBlock Style="{StaticResource MenuHeader}" DockPanel.Dock="Top">Timeline</TextBlock>
             <Menu>
-                <MenuItem Name="DriverDropdown" Header="Driver"/>
+                <MenuItem Header="Interpreter">
+                    <MenuItem Header="Selected: None" IsEnabled="False"/>
+                    <Separator/>
+                    <MenuItem Header="Select Interpreter" Name="InterpreterDropdown"/>
+                </MenuItem>
+                <MenuItem Header="Driver">
+                    <MenuItem Header="Selected: None" IsEnabled="False"/>
+                    <Separator/>
+                    <MenuItem Header="Select Driver" Name="DriverDropdown"/>
+                </MenuItem>
+                <MenuItem Header="Start"/>
+                <MenuItem Header="Cancel"/>
             </Menu>
         </DockPanel>
         <!--Timeline Content-->

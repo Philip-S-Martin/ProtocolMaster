@@ -11,12 +11,10 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <!-- Accent and AppTheme setting -->
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
-
+                <!-- Visual-Studio like Theme basis -->
                 <ResourceDictionary Source="pack://application:,,,/Selen.Wpf.SystemStyles;component/Styles.xaml"/>
-
-                <ResourceDictionary Source="Themes/Colors.xaml"/>
+                <!-- Theme cohesion updates -->
+                <ResourceDictionary Source="Theme/Dark.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
         </ResourceDictionary>

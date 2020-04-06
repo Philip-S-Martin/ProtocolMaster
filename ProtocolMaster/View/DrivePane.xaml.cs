@@ -1,18 +1,8 @@
-﻿using System;
+﻿using ProtocolMaster.Component.Google;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using ProtocolMaster.Component;
-using ProtocolMaster.Component.Google;
 
 namespace ProtocolMaster.View
 {
@@ -72,7 +62,7 @@ namespace ProtocolMaster.View
         {
             FileTree.Items.Clear();
             idDictionary.Clear();
-            
+
             MarkupCallback callback = Display_Tree_Child;
             Drive.Instance.Refresh(callback);
         }
@@ -92,7 +82,7 @@ namespace ProtocolMaster.View
             {
                 TreeViewItem parent;
                 idDictionary.TryGetValue(parentName, out parent);
-                if(parent != null)
+                if (parent != null)
                     parent.Items.Add(child);
                 else
                     FileTree.Items.Add(child);
@@ -104,5 +94,5 @@ namespace ProtocolMaster.View
         }
     }
 
-    
+
 }

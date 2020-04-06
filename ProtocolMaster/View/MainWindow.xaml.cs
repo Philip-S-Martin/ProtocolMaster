@@ -1,17 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows;
-using ProtocolMaster.Component;
-using ProtocolMaster.View;
-using ProtocolMaster.Component.Google;
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
+using System;
 
 
-namespace ProtocolMaster
+namespace ProtocolMaster.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -42,7 +33,7 @@ namespace ProtocolMaster
 
         private void OnLoad(object sender, EventArgs e)
         {
-            
+
         }
 
         // Window Closing Operations

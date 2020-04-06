@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Services;
+﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
+using Google.Apis.Services;
+using ProtocolMaster.Component.Debug;
+using System.Collections.Generic;
 
 namespace ProtocolMaster.Component.Google
 {
@@ -113,7 +112,7 @@ namespace ProtocolMaster.Component.Google
 
         public void CallbackPreBF(MarkupCallback callback)
         {
-            if(Auth.Instance.isAuthenticated())
+            if (Auth.Instance.isAuthenticated())
                 root.CallbackPreBF(callback);
         }
         #endregion

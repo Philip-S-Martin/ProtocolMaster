@@ -1,7 +1,7 @@
-﻿using System.IO.Ports;
-using ProtocolMaster.Component;
-using ProtocolMaster.Component.Model;
+﻿using ProtocolMaster.Component.Model;
+using ProtocolMaster.Component.Debug;
 using System.ComponentModel.Composition;
+using System.IO.Ports;
 
 namespace SchedulinoDriver
 {

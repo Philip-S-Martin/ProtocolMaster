@@ -1,29 +1,17 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
-using Accord.Video.FFMPEG;
-using AForge.Video;
-using AForge.Video.DirectShow;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
-using Microsoft.Win32;
-using ProtocolMaster.Component;
+﻿using System.Windows.Controls;
 
 namespace ProtocolMaster.View
 {
     /// <summary>
     /// Interaction logic for VideoPane.xaml
     /// </summary>
-    public partial class VideoPane : Page, IDisposable
+    public partial class VideoPane : Page
     {
+        public VideoPane()
+        {
+            InitializeComponent();
+        }
+        /*
         #region Private fields
         private FilterInfo _currentDevice;
 
@@ -40,20 +28,7 @@ namespace ProtocolMaster.View
         private DateTime? _firstFrameTime;
         #endregion
 
-        public VideoPane()
-        {
-            VideoDevices = new ObservableCollection<FilterInfo>();
-            GetVideoDevices();
-            StartSourceCommand = new RelayCommand(StartCamera);
-            StopSourceCommand = new RelayCommand(StopCamera);
-            StartRecordingCommand = new RelayCommand(StartRecording);
-            StopRecordingCommand = new RelayCommand(StopRecording);
-            SaveSnapshotCommand = new RelayCommand(SaveSnapshot);
-            IpCameraUrl = "http://88.53.197.250/axis-cgi/mjpg/video.cgi?resolution=320×240";
-            
-            InitializeComponent();
-            //this.Closing += (s, e) => (this.DataContext as IDisposable).Dispose();
-        }
+        
 
 
         public ObservableCollection<FilterInfo> VideoDevices { get; set; }
@@ -230,5 +205,6 @@ namespace ProtocolMaster.View
             _writer?.Dispose();
         }
         public WebCam webCamera { get; set; }
+        */
     }
 }

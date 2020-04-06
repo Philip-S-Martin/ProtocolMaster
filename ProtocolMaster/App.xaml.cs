@@ -1,13 +1,10 @@
-﻿using System;
-using System.IO;
+﻿using ProtocolMaster.Component.Debug;
+using ProtocolMaster.Component.Google;
+using ProtocolMaster.Component.Model;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using ProtocolMaster.Component;
-using ProtocolMaster.Component.Google;
-using System.Windows.Threading;
-using System.Collections.Concurrent;
-using ProtocolMaster.Component.Model;
+using ProtocolMaster.View;
 
 namespace ProtocolMaster
 {
@@ -16,13 +13,12 @@ namespace ProtocolMaster
     /// </summary>
     public partial class App : Application
     {
-        public static App Instance { get { return (App)Application.Current; }}
+        public static App Instance { get { return (App)Application.Current; } }
         public static MainWindow Window { get { return (MainWindow)Application.Current.MainWindow; } }
         public bool LoggedIn => Auth.Instance.isAuthenticated();
 
         DriverManager driverManager;
-
-        Thread runThread;
+        InterpreterManager interpreterManager;
 
         void App_Startup(object sender, StartupEventArgs e)
         {
@@ -32,12 +28,7 @@ namespace ProtocolMaster
             Log.Out("Application Data: " + Log.Instance.AppData);
 
             driverManager = new DriverManager();
-            /*
-            InitializeComponent();
-            runThread = new Thread(Schedulino.Start);
-            runThread.Start();
-            Dispatcher.FromThread(runThread);
-            */
+            interpreterManager = new InterpreterManager();
         }
 
         // Full Login Routine

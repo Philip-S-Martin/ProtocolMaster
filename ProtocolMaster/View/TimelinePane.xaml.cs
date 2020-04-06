@@ -18,5 +18,12 @@ namespace ProtocolMaster.View
             newDriver.Header = name;
             DriverDropdown.Items.Add(newDriver);
         }
+
+        public void ListInterpreter(string name)
+        {
+            MenuItem newInterpreter = new MenuItem();
+            newInterpreter.Header = name;
+            InterpreterDropdown.Items.Add(newInterpreter);
+        }
     }
 }

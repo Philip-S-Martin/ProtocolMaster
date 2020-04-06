@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ProtocolMaster.View
 {
@@ -33,11 +24,11 @@ namespace ProtocolMaster.View
 
         public void Log_Folder_Click(object sender, RoutedEventArgs e)
         {
-            ProtocolMaster.Component.Log.Instance.OpenFolder();
+            ProtocolMaster.Component.Debug.Log.Instance.OpenFolder();
         }
         public void Log_Test(object sender, RoutedEventArgs e)
         {
-            ProtocolMaster.Component.Log.Error("Test");
+            ProtocolMaster.Component.Debug.Log.Error("Test");
         }
     }
 }

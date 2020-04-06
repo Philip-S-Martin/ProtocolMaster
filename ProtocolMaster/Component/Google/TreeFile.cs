@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Google.Apis.Drive.v3.Data;
+using ProtocolMaster.Component.Debug;
 using System.Collections.Generic;
-using System.Text;
-using Google.Apis.Drive.v3.Data;
 
 namespace ProtocolMaster.Component.Google
 {
@@ -36,7 +35,7 @@ namespace ProtocolMaster.Component.Google
         {
             List<File> childList = Drive.Instance.GetChildren(File);
             if (childList == null) return;
-            foreach(File child in childList)
+            foreach (File child in childList)
             {
                 children.Add(new TreeFile(child, this));
             }
