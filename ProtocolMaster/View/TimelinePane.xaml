@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:ProtocolMaster.View"
+      xmlns:oxy="http://oxyplot.org/wpf"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="1200"
       Title="TimelinePane">
@@ -28,8 +29,8 @@
             </Menu>
         </DockPanel>
         <!--Timeline Content-->
-        <TextBlock>
-                        This will be a timeline, it's not done, but that is fine!
-        </TextBlock>
+        <Grid>
+            <oxy:PlotView Name="plot" />
+        </Grid>
     </DockPanel>
 </Page>

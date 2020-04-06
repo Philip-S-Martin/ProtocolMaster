@@ -1,4 +1,12 @@
-﻿using System.Windows.Controls;
+﻿using OxyPlot;
+using OxyPlot.Annotations;
+using OxyPlot.Axes;
+using OxyPlot.Series;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Controls;
+
 
 namespace ProtocolMaster.View
 {
@@ -10,6 +18,7 @@ namespace ProtocolMaster.View
         public TimelinePane()
         {
             InitializeComponent();
+            SetUpPlot();
         }
 
         public void ListDriver(string name)
@@ -24,6 +33,86 @@ namespace ProtocolMaster.View
             MenuItem newInterpreter = new MenuItem();
             newInterpreter.Header = name;
             InterpreterDropdown.Items.Add(newInterpreter);
+        }
+
+        private void SetUpPlot()
+        {
+            DateTime start = new DateTime(2017, 1, 1, 15, 20, 0);
+            DateTime end = new DateTime(2017, 1, 1, 15, 30, 0);
+
+            var model = new PlotModel();
+            model.IsLegendVisible = false;
+
+            model.Axes.Add(new OxyPlot.Axes.DateTimeAxis()
+            {
+                Position = AxisPosition.Bottom,
+                TicklineColor = OxyColors.Gray,
+                AxislineColor = OxyColors.Gray,
+                MinorTicklineColor = OxyColors.Gray,
+                TextColor = OxyColors.WhiteSmoke,
+                TitleColor = OxyColors.WhiteSmoke,
+                ExtraGridlineColor = OxyColors.Gray,
+                MinorGridlineColor = OxyColors.Gray,
+                MajorGridlineColor = OxyColors.Gray
+            });
+            var categoryAxis = new OxyPlot.Axes.CategoryAxis()
+            {
+                Position = AxisPosition.Left,
+                TicklineColor = OxyColors.Gray,
+                AxislineColor = OxyColors.Gray,
+                MinorTicklineColor = OxyColors.Gray,
+                TextColor = OxyColors.WhiteSmoke,
+                TitleColor = OxyColors.WhiteSmoke,
+                ExtraGridlineColor = OxyColors.Gray,
+                MinorGridlineColor = OxyColors.Gray,
+                MajorGridlineColor = OxyColors.Gray
+            };
+            categoryAxis.Labels.Add("Sound");
+            categoryAxis.Labels.Add("VNS");
+            categoryAxis.Labels.Add("Shock");
+            categoryAxis.Labels.Add("Opto");
+
+            model.Axes.Add(categoryAxis);
+            plot.Model = model;
+
+
+            var series = new OxyPlot.Series.IntervalBarSeries { Title = "Series 1", StrokeThickness = 1 };
+            model.Series.Add(series);
+
+            Random random = new Random();
+
+            plot.Model.DefaultColors = new List<OxyColor>
+                {
+                OxyColors.Gray,
+                OxyColors.Gray,
+                OxyColors.Gray,
+                OxyColors.Gray
+                };
+            plot.Model.TextColor = OxyColors.White;
+            plot.Model.PlotAreaBorderColor = OxyColors.Gray;
+
+            
+
+            for (int i = 0; i < 10; i++)
+            {
+                var targetSeries = new OxyPlot.Series.IntervalBarSeries { Title = "Series " + i.ToString(), StrokeThickness = 1 };
+                for (int j = 0; j < random.Next(0, i); j++)
+                    targetSeries.Items.Add(new IntervalBarItem { CategoryIndex = j, Start = start.AddHours(i).ToOADate(), End = end.AddHours(i).ToOADate() });
+
+                model.Series.Add(targetSeries);
+            }
+
+            LineAnnotation Line = new LineAnnotation()
+            {
+                StrokeThickness = 1,
+                Color = OxyColors.Green,
+                Type = LineAnnotationType.Vertical,
+                X = start.AddHours(5).ToOADate(),
+                Y = 0
+            };
+
+            plot.Model.Annotations.Add(Line);
+
         }
     }
 }
