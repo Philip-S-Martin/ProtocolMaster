@@ -19,10 +19,7 @@
             </Menu>
         </DockPanel>
         <!--Google Drive Treeview-->
-        <TreeView  Name="FileTree" BorderThickness="0" Background="Transparent" >
-            <TreeViewItem Header="McIntyre">
-                <TreeViewItem Header="VNS AFC Volume Exp"/>
-            </TreeViewItem>
+        <TreeView  Name="FileTree" BorderThickness="0" Background="Transparent">
         </TreeView>
     </DockPanel>
 

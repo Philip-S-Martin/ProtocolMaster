@@ -1,13 +1,9 @@
-﻿using System;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.Util.Store;
+using ProtocolMaster.Component.Debug;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Util.Store;
-
-using File = Google.Apis.Drive.v3.Data.File;
 
 namespace ProtocolMaster.Component.Google
 {
@@ -54,23 +50,23 @@ namespace ProtocolMaster.Component.Google
         }
         private void CreateServices(IService[] services)
         {
-            foreach(IService service in services)
+            foreach (IService service in services)
             {
                 service.CreateService(credential);
             }
         }
-        
+
         private string[] CombineServiceTokens(IService[] services)
         {
             List<string> builder = new List<string>();
-            foreach(IService service in services)
+            foreach (IService service in services)
             {
-                foreach(string token in service.ServiceTokens())
+                foreach (string token in service.ServiceTokens())
                 {
                     builder.Add(token);
                 }
             }
-            
+
             return builder.ToArray();
         }
 

@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using ProtocolMaster.Component.Debug;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition;
-using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.ComponentModel.Composition.Hosting;
 using System.IO;
 
 namespace ProtocolMaster.Component.Model
 {
     public class DriverManager
     {
-        //public static ConcurrentBag<string> currentPorts = new ConcurrentBag<string>();
-        //private static ConcurrentDictionary<string, bool> allPorts = new ConcurrentDictionary<string, bool>();
-
         [ImportMany]
         IEnumerable<Lazy<IDriver, IDriverData>> _drivers;
 
@@ -26,13 +18,13 @@ namespace ProtocolMaster.Component.Model
         {
             AggregateCatalog catalog = new AggregateCatalog();
             catalog.Catalogs.Add(new AssemblyCatalog(typeof(DriverManager).Assembly));
-            catalog.Catalogs.Add(new DirectoryCatalog(Path.GetDirectoryName( System.Reflection.Assembly.GetEntryAssembly().Location) + "\\Driver"));
+            catalog.Catalogs.Add(new DirectoryCatalog(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\Driver"));
             _container = new CompositionContainer(catalog);
             Log.Error("Drivers Location: " + Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\Driver");
 
             try
             {
-                 this._container.ComposeParts(this);
+                this._container.ComposeParts(this);
             }
             catch (CompositionException compositionException)
             {
