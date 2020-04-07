@@ -94,8 +94,7 @@ namespace ProtocolMaster.Component.Google
                 listRequest.PageSize = 20;
                 listRequest.Fields = "nextPageToken, files(id, name, mimeType, parents)";
                 listRequest.Q =
-                    "mimeType = 'application/vnd.google-apps.folder' and " +
-                    "'" + parent.Id + "' in parents and" +
+                    "mimeType = 'application/vnd.google-apps.spreadsheet' and " +
                     "trashed = false";
                 result = listRequest.Execute();
                 list.AddRange(result.Files);

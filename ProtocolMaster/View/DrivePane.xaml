@@ -19,8 +19,8 @@
             </Menu>
         </DockPanel>
         <!--Google Drive Treeview-->
-        <TreeView  Name="FileTree" BorderThickness="0" Background="Transparent">
-            <TreeViewItem Header="Google Drive" Focusable="False"/>
+        <TreeView BorderThickness="0" Background="Transparent">
+            <TreeViewItem Header="Google Drive" Name="FileTree" Focusable="False"/>
             <TreeViewItem Header="Local Folder" Focusable="False">
                 <TreeViewItem Header="example_protocols" Focusable="False">
                     <TreeViewItem Header="NO-AFC"/>
