@@ -2,11 +2,15 @@
 
 namespace ProtocolMaster.Component.Model
 {
-    class Event
+    public class IInterpretedEvent
     {
-        int loadOrder;
-        IEnumerable<string> drivers;
-        Dictionary<string, object> properties;
+        string symbol;
+        /*
+        private int loadOrder;
+        private Dictionary<string, object> properties;
+
+        public int LoadOrder { get => loadOrder; private set => loadOrder = value; }
+        public Dictionary<string, object> Properties { get => properties; private set => properties = value; }*/
         // example driver = {"Schedulino"}, properties = {<"time_ms", 1000>, <"pin", 5>, <"state", 1>} 
         // would be interpreted as: 
         // - at 1 second (1000ms) into the protocol, change the state of pin 5 to HIGH

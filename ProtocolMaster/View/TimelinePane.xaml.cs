@@ -2,9 +2,12 @@
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Series;
+using ProtocolMaster.Component.Debug;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 
@@ -35,6 +38,24 @@ namespace ProtocolMaster.View
             InterpreterDropdown.Items.Add(newInterpreter);
         }
 
+        public void ListVisualizer(string name)
+        {
+            MenuItem newVis = new MenuItem();
+            newVis.Header = name;
+            VisualizerDropdown.Items.Add(newVis);
+        }
+
+
+        public void Start_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        public async void Stop_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private void SetUpPlot()
         {
             DateTime start = new DateTime(2017, 1, 1, 15, 20, 0);
@@ -58,14 +79,15 @@ namespace ProtocolMaster.View
             var categoryAxis = new OxyPlot.Axes.CategoryAxis()
             {
                 Position = AxisPosition.Left,
-                TicklineColor = OxyColors.Gray,
+                TicklineColor = OxyColors.Transparent,
                 AxislineColor = OxyColors.Gray,
-                MinorTicklineColor = OxyColors.Gray,
+                MinorTicklineColor = OxyColors.Transparent,
                 TextColor = OxyColors.WhiteSmoke,
                 TitleColor = OxyColors.WhiteSmoke,
                 ExtraGridlineColor = OxyColors.Gray,
                 MinorGridlineColor = OxyColors.Gray,
-                MajorGridlineColor = OxyColors.Gray
+                MajorGridlineColor = OxyColors.Gray,
+                ExtraGridlines = new double[] {0,1,2,3}
             };
             categoryAxis.Labels.Add("Sound");
             categoryAxis.Labels.Add("VNS");
@@ -89,7 +111,7 @@ namespace ProtocolMaster.View
                 OxyColors.Gray
                 };
             plot.Model.TextColor = OxyColors.White;
-            plot.Model.PlotAreaBorderColor = OxyColors.Gray;
+            plot.Model.PlotAreaBorderColor = OxyColors.Transparent;
 
             
 
@@ -97,8 +119,7 @@ namespace ProtocolMaster.View
             {
                 var targetSeries = new OxyPlot.Series.IntervalBarSeries { Title = "Series " + i.ToString(), StrokeThickness = 1 };
                 for (int j = 0; j < random.Next(0, i); j++)
-                    targetSeries.Items.Add(new IntervalBarItem { CategoryIndex = j, Start = start.AddHours(i).ToOADate(), End = end.AddHours(i).ToOADate() });
-
+                    targetSeries.Items.Add(new IntervalBarItem { CategoryIndex = j, Start = start.AddHours(random.NextDouble() + i).ToOADate(), End = end.AddHours(random.NextDouble() + i).ToOADate() });
                 model.Series.Add(targetSeries);
             }
 
@@ -107,11 +128,16 @@ namespace ProtocolMaster.View
                 StrokeThickness = 1,
                 Color = OxyColors.Green,
                 Type = LineAnnotationType.Vertical,
-                X = start.AddHours(5).ToOADate(),
+                X = start.AddHours(6).ToOADate(),
                 Y = 0
             };
 
             plot.Model.Annotations.Add(Line);
+
+        }
+
+        private void MenuItem_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
 
         }
     }

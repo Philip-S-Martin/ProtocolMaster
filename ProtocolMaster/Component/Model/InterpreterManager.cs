@@ -7,34 +7,23 @@ using System.IO;
 
 namespace ProtocolMaster.Component.Model
 {
-    class InterpreterManager
+    internal interface IInterpreterManager
+    {
+        void Print();
+    }
+
+    [Export(typeof(IInterpreterManager))]
+    internal class InterpreterManager : IInterpreterManager
     {
         [ImportMany]
-        IEnumerable<Lazy<IInterpreter, IInterpreterData>> _interpreters;
-
-        private CompositionContainer _container;
-
-        public InterpreterManager()
+        IEnumerable<Lazy<IInterpreter, IExtensionData>> _drivers;
+        // Driver thread management
+        public void Print()
         {
-            AggregateCatalog catalog = new AggregateCatalog();
-            catalog.Catalogs.Add(new AssemblyCatalog(typeof(InterpreterManager).Assembly));
-            catalog.Catalogs.Add(new DirectoryCatalog(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\Interpreter"));
-            _container = new CompositionContainer(catalog);
-            Log.Error("Interpreters Location: " + Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\Interpreter");
-
-            try
+            foreach (Lazy<IInterpreter, IExtensionData> i in _drivers)
             {
-                this._container.ComposeParts(this);
-            }
-            catch (CompositionException compositionException)
-            {
-                Log.Error(compositionException.ToString());
-            }
-
-            foreach (Lazy<IInterpreter, IInterpreterData> i in _interpreters)
-            {
-                App.Window.Timeline.ListInterpreter(i.Metadata.Symbol[0].ToString());
-                Log.Error("Interpreter found: " + i.Metadata.Symbol[0].ToString());
+                App.Window.Timeline.ListInterpreter(i.Metadata.Symbol[0]);
+                Log.Error("Interpreter found: " + i.Metadata.Symbol[0]);
             }
         }
     }

@@ -1,42 +1,35 @@
 ﻿using ProtocolMaster.Component.Debug;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ProtocolMaster.Component.Model
 {
-    public class DriverManager
+    internal interface IDriverManager
+    {
+        void Print();
+    }
+
+    [Export(typeof(IDriverManager))]
+    internal class DriverManager : IDriverManager
     {
         [ImportMany]
-        IEnumerable<Lazy<IDriver, IDriverData>> _drivers;
-
-        private CompositionContainer _container;
-
-        public DriverManager()
+        IEnumerable<Lazy<IDriver, IExtensionData>> _drivers;
+        // Driver thread management
+        public void Print()
         {
-            AggregateCatalog catalog = new AggregateCatalog();
-            catalog.Catalogs.Add(new AssemblyCatalog(typeof(DriverManager).Assembly));
-            catalog.Catalogs.Add(new DirectoryCatalog(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\Driver"));
-            _container = new CompositionContainer(catalog);
-            Log.Error("Drivers Location: " + Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\Driver");
-
-            try
+            foreach (Lazy<IDriver, IExtensionData> i in _drivers)
             {
-                this._container.ComposeParts(this);
-            }
-            catch (CompositionException compositionException)
-            {
-                Log.Error(compositionException.ToString());
-            }
-
-            foreach (Lazy<IDriver, IDriverData> i in _drivers)
-            {
-                App.Window.Timeline.ListDriver(i.Metadata.Symbol);
-                Log.Error("Driver found: " + i.Metadata.Symbol);
+                App.Window.Timeline.ListDriver(i.Metadata.Symbol[0]);
+                Log.Error("Driver found: " + i.Metadata.Symbol[0]);
             }
         }
+        
 
         // Old code from when DriverManager was really more of a SerialDriverManager
         /*

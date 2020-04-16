@@ -24,8 +24,14 @@
                     <Separator/>
                     <MenuItem Header="Select Driver" Name="DriverDropdown"/>
                 </MenuItem>
-                <MenuItem Header="Start"/>
-                <MenuItem Header="Cancel"/>
+                <MenuItem Header="Visualizer">
+                    <MenuItem Header="Selected: None" IsEnabled="False"/>
+                    <Separator/>
+                    <MenuItem Header="Select Visualizer" Name="VisualizerDropdown"/>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Start" Click="Start_Click"/>
+                <MenuItem Header="Cancel" Click="Stop_Click"/>
             </Menu>
         </DockPanel>
         <!--Timeline Content-->

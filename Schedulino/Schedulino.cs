@@ -6,7 +6,7 @@ using System.IO.Ports;
 namespace SchedulinoDriver
 {
     [Export(typeof(ProtocolMaster.Component.Model.IDriver))]
-    [ExportMetadata("Symbol", "Schedulino")]
+    [ExportMetadata("Symbol", new string[] { "Schedulino" })]
     public class Schedulino : IDriver
     {
         private enum enum_state { SETUP = 0, RUNNING, RESET }

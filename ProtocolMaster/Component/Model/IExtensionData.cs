@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace ProtocolMaster.Component.Model
 {
-    public interface IInterpreter
+    public interface IExtensionData
     {
+        string[] Symbol { get; }
     }
 }

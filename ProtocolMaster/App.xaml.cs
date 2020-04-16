@@ -27,8 +27,7 @@ namespace ProtocolMaster
             MainWindow.Show();
             Log.Out("Application Data: " + Log.Instance.AppData);
 
-            driverManager = new DriverManager();
-            interpreterManager = new InterpreterManager();
+            ExtensionManager exMgr = new ExtensionManager();
         }
 
         // Full Login Routine
