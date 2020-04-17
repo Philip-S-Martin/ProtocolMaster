@@ -3,11 +3,10 @@ using ProtocolMaster.Component.Debug;
 using System.ComponentModel.Composition;
 using System.IO.Ports;
 
-namespace SchedulinoDriver
+namespace Schedulino
 {
-    [Export(typeof(ProtocolMaster.Component.Model.IDriver))]
-    [ExportMetadata("Symbol", new string[] { "Schedulino" })]
-    public class Schedulino : IDriver
+    [DriverExtension("Schedulino", 1, "E1", "E2", "E3")]
+    public class SchedulinoDriver : IDriver
     {
         private enum enum_state { SETUP = 0, RUNNING, RESET }
         enum_state _state;

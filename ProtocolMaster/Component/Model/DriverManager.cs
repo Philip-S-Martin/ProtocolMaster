@@ -19,14 +19,14 @@ namespace ProtocolMaster.Component.Model
     internal class DriverManager : IDriverManager
     {
         [ImportMany]
-        IEnumerable<Lazy<IDriver, IExtensionData>> _drivers;
+        IEnumerable<Lazy<IDriver, DriverExtension>> _drivers;
         // Driver thread management
         public void Print()
         {
-            foreach (Lazy<IDriver, IExtensionData> i in _drivers)
+            foreach (Lazy<IDriver, DriverExtension> i in _drivers)
             {
-                App.Window.Timeline.ListDriver(i.Metadata.Symbol[0]);
-                Log.Error("Driver found: " + i.Metadata.Symbol[0]);
+                App.Window.Timeline.ListDriver(i.Metadata.Name);
+                Log.Error("Driver found: " + i.Metadata.Name);
             }
         }
         

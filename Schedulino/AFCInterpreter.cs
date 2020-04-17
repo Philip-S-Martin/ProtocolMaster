@@ -6,10 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SchedulinoDriver
+namespace Schedulino
 {
-    [Export(typeof(ProtocolMaster.Component.Model.IInterpreter))]
-    [ExportMetadata("Symbol", new string[] { "LegacyAFCInterpreter", "Header 1", "Header 2", "Header 3" })]
+    [InterpreterExtension("LegacyAFCInterpreter", 1, "A,B,C", "D,E,F")]
     public class LegacyAFCInterpreter : IInterpreter
     {
 

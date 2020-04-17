@@ -16,14 +16,20 @@ namespace ProtocolMaster.Component.Model
     internal class InterpreterManager : IInterpreterManager
     {
         [ImportMany]
-        IEnumerable<Lazy<IInterpreter, IExtensionData>> _drivers;
+        IEnumerable<Lazy<IInterpreter, InterpreterExtension>> _interpreters;
         // Driver thread management
         public void Print()
         {
-            foreach (Lazy<IInterpreter, IExtensionData> i in _drivers)
+            foreach (Lazy<IInterpreter, InterpreterExtension> driver in _interpreters)
             {
-                App.Window.Timeline.ListInterpreter(i.Metadata.Symbol[0]);
-                Log.Error("Interpreter found: " + i.Metadata.Symbol[0]);
+                App.Window.Timeline.ListInterpreter(driver.Metadata.Name);
+                Log.Error("Interpreter found: " + driver.Metadata.Name);
+
+                for (int i = 0; i < driver.Metadata.PageHeadersCSV.Length; i++)
+                {
+                    foreach (string val in driver.Metadata.PageHeadersCSV[i].Split(','))
+                        Log.Error("Header " + i + ": " + val);
+                }
             }
         }
     }
