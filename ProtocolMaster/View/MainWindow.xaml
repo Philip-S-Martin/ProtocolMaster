@@ -17,11 +17,10 @@
                 <MenuItem Header="File" >
                     <MenuItem Header="Settings"/>
                     <Separator/>
-                    <MenuItem Header="Log Folder"/>
-                    <MenuItem Header="Protocols Folder"/>
+                    <MenuItem Header="Log Folder" Click="Click_Log_Folder"/>
+                    <MenuItem Header="Protocols Folder" Click="Click_Protocol_Folder"/>
                     <Separator/>
-                    <MenuItem Header="Interpreter Folder"/>
-                    <MenuItem Header="Driver Folder"/>
+                    <MenuItem Header="Extensions Folder" Click="Click_Extension_Folder"/>
                 </MenuItem>
                 <MenuItem Header="Google" >
                     <MenuItem Header="Account: Not Logged in" IsEnabled="False"/>
@@ -37,7 +36,7 @@
         <Controls:WindowCommands>
             <Menu >
                 <MenuItem Header="Help">
-                    <MenuItem Header="Online Documentation" IsEnabled="False"/>
+                    <MenuItem Header="Online Documentation" Click="Click_Documentation"/>
                 </MenuItem>
             </Menu>
         </Controls:WindowCommands>

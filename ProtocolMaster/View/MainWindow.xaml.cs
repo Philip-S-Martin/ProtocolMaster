@@ -1,6 +1,6 @@
 ﻿using MahApps.Metro.Controls;
 using System;
-
+using System.IO;
 
 namespace ProtocolMaster.View
 {
@@ -29,6 +29,38 @@ namespace ProtocolMaster.View
             //PropertiesView.Navigate(Properties);
             TimelineView.Navigate(Timeline);
             VideoView.Navigate(Video);
+        }
+
+        private void Click_Documentation(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://sites.google.com/view/protocolmaster/docs");
+        }
+
+        private void Click_Extension_Folder(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+            {
+                FileName = "C:\\Users\\phili\\source\\repos\\Philip-S-Martin\\ProtocolMaster\\ProtocolMaster\\bin\\Debug\\net48\\Extensions",
+                UseShellExecute = true,
+                Verb = "open"
+            });
+        }
+
+        private void Click_Protocol_Folder(object sender, EventArgs e)
+        {
+            string target = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ProtocolMaster\\Protocols";
+            Directory.CreateDirectory(target);
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+            {
+                FileName = target,
+                UseShellExecute = true,
+                Verb = "open"
+            });
+        }
+
+        private void Click_Log_Folder(object sender, EventArgs e)
+        {
+            ProtocolMaster.Component.Debug.Log.Instance.OpenFolder();
         }
 
         private void OnLoad(object sender, EventArgs e)
