@@ -125,7 +125,7 @@ namespace ProtocolMaster.View
 
             LineAnnotation Line = new LineAnnotation()
             {
-                StrokeThickness = 1,
+                StrokeThickness = 2,
                 Color = OxyColors.Green,
                 Type = LineAnnotationType.Vertical,
                 X = start.AddHours(6).ToOADate(),
