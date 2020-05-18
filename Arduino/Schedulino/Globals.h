@@ -20,34 +20,59 @@ uint32_t elapsed = 0;
 uint32_t run_time = 0;
 uint32_t run_offset = 0;
 
+void _schedule_init();
+uint16_t _schedule_capacity(), _schedule_first_index(), _schedule_last_index();
+
 #define SCHEDULE_MAX_EVENTS 192
 typedef struct
 {
   uint16_t first = 0;
-  uint16_t end = 0;
+  uint16_t last = 0;
+  uint16_t (*capacity)();
+  uint16_t (*firstIndex)();
+  uint16_t (*lastIndex)();
   uint32_t time[SCHEDULE_MAX_EVENTS];
   byte pin[SCHEDULE_MAX_EVENTS];
   byte state[SCHEDULE_MAX_EVENTS];
 } schedule_data;
 schedule_data schedule;
 
+void _schedule_init()
+{
+  schedule.capacity = _schedule_capacity;
+  schedule.firstIndex = _schedule_first_index;
+  schedule.lastIndex = _schedule_last_index;
+}
+uint16_t _schedule_capacity()
+{
+  return SCHEDULE_MAX_EVENTS - (schedule.last - schedule.first);
+}
+uint16_t _schedule_first_index()
+{
+  return schedule.first % SCHEDULE_MAX_EVENTS;
+}
+uint16_t _schedule_last_index()
+{
+  return schedule.last % SCHEDULE_MAX_EVENTS;
+}
+
 // SERIAL HELPERS
 
 void WriteBytes(uint32_t target)
 {
   byte sendBuf[4];
-  sendBuf[3] = (byte) target & 255;
-  sendBuf[2] = (byte) (target >> 8) & 255;
-  sendBuf[1] = (byte) (target >> 16) & 255;
-  sendBuf[0] = (byte) (target >> 24) & 255;
+  sendBuf[3] = (byte)target & 255;
+  sendBuf[2] = (byte)(target >> 8) & 255;
+  sendBuf[1] = (byte)(target >> 16) & 255;
+  sendBuf[0] = (byte)(target >> 24) & 255;
   Serial.write(sendBuf, 4);
 }
 
 void WriteBytes(uint16_t target)
 {
   byte sendBuf[2];
-  sendBuf[1] = (byte) target & 255;
-  sendBuf[0] = (byte) (target >> 8) & 255;
+  sendBuf[1] = (byte)target & 255;
+  sendBuf[0] = (byte)(target >> 8) & 255;
   Serial.write(sendBuf, 2);
 }
 
@@ -91,9 +116,7 @@ void Report(uint16_t index)
 void Capacity()
 {
   WriteBytes((byte)'C');
-  WriteBytes((byte)SCHEDULE_MAX_EVENTS);
+  WriteBytes(schedule.capacity());
 }
-
-
 
 #endif

@@ -15,12 +15,13 @@
             <Menu>
                 <MenuItem Header="Sign-In" Name="AccountButton" Click="Account_Click"/>
                 <MenuItem Header="Refresh" Name="RefreshButton" Click="Refresh_Click"/>
-                <MenuItem Header="New Folder" Name="FolderButton" Click="Folder_Click"/>
+                <MenuItem Header="New Folder" Name="FolderButton" Click="Folder_Click" Visibility="Hidden"/>
             </Menu>
         </DockPanel>
         <!--Google Drive Treeview-->
-        <TreeView  Name="FileTree" BorderThickness="0" Background="Transparent">
-            <TreeViewItem Header="Google Drive" Focusable="False"/>
+        <TreeView BorderThickness="0" Background="Transparent">
+            <TreeViewItem Header="Google Drive Published" Focusable="False"/>
+            <TreeViewItem Header="Google Drive Private" Name="FileTree" Focusable="False"/>
             <TreeViewItem Header="Local Folder" Focusable="False">
                 <TreeViewItem Header="example_protocols" Focusable="False">
                     <TreeViewItem Header="NO-AFC"/>

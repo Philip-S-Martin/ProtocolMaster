@@ -33,17 +33,21 @@ namespace ProtocolMaster.Component.Google
 
         private void FindChildren()
         {
-            List<File> childList = Drive.Instance.GetChildren(File);
-            if (childList == null) return;
-            foreach (File child in childList)
+            if (parent == null)
             {
-                children.Add(new TreeFile(child, this));
+                List<File> childList = Drive.Instance.GetChildren(File);
+                if (childList == null) return;
+                foreach (File child in childList)
+                {
+                    children.Add(new TreeFile(child, this));
+                }
             }
         }
 
         public void CallbackPreBF(MarkupCallback callback)
         {
-            Callback(callback);
+            if(parent != null)
+                Callback(callback);
             foreach (TreeFile child in children)
             {
                 child.CallbackPreBF(callback);
@@ -51,9 +55,6 @@ namespace ProtocolMaster.Component.Google
         }
         public void Callback(MarkupCallback callback)
         {
-            if (File.Parents != null && File.Parents[0] != null)
-                callback(File.Parents[0], File.Id, File.Name);
-            else
                 callback(null, File.Id, File.Name);
         }
     }

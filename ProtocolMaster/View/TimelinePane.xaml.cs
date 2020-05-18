@@ -2,9 +2,13 @@
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Series;
+using ProtocolMaster.Component.Debug;
+using ProtocolMaster.Component.Model;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 
@@ -21,18 +25,63 @@ namespace ProtocolMaster.View
             SetUpPlot();
         }
 
-        public void ListDriver(string name)
+        public void ListDriver(DriverMeta data)
         {
             MenuItem newDriver = new MenuItem();
-            newDriver.Header = name;
+            newDriver.Header = data.Name + " " + data.Version;
+            newDriver.Resources.Add("data", data);
+            newDriver.Click += new RoutedEventHandler(DriverClickHandler);
             DriverDropdown.Items.Add(newDriver);
         }
 
-        public void ListInterpreter(string name)
+        public void DriverClickHandler(object sender, RoutedEventArgs e)
+        {
+            MenuItem src = e.Source as MenuItem;
+            DriverMeta data = src.Resources["data"] as DriverMeta;
+            SelectedDriver.Header = "Selected: " + data.Name + " " + data.Version;
+            App.Instance.Extensions.Drivers.Select(data);
+        }
+
+        public void ListInterpreter(InterpreterMeta data)
         {
             MenuItem newInterpreter = new MenuItem();
-            newInterpreter.Header = name;
+            newInterpreter.Header = data.Name + " " + data.Version;
+            newInterpreter.Resources.Add("data", data);
+            newInterpreter.Click += new RoutedEventHandler(InterpreterClickHandler);
             InterpreterDropdown.Items.Add(newInterpreter);
+        }
+
+        public void InterpreterClickHandler(object sender, RoutedEventArgs e)
+        {
+            MenuItem src = e.Source as MenuItem;
+            InterpreterMeta data = src.Resources["data"] as InterpreterMeta;
+            SelectedInterpreter.Header = "Selected: " + data.Name + " " + data.Version;
+        }
+
+        public void ListVisualizer(VisualizerMeta data)
+        {
+            MenuItem newVis = new MenuItem();
+            newVis.Header = data.Name + " " + data.Version;
+            newVis.Resources.Add("data", data);
+            newVis.Click += new RoutedEventHandler(VisualizerClickHandler);
+            VisualizerDropdown.Items.Add(newVis);
+        }
+
+        public void VisualizerClickHandler(object sender, RoutedEventArgs e)
+        {
+            MenuItem src = e.Source as MenuItem;
+            VisualizerMeta data = src.Resources["data"] as VisualizerMeta;
+            SelectedVisualizer.Header = "Selected: " + data.Name + " " + data.Version;
+        }
+
+        public void Start_Click(object sender, RoutedEventArgs e)
+        {
+            App.Instance.Extensions.Drivers.Run();
+        }
+
+        public void Stop_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
         private void SetUpPlot()
@@ -58,14 +107,15 @@ namespace ProtocolMaster.View
             var categoryAxis = new OxyPlot.Axes.CategoryAxis()
             {
                 Position = AxisPosition.Left,
-                TicklineColor = OxyColors.Gray,
+                TicklineColor = OxyColors.Transparent,
                 AxislineColor = OxyColors.Gray,
-                MinorTicklineColor = OxyColors.Gray,
+                MinorTicklineColor = OxyColors.Transparent,
                 TextColor = OxyColors.WhiteSmoke,
                 TitleColor = OxyColors.WhiteSmoke,
                 ExtraGridlineColor = OxyColors.Gray,
                 MinorGridlineColor = OxyColors.Gray,
-                MajorGridlineColor = OxyColors.Gray
+                MajorGridlineColor = OxyColors.Gray,
+                ExtraGridlines = new double[] {0,1,2,3}
             };
             categoryAxis.Labels.Add("Sound");
             categoryAxis.Labels.Add("VNS");
@@ -89,7 +139,7 @@ namespace ProtocolMaster.View
                 OxyColors.Gray
                 };
             plot.Model.TextColor = OxyColors.White;
-            plot.Model.PlotAreaBorderColor = OxyColors.Gray;
+            plot.Model.PlotAreaBorderColor = OxyColors.Transparent;
 
             
 
@@ -97,21 +147,25 @@ namespace ProtocolMaster.View
             {
                 var targetSeries = new OxyPlot.Series.IntervalBarSeries { Title = "Series " + i.ToString(), StrokeThickness = 1 };
                 for (int j = 0; j < random.Next(0, i); j++)
-                    targetSeries.Items.Add(new IntervalBarItem { CategoryIndex = j, Start = start.AddHours(i).ToOADate(), End = end.AddHours(i).ToOADate() });
-
+                    targetSeries.Items.Add(new IntervalBarItem { CategoryIndex = j, Start = start.AddHours(random.NextDouble() + i).ToOADate(), End = end.AddHours(random.NextDouble() + i).ToOADate() });
                 model.Series.Add(targetSeries);
             }
 
             LineAnnotation Line = new LineAnnotation()
             {
-                StrokeThickness = 1,
+                StrokeThickness = 2,
                 Color = OxyColors.Green,
                 Type = LineAnnotationType.Vertical,
-                X = start.AddHours(5).ToOADate(),
+                X = start.AddHours(6).ToOADate(),
                 Y = 0
             };
 
             plot.Model.Annotations.Add(Line);
+
+        }
+
+        private void MenuItem_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
 
         }
     }

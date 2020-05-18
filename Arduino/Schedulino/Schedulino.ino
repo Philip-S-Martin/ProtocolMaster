@@ -7,6 +7,7 @@
 void setup()
 {
   Serial.begin(9600);
+  _schedule_init();
   _Process_Reset();
 }
 
