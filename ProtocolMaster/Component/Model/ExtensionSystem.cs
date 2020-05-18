@@ -7,29 +7,30 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 
 namespace ProtocolMaster.Component.Model
 {
 
-    internal class ExtensionManager
+    internal class ExtensionSystem
     {
         // Import All Extensions so that they can be Composed (ComposeParts())
         [Import(typeof(IDriverManager))]
         private IDriverManager driverManager;
-        public IDriverManager DriverManager { get => driverManager; private set => driverManager = value; }
+        public IDriverManager Drivers { get => driverManager; private set => driverManager = value; }
 
         [Import(typeof(IInterpreterManager))]
         private IInterpreterManager interpreterManager;
-        public IInterpreterManager InterpreterManager { get => interpreterManager; private set => interpreterManager = value; }
+        public IInterpreterManager Interpreters { get => interpreterManager; private set => interpreterManager = value; }
 
         [Import(typeof(IVisualizerManager))]
         private IVisualizerManager visualizerManager;
-        public IVisualizerManager VisualizerManager { get => visualizerManager; private set => visualizerManager = value; }
+        public IVisualizerManager Visualizers { get => visualizerManager; private set => visualizerManager = value; }
 
         // Composition Objects
         private CompositionContainer _container;
 
-        public ExtensionManager()
+        public ExtensionSystem()
         {
             string targetDir = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\Extensions";
             AggregateCatalog catalog = new AggregateCatalog();
@@ -50,6 +51,12 @@ namespace ProtocolMaster.Component.Model
             driverManager.Print();
             interpreterManager.Print();
             visualizerManager.Print();
+        }
+
+        public void Run()
+        {
+            //interpreterManager.Run();
+            //driverManager.
         }
     }
 }

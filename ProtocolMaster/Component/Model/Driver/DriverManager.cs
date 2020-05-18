@@ -13,23 +13,67 @@ namespace ProtocolMaster.Component.Model
     internal interface IDriverManager
     {
         void Print();
+        void Select(DriverMeta target);
+        void Run();
     }
 
     [Export(typeof(IDriverManager))]
     internal class DriverManager : IDriverManager
     {
+        ExportFactory<IDriver, DriverMeta> driverFactory;
+        ExportLifetimeContext<IDriver> driverContext;
+        IDriver driver;
+
+        private Task runTask;
+        private CancellationToken cancelToken;
+        private CancellationTokenSource tokenSource;
+
         [ImportMany]
-        IEnumerable<Lazy<IDriver, DriverExtension>> _drivers;
+        IEnumerable<ExportFactory<IDriver, DriverMeta>> _drivers;
         // Driver thread management
         public void Print()
         {
-            foreach (Lazy<IDriver, DriverExtension> i in _drivers)
+            foreach (ExportFactory<IDriver, DriverMeta> i in _drivers)
             {
-                App.Window.Timeline.ListDriver(i.Metadata.Name);
-                Log.Error("Driver found: " + i.Metadata.Name);
+                App.Window.Timeline.ListDriver(i.Metadata);
+                Log.Error("Driver found: " + i.Metadata.Name + " version " + i.Metadata.Version);
             }
         }
-        
+
+        public void Select(DriverMeta target)
+        {
+            foreach (ExportFactory<IDriver, DriverMeta> i in _drivers)
+            {
+                if(i.Metadata == target)
+                {
+                    driverFactory = i;
+                }
+            }
+        }
+
+        public void Run()
+        {
+            driverContext = driverFactory.CreateExport();
+            driver = driverContext.Value;
+
+            List<DriveData> data = new List<DriveData>();
+
+            tokenSource = new CancellationTokenSource();
+            cancelToken = tokenSource.Token;
+
+            runTask = Task.Run(new Action(() =>
+            {
+                // Register driver cancel
+                cancelToken.Register(new Action(() => driver.Cancel()));
+                // pre-fill event data
+                driver.ProcessData(data);
+                // Loop through driver
+                driver.Run();
+            }), tokenSource.Token);
+
+            driverContext.Dispose();
+        }
+
 
         // Old code from when DriverManager was really more of a SerialDriverManager
         /*

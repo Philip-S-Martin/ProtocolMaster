@@ -2,9 +2,18 @@
 
 namespace ProtocolMaster.Component.Model
 {
-    public class IInterpretedEvent
+    public class DriveData
     {
-        string symbol;
+        public string Handler { get; private set; }
+        public uint TimeMs { get; private set; }
+        public Dictionary<string, object> Arguments { get; private set; }
+
+        public DriveData(string handler, uint timeMs)
+        {
+            this.Handler = handler;
+            this.TimeMs = timeMs;
+            Arguments = new Dictionary<string, object>();
+        }
         /*
         private int loadOrder;
         private Dictionary<string, object> properties;

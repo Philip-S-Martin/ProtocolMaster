@@ -3,6 +3,7 @@ using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using ProtocolMaster.Component.Debug;
+using ProtocolMaster.Component.Model;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -24,34 +25,61 @@ namespace ProtocolMaster.View
             SetUpPlot();
         }
 
-        public void ListDriver(string name)
+        public void ListDriver(DriverMeta data)
         {
             MenuItem newDriver = new MenuItem();
-            newDriver.Header = name;
+            newDriver.Header = data.Name + " " + data.Version;
+            newDriver.Resources.Add("data", data);
+            newDriver.Click += new RoutedEventHandler(DriverClickHandler);
             DriverDropdown.Items.Add(newDriver);
         }
 
-        public void ListInterpreter(string name)
+        public void DriverClickHandler(object sender, RoutedEventArgs e)
+        {
+            MenuItem src = e.Source as MenuItem;
+            DriverMeta data = src.Resources["data"] as DriverMeta;
+            SelectedDriver.Header = "Selected: " + data.Name + " " + data.Version;
+            App.Instance.Extensions.Drivers.Select(data);
+        }
+
+        public void ListInterpreter(InterpreterMeta data)
         {
             MenuItem newInterpreter = new MenuItem();
-            newInterpreter.Header = name;
+            newInterpreter.Header = data.Name + " " + data.Version;
+            newInterpreter.Resources.Add("data", data);
+            newInterpreter.Click += new RoutedEventHandler(InterpreterClickHandler);
             InterpreterDropdown.Items.Add(newInterpreter);
         }
 
-        public void ListVisualizer(string name)
+        public void InterpreterClickHandler(object sender, RoutedEventArgs e)
+        {
+            MenuItem src = e.Source as MenuItem;
+            InterpreterMeta data = src.Resources["data"] as InterpreterMeta;
+            SelectedInterpreter.Header = "Selected: " + data.Name + " " + data.Version;
+        }
+
+        public void ListVisualizer(VisualizerMeta data)
         {
             MenuItem newVis = new MenuItem();
-            newVis.Header = name;
+            newVis.Header = data.Name + " " + data.Version;
+            newVis.Resources.Add("data", data);
+            newVis.Click += new RoutedEventHandler(VisualizerClickHandler);
             VisualizerDropdown.Items.Add(newVis);
         }
 
+        public void VisualizerClickHandler(object sender, RoutedEventArgs e)
+        {
+            MenuItem src = e.Source as MenuItem;
+            VisualizerMeta data = src.Resources["data"] as VisualizerMeta;
+            SelectedVisualizer.Header = "Selected: " + data.Name + " " + data.Version;
+        }
 
         public void Start_Click(object sender, RoutedEventArgs e)
         {
-
+            App.Instance.Extensions.Drivers.Run();
         }
 
-        public async void Stop_Click(object sender, RoutedEventArgs e)
+        public void Stop_Click(object sender, RoutedEventArgs e)
         {
 
         }

@@ -8,11 +8,21 @@ using System.Threading.Tasks;
 
 namespace Schedulino
 {
-    [InterpreterExtension("LegacyAFCInterpreter", 1, "A,B,C", "D,E,F")]
+    [InterpreterMeta("SchedulinoDriverTest", "1.1", "A,B,C", "D,E,F")]
     public class LegacyAFCInterpreter : IInterpreter
     {
+        public List<DriveData> Data => throw new NotImplementedException();
 
+        public void Cancel()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Run()
+        {
+            throw new NotImplementedException();
+        }
     }
 
-    
+
 }

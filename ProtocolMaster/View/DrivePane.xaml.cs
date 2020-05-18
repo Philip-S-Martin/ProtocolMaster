@@ -63,8 +63,12 @@ namespace ProtocolMaster.View
             FileTree.Items.Clear();
             idDictionary.Clear();
 
-            MarkupCallback callback = Display_Tree_Child;
-            Drive.Instance.Refresh(callback);
+            // Refresh Google Drive Private
+            if (App.Instance.LoggedIn)
+            {
+                MarkupCallback callback = Display_Tree_Child;
+                Drive.Instance.Refresh(callback);
+            }
         }
 
         public void Folder_Click(object sender, RoutedEventArgs e)

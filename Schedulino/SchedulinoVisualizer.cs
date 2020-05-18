@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Schedulino
 {
-    [VisualizerExtension("CategoricalVisualizer", 1, "C1", "C2", "C3")]
+    [VisualizerMeta("CategoricalVisualizer", "1.1", "C1", "C2", "C3")]
     public class CategoricalVisualizer : IVisualizer
     {
 

@@ -17,13 +17,13 @@ namespace ProtocolMaster.Component.Model
     internal class VisualizerManager : IVisualizerManager
     {
         [ImportMany]
-        IEnumerable<Lazy<IVisualizer, VisualizerExtension>> _visualizers;
+        IEnumerable<ExportFactory<IVisualizer, VisualizerMeta>> _visualizers;
         public void Print()
         {
-            foreach (Lazy<IVisualizer, VisualizerExtension> i in _visualizers)
+            foreach (ExportFactory<IVisualizer, VisualizerMeta> i in _visualizers)
             {
-                App.Window.Timeline.ListVisualizer(i.Metadata.Name);
-                Log.Error("Visualizer found: " + i.Metadata.Name);
+                App.Window.Timeline.ListVisualizer(i.Metadata);
+                Log.Error("Visualizer found: " + i.Metadata.Name + " version " + i.Metadata.Version);
             }
         }
     }

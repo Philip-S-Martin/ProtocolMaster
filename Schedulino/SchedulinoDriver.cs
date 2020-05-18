@@ -2,10 +2,14 @@
 using ProtocolMaster.Component.Debug;
 using System.ComponentModel.Composition;
 using System.IO.Ports;
+using System.Collections.Generic;
+using System.Threading;
+using System.Net.Http.Headers;
+using System.Collections.Concurrent;
 
 namespace Schedulino
 {
-    [DriverExtension("Schedulino", 1, "E1", "E2", "E3")]
+    [DriverMeta("Schedulino", "1.1", "DigitalDuration", "DigitalPulse", "DigitalStringDuration")]
     public class SchedulinoDriver : IDriver
     {
         private enum enum_state { SETUP = 0, RUNNING, RESET }
@@ -17,119 +21,197 @@ namespace Schedulino
         SerialPort serial;
         public SerialPort Serial { get => serial; set => serial = value; }
 
-        public void Setup()
+        public ConcurrentQueue<VisualData> visualData { get; private set; }
+
+        // Data processing handlers
+        delegate void Handler(DriveData item);
+        Dictionary<string, Handler> handlers;
+        Handler invalidKeyHander;
+
+        // Arduino Serial receivers
+        delegate void Receiver();
+        Dictionary<char, Receiver> receivers;
+        Receiver invalidKeyReceiver;
+
+        public SchedulinoDriver()
         {
             _state = enum_state.SETUP;
             _run_time = 0;
             _serial_available = 0;
             _capacity = 0;
 
+            // Handlers for processing data
+            handlers = new Dictionary<string, Handler>();
+            handlers.Add("DigitalDuration", DigitalDurationHandler);
+            handlers.Add("DigitalPulse", DigitalPulseHandler);
+            handlers.Add("DigitalStringDuration", DigitalStringDurationHandler);
+            invalidKeyHander = InvalidKeyHandler;
+
+            // Reveivers for receiving data from Arduino
+            receivers = new Dictionary<char, Receiver>();
+            receivers.Add('C', CapacityReceiver);
+            receivers.Add('E', ErrorReceiver);
+            receivers.Add('D', DoneReceiver);
+            receivers.Add('P', ReportReceiver);
+            receivers.Add('R', ReplyReceiver);
+            invalidKeyReceiver = InvalidKeyReceiver;
+        }
+
+        public void Cancel()
+        {
+            Log.Error("Cancelling Schedulino");
+        }
+
+        public void ProcessData(List<DriveData> dataList)
+        {
+            foreach(DriveData data in dataList)
+            {
+                Handle(data);
+            }
+        }
+
+        public void Run()
+        {
+            // SerialPort setup
+            Serial = new SerialPort();
+            Serial.RtsEnable = true;
+            Serial.DtrEnable = true;
+            Serial.PortName = "COM3";
             Serial.BaudRate = 9600;
             Serial.Open();
+
+            while (true)
+            {
+                int read = Serial.ReadByte();
+                if (read != -1)
+                    Receive((char)read);
+            }
         }
 
-        public async void Loop()
+        private void Handle(DriveData data)
         {
-            byte[] read = new byte[1];
-            await Serial.BaseStream.ReadAsync(read, 0, 1);
-            Receive((char)read[0]);
+            Log.Error("Handling: " + data.Handler);
+            Handler thisKeyHandler;
+            if (handlers.TryGetValue(data.Handler, out thisKeyHandler))
+            {
+                thisKeyHandler(data);
+            }
+            else
+            {
+                invalidKeyHander(data);
+            }
         }
 
-        public void Exit()
+        #region Handler Functions
+        private void DigitalDurationHandler(DriveData item)
         {
 
         }
+        private void DigitalPulseHandler(DriveData item)
+        {
+
+        }
+        private void DigitalStringDurationHandler(DriveData item)
+        {
+
+        }
+        private void InvalidKeyHandler(DriveData item)
+        {
+
+        }
+        #endregion
 
         private void Receive(char input)
         {
-            switch (input)
+            Log.Error("Receiving: " + input);
+            Receiver thisKeyReceiver;
+            if (receivers.TryGetValue(input, out thisKeyReceiver))
             {
-                case 'C':
-                    ReceiveCapacity();
-                    break;
-                case 'E':
-                    ReceiveError();
-                    break;
-                case 'D':
-                    ReceiveDone();
-                    break;
-                case 'P':
-                    ReceiveReport();
-                    break;
-                case 'R':
-                    ReceiveReply();
-                    break;
-                default:
-                    ReceiveIncorrect();
-                    break;
+                thisKeyReceiver();
+            }
+            else
+            {
+                invalidKeyReceiver();
             }
         }
-        // Receivers: should probably be broken out into other classes...
-        #region
-        private uint _RecieveNum(int length)
+
+        #region Receiver Functions
+        private void CapacityReceiver()
         {
-            byte[] response = new byte[length];
-            Serial.Read(response, 0, length);
-            uint result = 0;
-            uint pow = 1;
-            for (int i = 0; i < length; i++)
-            {
-                result += response[i] * pow;
-                pow = pow << 8;
-            }
-            return result;
-        }
-        private uint _SendNum(ulong num, int length)
-        {
-            byte[] response = new byte[length];
-            Serial.Read(response, 0, length);
-            uint result = 0;
-            uint pow = 1;
-            for (int i = 0; i < length; i++)
-            {
-                result += response[i] * pow;
-                pow = pow << 8;
-            }
-            return result;
-        }
-        private void ReceiveCapacity()
-        {
-            _capacity = _RecieveNum(2);
+            _capacity = NumReadSerial(2);
             Log.Error("Schedulino CAPACITY\ncapacity:" + _capacity);
         }
-        private void ReceiveError()
+        private void ErrorReceiver()
         {
             byte file, error, ext;
-            file = (byte)_RecieveNum(1);
-            error = (byte)_RecieveNum(1);
-            ext = (byte)_RecieveNum(1);
+            file = (byte)NumReadSerial(1);
+            error = (byte)NumReadSerial(1);
+            ext = (byte)NumReadSerial(1);
             Log.Error("Schedulino ERROR\nfile:" + file + "\nerror:" + error + "\next:" + ext); ;
 
         }
-        private void ReceiveDone()
+        private void DoneReceiver()
         {
-            _run_time = _RecieveNum(4);
-            _state = (enum_state)_RecieveNum(1);
+            _run_time = NumReadSerial(4);
+            _state = (enum_state)NumReadSerial(1);
             Log.Error("Schedulino DONE\nrun_time:" + _run_time + "\nstate:" + _state);
         }
-        private void ReceiveReport()
+        private void ReportReceiver()
         {
-            ushort index = (ushort)_RecieveNum(2);
-            uint time = (uint)_RecieveNum(4);
-            byte pin = (byte)_RecieveNum(1);
-            byte pinstate = (byte)_RecieveNum(1);
+            ushort index = (ushort)NumReadSerial(2);
+            uint time = (uint)NumReadSerial(4);
+            byte pin = (byte)NumReadSerial(1);
+            byte pinstate = (byte)NumReadSerial(1);
             Log.Error("Schedulino REPORT\nindex:" + index + "\ntime:" + time + "\npin:" + pin + "\npinstate:" + pinstate);
-
         }
-        private void ReceiveReply()
+        private void ReplyReceiver()
         {
-            _serial_available = (byte)_RecieveNum(1);
+            _serial_available = (byte)NumReadSerial(1);
             Log.Error("Schedulino REPLY\nserial_available:" + _serial_available);
         }
-        private void ReceiveIncorrect()
+        private void InvalidKeyReceiver()
         {
             Log.Error("Schedulino UNEXPECTED BYTE");
         }
+
+
         #endregion
+
+        #region Read/Write Functions
+        private uint NumReadSerial(int length)
+        {
+            byte[] readBytes = new byte[length];
+            Serial.Read(readBytes, 0, length);
+            return NumRead(readBytes);
+        }
+        private static uint NumRead(byte[] input)
+        {
+            uint result = 0;
+            uint pow = 1;
+            for (int i = input.Length - 1; i >= 0; i--)
+            {
+                result += input[i] * pow;
+                pow = pow << 8;
+            }
+            return result;
+        }
+        private void NumWriteSerial(uint num, int length)
+        {
+            Serial.Write(NumWrite(num, length), 0, length);
+        }
+        private static byte[] NumWrite(uint num, int length)
+        {
+            byte[] response = new byte[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                num = num >> (i * 8);
+                response[i] = (byte)num;
+            }
+            return response;
+        }
+        #endregion
+
+
     }
 }

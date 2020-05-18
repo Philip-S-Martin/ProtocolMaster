@@ -20,6 +20,9 @@ uint32_t elapsed = 0;
 uint32_t run_time = 0;
 uint32_t run_offset = 0;
 
+void _schedule_init();
+uint16_t _schedule_capacity(), _schedule_first_index(), _schedule_last_index();
+
 #define SCHEDULE_MAX_EVENTS 192
 typedef struct
 {
@@ -42,7 +45,7 @@ void _schedule_init()
 }
 uint16_t _schedule_capacity()
 {
-  return schedule.last - schedule.first;
+  return SCHEDULE_MAX_EVENTS - (schedule.last - schedule.first);
 }
 uint16_t _schedule_first_index()
 {

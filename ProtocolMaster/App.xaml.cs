@@ -17,9 +17,7 @@ namespace ProtocolMaster
         public static MainWindow Window { get { return (MainWindow)Application.Current.MainWindow; } }
         public bool LoggedIn => Auth.Instance.isAuthenticated();
 
-        DriverManager driverManager;
-        InterpreterManager interpreterManager;
-
+        internal ExtensionSystem Extensions { get; private set; }
         void App_Startup(object sender, StartupEventArgs e)
         {
             Log.Error("ProtocolMaster Starting up");
@@ -27,7 +25,7 @@ namespace ProtocolMaster
             MainWindow.Show();
             Log.Out("Application Data: " + Log.Instance.AppData);
 
-            ExtensionManager exMgr = new ExtensionManager();
+            Extensions = new ExtensionSystem();
         }
 
         // Full Login Routine
