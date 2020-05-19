@@ -29,11 +29,12 @@ namespace ProtocolMaster.Component.Model
         private CancellationTokenSource tokenSource;
 
         [ImportMany]
-        IEnumerable<ExportFactory<IDriver, DriverMeta>> _drivers;
+        private IEnumerable<ExportFactory<IDriver, DriverMeta>> Drivers { get; set; }
+
         // Driver thread management
         public void Print()
         {
-            foreach (ExportFactory<IDriver, DriverMeta> i in _drivers)
+            foreach (ExportFactory<IDriver, DriverMeta> i in Drivers)
             {
                 App.Window.Timeline.ListDriver(i.Metadata);
                 Log.Error("Driver found: " + i.Metadata.Name + " version " + i.Metadata.Version);
@@ -42,9 +43,9 @@ namespace ProtocolMaster.Component.Model
 
         public void Select(DriverMeta target)
         {
-            foreach (ExportFactory<IDriver, DriverMeta> i in _drivers)
+            foreach (ExportFactory<IDriver, DriverMeta> i in Drivers)
             {
-                if(i.Metadata == target)
+                if (i.Metadata == target)
                 {
                     driverFactory = i;
                 }

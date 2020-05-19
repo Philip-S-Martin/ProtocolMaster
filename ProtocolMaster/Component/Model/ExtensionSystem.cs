@@ -16,16 +16,13 @@ namespace ProtocolMaster.Component.Model
     {
         // Import All Extensions so that they can be Composed (ComposeParts())
         [Import(typeof(IDriverManager))]
-        private IDriverManager driverManager;
-        public IDriverManager Drivers { get => driverManager; private set => driverManager = value; }
+        public IDriverManager Drivers { get; private set; }
 
         [Import(typeof(IInterpreterManager))]
-        private IInterpreterManager interpreterManager;
-        public IInterpreterManager Interpreters { get => interpreterManager; private set => interpreterManager = value; }
+        public IInterpreterManager Interpreters { get; private set; }
 
         [Import(typeof(IVisualizerManager))]
-        private IVisualizerManager visualizerManager;
-        public IVisualizerManager Visualizers { get => visualizerManager; private set => visualizerManager = value; }
+        public IVisualizerManager Visualizers { get; private set; }
 
         // Composition Objects
         private readonly CompositionContainer _container;
@@ -48,9 +45,9 @@ namespace ProtocolMaster.Component.Model
                 Log.Error(compositionException.ToString());
             }
 
-            driverManager.Print();
-            interpreterManager.Print();
-            visualizerManager.Print();
+            Drivers.Print();
+            Interpreters.Print();
+            Visualizers.Print();
         }
 
         public void Run()

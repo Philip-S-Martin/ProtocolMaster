@@ -12,8 +12,8 @@ namespace Schedulino
     [DriverMeta("Schedulino", "1.1", "DigitalDuration", "DigitalPulse", "DigitalStringDuration")]
     public class SchedulinoDriver : IDriver
     {
-        private enum enum_state { SETUP = 0, RUNNING, RESET }
-        enum_state _state;
+        private enum ScheduleState { SETUP = 0, RUNNING, RESET }
+        ScheduleState _state;
         uint _run_time;
         byte _serial_available;
         private uint _capacity;
@@ -25,35 +25,39 @@ namespace Schedulino
 
         // Data processing handlers
         delegate void Handler(DriveData item);
-        Dictionary<string, Handler> handlers;
-        Handler invalidKeyHander;
+        readonly Dictionary<string, Handler> handlers;
+        readonly Handler invalidKeyHander;
 
         // Arduino Serial receivers
         delegate void Receiver();
-        Dictionary<char, Receiver> receivers;
-        Receiver invalidKeyReceiver;
+        readonly Dictionary<char, Receiver> receivers;
+        readonly Receiver invalidKeyReceiver;
 
         public SchedulinoDriver()
         {
-            _state = enum_state.SETUP;
+            _state = ScheduleState.SETUP;
             _run_time = 0;
             _serial_available = 0;
             _capacity = 0;
 
             // Handlers for processing data
-            handlers = new Dictionary<string, Handler>();
-            handlers.Add("DigitalDuration", DigitalDurationHandler);
-            handlers.Add("DigitalPulse", DigitalPulseHandler);
-            handlers.Add("DigitalStringDuration", DigitalStringDurationHandler);
+            handlers = new Dictionary<string, Handler>
+            {
+                { "DigitalDuration", DigitalDurationHandler },
+                { "DigitalPulse", DigitalPulseHandler },
+                { "DigitalStringDuration", DigitalStringDurationHandler }
+            };
             invalidKeyHander = InvalidKeyHandler;
 
             // Reveivers for receiving data from Arduino
-            receivers = new Dictionary<char, Receiver>();
-            receivers.Add('C', CapacityReceiver);
-            receivers.Add('E', ErrorReceiver);
-            receivers.Add('D', DoneReceiver);
-            receivers.Add('P', ReportReceiver);
-            receivers.Add('R', ReplyReceiver);
+            receivers = new Dictionary<char, Receiver>
+            {
+                { 'C', CapacityReceiver },
+                { 'E', ErrorReceiver },
+                { 'D', DoneReceiver },
+                { 'P', ReportReceiver },
+                { 'R', ReplyReceiver }
+            };
             invalidKeyReceiver = InvalidKeyReceiver;
         }
 
@@ -73,11 +77,13 @@ namespace Schedulino
         public void Run()
         {
             // SerialPort setup
-            Serial = new SerialPort();
-            Serial.RtsEnable = true;
-            Serial.DtrEnable = true;
-            Serial.PortName = "COM3";
-            Serial.BaudRate = 9600;
+            Serial = new SerialPort
+            {
+                RtsEnable = true,
+                DtrEnable = true,
+                PortName = "COM3",
+                BaudRate = 9600
+            };
             Serial.Open();
 
             while (true)
@@ -91,8 +97,7 @@ namespace Schedulino
         private void Handle(DriveData data)
         {
             Log.Error("Handling: " + data.Handler);
-            Handler thisKeyHandler;
-            if (handlers.TryGetValue(data.Handler, out thisKeyHandler))
+            if (handlers.TryGetValue(data.Handler, out Handler thisKeyHandler))
             {
                 thisKeyHandler(data);
             }
@@ -124,8 +129,7 @@ namespace Schedulino
         private void Receive(char input)
         {
             Log.Error("Receiving: " + input);
-            Receiver thisKeyReceiver;
-            if (receivers.TryGetValue(input, out thisKeyReceiver))
+            if (receivers.TryGetValue(input, out Receiver thisKeyReceiver))
             {
                 thisKeyReceiver();
             }
@@ -153,7 +157,7 @@ namespace Schedulino
         private void DoneReceiver()
         {
             _run_time = NumReadSerial(4);
-            _state = (enum_state)NumReadSerial(1);
+            _state = (ScheduleState)NumReadSerial(1);
             Log.Error("Schedulino DONE\nrun_time:" + _run_time + "\nstate:" + _state);
         }
         private void ReportReceiver()
@@ -191,7 +195,7 @@ namespace Schedulino
             for (int i = input.Length - 1; i >= 0; i--)
             {
                 result += input[i] * pow;
-                pow = pow << 8;
+                pow <<= 8;
             }
             return result;
         }
@@ -205,7 +209,7 @@ namespace Schedulino
 
             for (int i = 0; i < length; i++)
             {
-                num = num >> (i * 8);
+                num >>= (i * 8);
                 response[i] = (byte)num;
             }
             return response;

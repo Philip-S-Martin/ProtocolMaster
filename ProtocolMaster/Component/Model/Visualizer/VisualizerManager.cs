@@ -17,10 +17,10 @@ namespace ProtocolMaster.Component.Model
     internal class VisualizerManager : IVisualizerManager
     {
         [ImportMany]
-        IEnumerable<ExportFactory<IVisualizer, VisualizerMeta>> _visualizers;
+        private IEnumerable<ExportFactory<IVisualizer, VisualizerMeta>> Visualizers { get; set; }
         public void Print()
         {
-            foreach (ExportFactory<IVisualizer, VisualizerMeta> i in _visualizers)
+            foreach (ExportFactory<IVisualizer, VisualizerMeta> i in Visualizers)
             {
                 App.Window.Timeline.ListVisualizer(i.Metadata);
                 Log.Error("Visualizer found: " + i.Metadata.Name + " version " + i.Metadata.Version);

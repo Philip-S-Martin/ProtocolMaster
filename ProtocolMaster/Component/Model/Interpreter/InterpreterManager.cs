@@ -21,7 +21,7 @@ namespace ProtocolMaster.Component.Model
     internal class InterpreterManager : IInterpreterManager
     {
         [ImportMany]
-        IEnumerable<ExportFactory<IInterpreter, InterpreterMeta>> _interpreters;
+        private IEnumerable<ExportFactory<IInterpreter, InterpreterMeta>> Interpreters { get; set; }
 
         ExportFactory<IInterpreter, InterpreterMeta> interpreterFactory;
         ExportLifetimeContext<IInterpreter> interpreterContext;
@@ -34,7 +34,7 @@ namespace ProtocolMaster.Component.Model
         // interpreter thread management
         public void Print()
         {
-            foreach (ExportFactory<IInterpreter, InterpreterMeta> interpreter in _interpreters)
+            foreach (ExportFactory<IInterpreter, InterpreterMeta> interpreter in Interpreters)
             {
                 App.Window.Timeline.ListInterpreter(interpreter.Metadata);
                 Log.Error("Interpreter found: " + interpreter.Metadata.Name +" version " + interpreter.Metadata.Version);
@@ -49,7 +49,7 @@ namespace ProtocolMaster.Component.Model
 
         public void Select(InterpreterMeta target)
         {
-            foreach (ExportFactory<IInterpreter, InterpreterMeta> i in _interpreters)
+            foreach (ExportFactory<IInterpreter, InterpreterMeta> i in Interpreters)
             {
                 if (i.Metadata == target)
                 {
