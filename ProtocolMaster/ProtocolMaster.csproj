@@ -21,6 +21,7 @@
     <PackageReference Include="Accord.Video.DirectShow" Version="3.8.0" />
     <PackageReference Include="Accord.Video.FFMPEG" Version="3.8.0" />
     <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+    <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2" />
     <PackageReference Include="Google.Apis" Version="1.44.1" />
     <PackageReference Include="Google.Apis.Auth" Version="1.44.1" />
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.44.0.1863" />

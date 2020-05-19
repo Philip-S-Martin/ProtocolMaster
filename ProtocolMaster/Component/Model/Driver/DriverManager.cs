@@ -74,6 +74,11 @@ namespace ProtocolMaster.Component.Model
             driverContext.Dispose();
         }
 
+        public void Cancel()
+        {
+            tokenSource.Cancel();
+        }
+
 
         // Old code from when DriverManager was really more of a SerialDriverManager
         /*

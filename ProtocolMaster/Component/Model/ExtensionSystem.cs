@@ -28,7 +28,7 @@ namespace ProtocolMaster.Component.Model
         public IVisualizerManager Visualizers { get => visualizerManager; private set => visualizerManager = value; }
 
         // Composition Objects
-        private CompositionContainer _container;
+        private readonly CompositionContainer _container;
 
         public ExtensionSystem()
         {
@@ -38,10 +38,10 @@ namespace ProtocolMaster.Component.Model
             catalog.Catalogs.Add(new DirectoryCatalog(targetDir));
             _container = new CompositionContainer(catalog);
             Log.Error("Extension Location: " + targetDir);
-
+            this._container.ComposeParts(this);
             try
             {
-                this._container.ComposeParts(this);
+                
             }
             catch (CompositionException compositionException)
             {

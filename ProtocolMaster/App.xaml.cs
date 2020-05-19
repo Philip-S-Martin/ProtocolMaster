@@ -15,7 +15,7 @@ namespace ProtocolMaster
     {
         public static App Instance { get { return (App)Application.Current; } }
         public static MainWindow Window { get { return (MainWindow)Application.Current.MainWindow; } }
-        public bool LoggedIn => Auth.Instance.isAuthenticated();
+        public bool LoggedIn => Auth.Instance.IsAuthenticated();
 
         internal ExtensionSystem Extensions { get; private set; }
         void App_Startup(object sender, StartupEventArgs e)

@@ -72,14 +72,14 @@ namespace ProtocolMaster.Component.Google
 
         public async Task DeAuthenticate()
         {
-            if (!isAuthenticated()) return;
+            if (!IsAuthenticated()) return;
             Log.Error("DeAuthenticate(): DEAUTHENTICATING");
             credential = null;
             await userStore.ClearAsync();
             Log.Error("Authenticate(): User Fully Deauthenticated");
         }
 
-        public bool isAuthenticated()
+        public bool IsAuthenticated()
         {
             return credential != null;
         }

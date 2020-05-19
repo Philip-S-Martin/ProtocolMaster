@@ -8,7 +8,7 @@ namespace ProtocolMaster.Component.Google
     public class TreeFile
     {
         private readonly TreeFile parent;
-        private List<TreeFile> children;
+        private readonly List<TreeFile> children;
         private readonly File file;
 
         public File File => file;

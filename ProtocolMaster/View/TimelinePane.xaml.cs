@@ -27,8 +27,10 @@ namespace ProtocolMaster.View
 
         public void ListDriver(DriverMeta data)
         {
-            MenuItem newDriver = new MenuItem();
-            newDriver.Header = data.Name + " " + data.Version;
+            MenuItem newDriver = new MenuItem
+            {
+                Header = data.Name + " " + data.Version
+            };
             newDriver.Resources.Add("data", data);
             newDriver.Click += new RoutedEventHandler(DriverClickHandler);
             DriverDropdown.Items.Add(newDriver);
@@ -44,8 +46,10 @@ namespace ProtocolMaster.View
 
         public void ListInterpreter(InterpreterMeta data)
         {
-            MenuItem newInterpreter = new MenuItem();
-            newInterpreter.Header = data.Name + " " + data.Version;
+            MenuItem newInterpreter = new MenuItem
+            {
+                Header = data.Name + " " + data.Version
+            };
             newInterpreter.Resources.Add("data", data);
             newInterpreter.Click += new RoutedEventHandler(InterpreterClickHandler);
             InterpreterDropdown.Items.Add(newInterpreter);
@@ -60,8 +64,10 @@ namespace ProtocolMaster.View
 
         public void ListVisualizer(VisualizerMeta data)
         {
-            MenuItem newVis = new MenuItem();
-            newVis.Header = data.Name + " " + data.Version;
+            MenuItem newVis = new MenuItem
+            {
+                Header = data.Name + " " + data.Version
+            };
             newVis.Resources.Add("data", data);
             newVis.Click += new RoutedEventHandler(VisualizerClickHandler);
             VisualizerDropdown.Items.Add(newVis);
@@ -89,8 +95,10 @@ namespace ProtocolMaster.View
             DateTime start = new DateTime(2017, 1, 1, 15, 20, 0);
             DateTime end = new DateTime(2017, 1, 1, 15, 30, 0);
 
-            var model = new PlotModel();
-            model.IsLegendVisible = false;
+            var model = new PlotModel
+            {
+                IsLegendVisible = false
+            };
 
             model.Axes.Add(new OxyPlot.Axes.DateTimeAxis()
             {

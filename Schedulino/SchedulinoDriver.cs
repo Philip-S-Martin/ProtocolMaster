@@ -21,7 +21,7 @@ namespace Schedulino
         SerialPort serial;
         public SerialPort Serial { get => serial; set => serial = value; }
 
-        public ConcurrentQueue<VisualData> visualData { get; private set; }
+        public ConcurrentQueue<VisualData> VisualData { get; private set; }
 
         // Data processing handlers
         delegate void Handler(DriveData item);

@@ -22,7 +22,7 @@ namespace ProtocolMaster.Component.Google
             }
         }
         // IService Implementation
-        private static string[] serviceTokens =
+        private static readonly string[] serviceTokens =
         {
             "https://www.googleapis.com/auth/drive.install"
         };
