@@ -6,6 +6,7 @@ using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 
@@ -27,8 +28,15 @@ namespace ProtocolMaster.Component.Model
         // Composition Objects
         private readonly CompositionContainer _container;
 
+        bool isRunning;
+
+        private Task runTask;
+        private CancellationToken cancelToken;
+        private CancellationTokenSource tokenSource;
+
         public ExtensionSystem()
         {
+            isRunning = false;
             string targetDir = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\Extensions";
             AggregateCatalog catalog = new AggregateCatalog();
             catalog.Catalogs.Add(new AssemblyCatalog(typeof(InterpreterManager).Assembly));
@@ -38,22 +46,46 @@ namespace ProtocolMaster.Component.Model
             this._container.ComposeParts(this);
             try
             {
-                
+
             }
             catch (CompositionException compositionException)
             {
                 Log.Error(compositionException.ToString());
             }
-
-            Drivers.Print();
-            Interpreters.Print();
-            Visualizers.Print();
+        }
+        public void PrepExtensions()
+        {
+            Drivers.Load();
+            Interpreters.Load();
+            Visualizers.Load();
         }
 
         public void Run()
         {
-            //interpreterManager.Run();
-            //driverManager.
+            if (isRunning == false)
+            {
+                isRunning = true;
+                tokenSource = new CancellationTokenSource();
+                cancelToken = tokenSource.Token;
+
+                runTask = Task.Run(new Action(() =>
+                {
+                    cancelToken.Register(new Action(() =>
+                        {
+                            //Interpreters.Cancel(); 
+                            Drivers.Cancel();
+                        }));
+                    Drivers.Run(Interpreters.Generate());
+                }), tokenSource.Token);
+            }
+        }
+        public void Cancel()
+        {
+            if (Drivers.IsRunning == true)
+            {
+                Drivers.Cancel();
+            }
+            isRunning = false;
         }
     }
 }

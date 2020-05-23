@@ -12,9 +12,12 @@ namespace ProtocolMaster.Component.Model
 {
     internal interface IDriverManager
     {
-        void Print();
+        void Load();
         void Select(DriverMeta target);
-        void Run();
+        DriverMeta Selected { get; }
+        void Run(List<DriveData> data);
+        void Cancel();
+        bool IsRunning { get; }
     }
 
     [Export(typeof(IDriverManager))]
@@ -27,18 +30,26 @@ namespace ProtocolMaster.Component.Model
         private Task runTask;
         private CancellationToken cancelToken;
         private CancellationTokenSource tokenSource;
+        public bool IsRunning { get; private set; }
 
         [ImportMany]
         private IEnumerable<ExportFactory<IDriver, DriverMeta>> Drivers { get; set; }
 
+        public DriverMeta Selected { get { return driverFactory.Metadata; } }
+
         // Driver thread management
-        public void Print()
+        public void Load()
         {
             foreach (ExportFactory<IDriver, DriverMeta> i in Drivers)
             {
                 App.Window.Timeline.ListDriver(i.Metadata);
-                Log.Error("Driver found: " + i.Metadata.Name + " version " + i.Metadata.Version);
+                if (i.Metadata.Name == "None" && i.Metadata.Version == "")
+                {
+                    Select(i.Metadata);
+                }
+                Log.Error("Driver found: '" + i.Metadata.Name + "' version: '" + i.Metadata.Version + "'");
             }
+            App.Window.Timeline.ShowSelectedDriver();
         }
 
         public void Select(DriverMeta target)
@@ -52,32 +63,86 @@ namespace ProtocolMaster.Component.Model
             }
         }
 
-        public void Run()
+        public void Run(List<DriveData> data)
         {
             driverContext = driverFactory.CreateExport();
             driver = driverContext.Value;
 
-            List<DriveData> data = new List<DriveData>();
-
-            tokenSource = new CancellationTokenSource();
-            cancelToken = tokenSource.Token;
-
-            runTask = Task.Run(new Action(() =>
-            {
-                // Register driver cancel
-                cancelToken.Register(new Action(() => driver.Cancel()));
-                // pre-fill event data
-                driver.ProcessData(data);
-                // Loop through driver
-                driver.Run();
-            }), tokenSource.Token);
+            IsRunning = true;
+            // pre-fill event data
+            driver.ProcessData(data);
+            // Loop through driver
+            driver.Run();
+            IsRunning = false;
 
             driverContext.Dispose();
         }
 
         public void Cancel()
         {
-            tokenSource.Cancel();
+            Log.Error("CANCELLATION REQUESTED");
+            driver.Cancel();
+            IsRunning = false;
+        }
+
+        public List<DriveData> TestData_A()
+        {
+            return new List<DriveData>()
+            {
+                new DriveData("DigitalDuration",
+                    new KeyValuePair<string, string>("SignalPin", "4"),
+                    new KeyValuePair<string, string>("DurationPin", "5"),
+                    new KeyValuePair<string, string>("TimeStartMs", "1000"),
+                    new KeyValuePair<string, string>("TimeEndMs", "2000")),
+                new DriveData("DigitalDuration",
+                    new KeyValuePair<string, string>("SignalPin", "6"),
+                    new KeyValuePair<string, string>("DurationPin", "7"),
+                    new KeyValuePair<string, string>("TimeStartMs", "1500"),
+                    new KeyValuePair<string, string>("TimeEndMs", "2500")),
+                new DriveData("DigitalStringDuration",
+                    new KeyValuePair<string, string>("SignalRange", "8:11"),
+                    new KeyValuePair<string, string>("DurationPin", "12"),
+                    new KeyValuePair<string, string>("Value", "1"),
+                    new KeyValuePair<string, string>("TimeStartMs", "1000"),
+                    new KeyValuePair<string, string>("TimeEndMs", "1500")),
+                new DriveData("DigitalStringDuration",
+                    new KeyValuePair<string, string>("SignalRange", "8:11"),
+                    new KeyValuePair<string, string>("DurationPin", "12"),
+                    new KeyValuePair<string, string>("Value", "2"),
+                    new KeyValuePair<string, string>("TimeStartMs", "1500"),
+                    new KeyValuePair<string, string>("TimeEndMs", "2000")),
+                new DriveData("DigitalStringDuration",
+                    new KeyValuePair<string, string>("SignalRange", "8:11"),
+                    new KeyValuePair<string, string>("DurationPin", "12"),
+                    new KeyValuePair<string, string>("Value", "3"),
+                    new KeyValuePair<string, string>("TimeStartMs", "2000"),
+                    new KeyValuePair<string, string>("TimeEndMs", "2500")),
+                new DriveData("DigitalStringDuration",
+                    new KeyValuePair<string, string>("SignalRange", "8:11"),
+                    new KeyValuePair<string, string>("DurationPin", "12"),
+                    new KeyValuePair<string, string>("Value", "4"),
+                    new KeyValuePair<string, string>("TimeStartMs", "2500"),
+                    new KeyValuePair<string, string>("TimeEndMs", "3000")),
+                new DriveData("DigitalStringDuration",
+                    new KeyValuePair<string, string>("SignalRange", "8:11"),
+                    new KeyValuePair<string, string>("DurationPin", "12"),
+                    new KeyValuePair<string, string>("Value", "5"),
+                    new KeyValuePair<string, string>("TimeStartMs", "3000"),
+                    new KeyValuePair<string, string>("TimeEndMs", "3500")),
+                new DriveData("DigitalStringDuration",
+                    new KeyValuePair<string, string>("SignalRange", "8:11"),
+                    new KeyValuePair<string, string>("DurationPin", "12"),
+                    new KeyValuePair<string, string>("Value", "6"),
+                    new KeyValuePair<string, string>("TimeStartMs", "3500"),
+                    new KeyValuePair<string, string>("TimeEndMs", "4000")),
+                new DriveData("DigitalStringDuration",
+                    new KeyValuePair<string, string>("SignalRange", "8:11"),
+                    new KeyValuePair<string, string>("DurationPin", "12"),
+                    new KeyValuePair<string, string>("Value", "7"),
+                    new KeyValuePair<string, string>("TimeStartMs", "4000"),
+                    new KeyValuePair<string, string>("TimeEndMs", "4500"))
+
+            };
         }
 
 

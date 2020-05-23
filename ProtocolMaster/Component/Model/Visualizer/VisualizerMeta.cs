@@ -25,5 +25,9 @@ namespace ProtocolMaster.Component.Model
             Name = (string)inputs["Name"];
             Version = (string)inputs["Version"];
         }
+        public override string ToString()
+        {
+            return Name + " " + Version;
+        }
     }
 }

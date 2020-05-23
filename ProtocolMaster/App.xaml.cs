@@ -26,6 +26,7 @@ namespace ProtocolMaster
             Log.Out("Application Data: " + Log.Instance.AppData);
 
             Extensions = new ExtensionSystem();
+            Extensions.PrepExtensions();
         }
 
         // Full Login Routine

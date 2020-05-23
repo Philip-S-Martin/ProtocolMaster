@@ -29,7 +29,7 @@ namespace ProtocolMaster.View
         {
             MenuItem newDriver = new MenuItem
             {
-                Header = data.Name + " " + data.Version
+                Header = data.ToString()
             };
             newDriver.Resources.Add("data", data);
             newDriver.Click += new RoutedEventHandler(DriverClickHandler);
@@ -40,15 +40,21 @@ namespace ProtocolMaster.View
         {
             MenuItem src = e.Source as MenuItem;
             DriverMeta data = src.Resources["data"] as DriverMeta;
-            SelectedDriver.Header = "Selected: " + data.Name + " " + data.Version;
+            
             App.Instance.Extensions.Drivers.Select(data);
+            ShowSelectedDriver();
+        }
+
+        public void ShowSelectedDriver()
+        {
+            SelectedDriver.Header = "Selected: " + App.Instance.Extensions.Drivers.Selected.ToString();
         }
 
         public void ListInterpreter(InterpreterMeta data)
         {
             MenuItem newInterpreter = new MenuItem
             {
-                Header = data.Name + " " + data.Version
+                Header = data.ToString()
             };
             newInterpreter.Resources.Add("data", data);
             newInterpreter.Click += new RoutedEventHandler(InterpreterClickHandler);
@@ -59,7 +65,13 @@ namespace ProtocolMaster.View
         {
             MenuItem src = e.Source as MenuItem;
             InterpreterMeta data = src.Resources["data"] as InterpreterMeta;
-            SelectedInterpreter.Header = "Selected: " + data.Name + " " + data.Version;
+            App.Instance.Extensions.Interpreters.Select(data);
+            ShowSelectedInterpreter();
+        }
+
+        public void ShowSelectedInterpreter()
+        {
+            SelectedInterpreter.Header = "Selected: " + App.Instance.Extensions.Interpreters.Selected.ToString();
         }
 
         public void ListVisualizer(VisualizerMeta data)
@@ -77,17 +89,23 @@ namespace ProtocolMaster.View
         {
             MenuItem src = e.Source as MenuItem;
             VisualizerMeta data = src.Resources["data"] as VisualizerMeta;
-            SelectedVisualizer.Header = "Selected: " + data.Name + " " + data.Version;
+            App.Instance.Extensions.Visualizers.Select(data);
+            ShowSelectedInterpreter();
+        }
+
+        public void ShowSelectedVisualizer()
+        {
+            SelectedVisualizer.Header = "Selected: " + App.Instance.Extensions.Visualizers.Selected.ToString();
         }
 
         public void Start_Click(object sender, RoutedEventArgs e)
         {
-            App.Instance.Extensions.Drivers.Run();
+            App.Instance.Extensions.Run();
         }
 
         public void Stop_Click(object sender, RoutedEventArgs e)
         {
-
+            App.Instance.Extensions.Cancel();
         }
 
         private void SetUpPlot()

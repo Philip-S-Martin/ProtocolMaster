@@ -19,7 +19,7 @@ byte Input_Map_Bytes[] = {'S', 'X', 'E', 'R', 'C'};
 // And this is the matrix!
 void (*Input_Map_Functions[enum_state_count][input_state_count])() = {
     {_Input_Start, _Input_Cancel, _Input_Event, _Input_Reply, _Input_Capacity},
-    {_Input_Error, _Input_Cancel,  _Input_Error, _Input_Reply, _Input_Capacity},
+    {_Input_Error, _Input_Cancel,  _Input_Event, _Input_Reply, _Input_Capacity},
     {_Input_Error, _Input_Error, _Input_Error, _Input_Error, _Input_Capacity}};
 
 void Schedule_Input()
@@ -83,14 +83,15 @@ void _Input_Event()
   }
   // reset wait timer, read 'E' to get to values
   input_event_wait = 0;
-  Serial.read();
+  Serial.read(); // Read E
   // read scheduled time
-  long pow = 1 << 24;
-  uint16_t index = schedule.last % SCHEDULE_MAX_EVENTS;
+  long pow = 1;
+  uint16_t index = schedule.lastIndex();
+  schedule.time[index] = 0;
   for(uint16_t i = 0; i < 4; i++)
   {
     schedule.time[index] += Serial.read() * pow;
-    pow >> 8;
+    pow <<= 8;
   }
   // read scheduled state
   schedule.pin[index] = Serial.read();
@@ -100,6 +101,7 @@ void _Input_Event()
     Error(FILE_INPUT, 3, 0);
   }
   schedule.state[index] = Serial.read();
+  Reply();
   schedule.last++;
 }
 void _Input_Reply()
