@@ -55,9 +55,14 @@ uint16_t _schedule_last_index()
 {
   return schedule.last % SCHEDULE_MAX_EVENTS;
 }
+uint16_t _schedule_index(uint16_t index)
+{
+  return index % SCHEDULE_MAX_EVENTS;
+}
 
 // SERIAL HELPERS
 
+/*
 void WriteBytes(uint32_t target)
 {
   byte sendBuf[4];
@@ -80,43 +85,44 @@ void WriteBytes(byte target)
 {
   Serial.write((byte)target);
 }
-
+*/
 // SERIAL IO
 
 void Error(byte file, byte error, byte ext)
 {
-  WriteBytes((byte)'E');
-  WriteBytes(file);
-  WriteBytes(error);
-  WriteBytes(ext);
+  Serial.write((byte)'E');
+  Serial.println(file);
+  Serial.println(error);
+  Serial.println(ext);
 }
 
 void Reply()
 {
-  WriteBytes((byte)'R');
-  WriteBytes((byte)Serial.available());
+  Serial.write((byte)'R');
 }
 
 void Done()
 {
-  WriteBytes((byte)'D');
-  WriteBytes(run_time);
-  WriteBytes((byte)state);
+  Serial.write((byte)'D');
+  Serial.println(run_time);
+  Serial.println((byte)state);
 }
 
 void Report(uint16_t index)
 {
-  WriteBytes((byte)'P');
-  WriteBytes(index);
-  WriteBytes(schedule.time[index]);
-  WriteBytes(schedule.pin[index]);
-  WriteBytes(schedule.state[index]);
+  uint16_t realIndex = _schedule_index(index);
+  Serial.write((byte)'P');
+  Serial.println(index);
+  Serial.println(schedule.time[realIndex]);
+  Serial.println(schedule.pin[realIndex]);
+  Serial.println(schedule.state[realIndex]);
 }
 
 void Capacity()
 {
-  WriteBytes((byte)'C');
-  WriteBytes(schedule.capacity());
+  Serial.write((byte)'C');
+  Serial.println(schedule.capacity());
+  Serial.println((byte)(63 - Serial.available()));
 }
 
 #endif

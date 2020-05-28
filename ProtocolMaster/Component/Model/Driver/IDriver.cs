@@ -11,7 +11,7 @@ namespace ProtocolMaster.Component.Model
     /// </summary>
     public interface IDriver
     {
-        ConcurrentQueue<VisualData> visualData { get; }
+        ConcurrentQueue<VisualData> VisualData { get; }
         /// <summary>
         /// Data processing function, this takes DriverData and converts it into hardware-compatible data
         /// </summary>

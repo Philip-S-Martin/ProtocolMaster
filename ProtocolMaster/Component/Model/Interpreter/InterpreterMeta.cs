@@ -21,12 +21,13 @@ namespace ProtocolMaster.Component.Model
 
         public InterpreterMeta(IDictionary<string, object> inputs)
         {
-            foreach (string str in inputs.Keys)
-                Debug.Log.Error("Key: " + str);
-
             PageHeadersCSV = (string[])inputs["PageHeadersCSV"];
             Name = (string)inputs["Name"];
             Version = (string)inputs["Version"];
+        }
+        public override string ToString()
+        {
+            return Name + " " + Version;
         }
     }
 }

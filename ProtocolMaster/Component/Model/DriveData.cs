@@ -5,14 +5,16 @@ namespace ProtocolMaster.Component.Model
     public class DriveData
     {
         public string Handler { get; private set; }
-        public uint TimeMs { get; private set; }
-        public Dictionary<string, object> Arguments { get; private set; }
+        public Dictionary<string, string> Arguments { get; private set; }
 
-        public DriveData(string handler, uint timeMs)
+        public DriveData(string handler, params KeyValuePair<string, string>[] args)
         {
             this.Handler = handler;
-            this.TimeMs = timeMs;
-            Arguments = new Dictionary<string, object>();
+            Arguments = new Dictionary<string, string>();
+            foreach(KeyValuePair<string, string> arg in args)
+            {
+                Arguments.Add(arg.Key, arg.Value);
+            }
         }
         /*
         private int loadOrder;

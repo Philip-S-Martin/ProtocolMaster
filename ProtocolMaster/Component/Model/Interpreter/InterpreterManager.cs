@@ -1,4 +1,6 @@
-﻿using ProtocolMaster.Component.Debug;
+﻿using ExcelDataReader;
+using ProtocolMaster.Component.Debug;
+using ProtocolMaster.Component.Model.Interpreter;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -11,9 +13,12 @@ namespace ProtocolMaster.Component.Model
 {
     internal interface IInterpreterManager
     {
-        void Print();
+        void Load();
         void Select(InterpreterMeta target);
-        void Run();
+        InterpreterMeta Selected { get; }
+
+
+        List<DriveData> Generate();
 
     }
 
@@ -21,35 +26,36 @@ namespace ProtocolMaster.Component.Model
     internal class InterpreterManager : IInterpreterManager
     {
         [ImportMany]
-        IEnumerable<ExportFactory<IInterpreter, InterpreterMeta>> _interpreters;
+        private IEnumerable<ExportFactory<IInterpreter, InterpreterMeta>> Interpreters { get; set; }
 
         ExportFactory<IInterpreter, InterpreterMeta> interpreterFactory;
         ExportLifetimeContext<IInterpreter> interpreterContext;
         IInterpreter interpreter;
+        public InterpreterMeta Selected { get { return interpreterFactory.Metadata; } }
+
 
         private Task runTask;
         private CancellationToken cancelToken;
         private CancellationTokenSource tokenSource;
 
         // interpreter thread management
-        public void Print()
+        public void Load()
         {
-            foreach (ExportFactory<IInterpreter, InterpreterMeta> interpreter in _interpreters)
+            foreach (ExportFactory<IInterpreter, InterpreterMeta> i in Interpreters)
             {
-                App.Window.Timeline.ListInterpreter(interpreter.Metadata);
-                Log.Error("Interpreter found: " + interpreter.Metadata.Name +" version " + interpreter.Metadata.Version);
-
-                for (int i = 0; i < interpreter.Metadata.PageHeadersCSV.Length; i++)
+                App.Window.Timeline.ListInterpreter(i.Metadata);
+                if (i.Metadata.Name == "None" && i.Metadata.Version == "")
                 {
-                    foreach (string val in interpreter.Metadata.PageHeadersCSV[i].Split(','))
-                        Log.Error("Header " + i + ": " + val);
+                    Select(i.Metadata);
                 }
+                Log.Error("Interpreter found: '" + i.Metadata.Name + "' version: '" + i.Metadata.Version + "'");
             }
+            App.Window.Timeline.ShowSelectedInterpreter();
         }
 
         public void Select(InterpreterMeta target)
         {
-            foreach (ExportFactory<IInterpreter, InterpreterMeta> i in _interpreters)
+            foreach (ExportFactory<IInterpreter, InterpreterMeta> i in Interpreters)
             {
                 if (i.Metadata == target)
                 {
@@ -59,23 +65,24 @@ namespace ProtocolMaster.Component.Model
         }
 
 
-        public void Run()
+        public List<DriveData> Generate()
         {
             interpreterContext = interpreterFactory.CreateExport();
             interpreter = interpreterContext.Value;
 
-            tokenSource = new CancellationTokenSource();
-            cancelToken = tokenSource.Token;
 
-            runTask = Task.Run(new Action(() =>
+            if (typeof(SpreadSheetInterpreter).IsAssignableFrom(interpreter.GetType()))
             {
-                // Register interpreter cancel
-                cancelToken.Register(new Action(() => interpreter.Cancel()));
-                // pre-fill event data
-                interpreter.Run();
-            }), tokenSource.Token);
+                SpreadSheetInterpreter spreadSheetInterpreter = interpreter as SpreadSheetInterpreter;
+                FileStream nfs = File.Open(Log.Instance.AppData + "\\Protocols\\Copy of example_protocols.xlsx", FileMode.Open, FileAccess.Read);
+                spreadSheetInterpreter.SetReader(ExcelReaderFactory.CreateReader(nfs));
+            }
+            // pre-fill event data
+            interpreter.Generate("TEST");
 
+            List<DriveData> result = interpreter.Data;
             interpreterContext.Dispose();
+            return result;
         }
     }
 }

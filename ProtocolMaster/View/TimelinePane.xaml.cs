@@ -27,8 +27,10 @@ namespace ProtocolMaster.View
 
         public void ListDriver(DriverMeta data)
         {
-            MenuItem newDriver = new MenuItem();
-            newDriver.Header = data.Name + " " + data.Version;
+            MenuItem newDriver = new MenuItem
+            {
+                Header = data.ToString()
+            };
             newDriver.Resources.Add("data", data);
             newDriver.Click += new RoutedEventHandler(DriverClickHandler);
             DriverDropdown.Items.Add(newDriver);
@@ -38,14 +40,22 @@ namespace ProtocolMaster.View
         {
             MenuItem src = e.Source as MenuItem;
             DriverMeta data = src.Resources["data"] as DriverMeta;
-            SelectedDriver.Header = "Selected: " + data.Name + " " + data.Version;
+            
             App.Instance.Extensions.Drivers.Select(data);
+            ShowSelectedDriver();
+        }
+
+        public void ShowSelectedDriver()
+        {
+            SelectedDriver.Header = "Selected: " + App.Instance.Extensions.Drivers.Selected.ToString();
         }
 
         public void ListInterpreter(InterpreterMeta data)
         {
-            MenuItem newInterpreter = new MenuItem();
-            newInterpreter.Header = data.Name + " " + data.Version;
+            MenuItem newInterpreter = new MenuItem
+            {
+                Header = data.ToString()
+            };
             newInterpreter.Resources.Add("data", data);
             newInterpreter.Click += new RoutedEventHandler(InterpreterClickHandler);
             InterpreterDropdown.Items.Add(newInterpreter);
@@ -55,13 +65,21 @@ namespace ProtocolMaster.View
         {
             MenuItem src = e.Source as MenuItem;
             InterpreterMeta data = src.Resources["data"] as InterpreterMeta;
-            SelectedInterpreter.Header = "Selected: " + data.Name + " " + data.Version;
+            App.Instance.Extensions.Interpreters.Select(data);
+            ShowSelectedInterpreter();
+        }
+
+        public void ShowSelectedInterpreter()
+        {
+            SelectedInterpreter.Header = "Selected: " + App.Instance.Extensions.Interpreters.Selected.ToString();
         }
 
         public void ListVisualizer(VisualizerMeta data)
         {
-            MenuItem newVis = new MenuItem();
-            newVis.Header = data.Name + " " + data.Version;
+            MenuItem newVis = new MenuItem
+            {
+                Header = data.Name + " " + data.Version
+            };
             newVis.Resources.Add("data", data);
             newVis.Click += new RoutedEventHandler(VisualizerClickHandler);
             VisualizerDropdown.Items.Add(newVis);
@@ -71,17 +89,23 @@ namespace ProtocolMaster.View
         {
             MenuItem src = e.Source as MenuItem;
             VisualizerMeta data = src.Resources["data"] as VisualizerMeta;
-            SelectedVisualizer.Header = "Selected: " + data.Name + " " + data.Version;
+            App.Instance.Extensions.Visualizers.Select(data);
+            ShowSelectedInterpreter();
+        }
+
+        public void ShowSelectedVisualizer()
+        {
+            SelectedVisualizer.Header = "Selected: " + App.Instance.Extensions.Visualizers.Selected.ToString();
         }
 
         public void Start_Click(object sender, RoutedEventArgs e)
         {
-            App.Instance.Extensions.Drivers.Run();
+            App.Instance.Extensions.Run();
         }
 
         public void Stop_Click(object sender, RoutedEventArgs e)
         {
-
+            App.Instance.Extensions.Cancel();
         }
 
         private void SetUpPlot()
@@ -89,8 +113,10 @@ namespace ProtocolMaster.View
             DateTime start = new DateTime(2017, 1, 1, 15, 20, 0);
             DateTime end = new DateTime(2017, 1, 1, 15, 30, 0);
 
-            var model = new PlotModel();
-            model.IsLegendVisible = false;
+            var model = new PlotModel
+            {
+                IsLegendVisible = false
+            };
 
             model.Axes.Add(new OxyPlot.Axes.DateTimeAxis()
             {

@@ -68,9 +68,11 @@ namespace ProtocolMaster.Component.Google
         public TreeFile CreateFolder(string name, TreeFile parent = null)
         {
             // Prepare the file
-            File newFile = new File();
-            newFile.Name = name;
-            newFile.MimeType = "application/vnd.google-apps.folder";
+            File newFile = new File
+            {
+                Name = name,
+                MimeType = "application/vnd.google-apps.folder"
+            };
             if (parent == null)
             {
                 parent = root;
@@ -111,14 +113,14 @@ namespace ProtocolMaster.Component.Google
 
         public void CallbackPreBF(MarkupCallback callback)
         {
-            if (Auth.Instance.isAuthenticated())
+            if (Auth.Instance.IsAuthenticated())
                 root.CallbackPreBF(callback);
         }
         #endregion
 
         // IService Implementation
         #region
-        private static string[] serviceTokens =
+        private static readonly string[] serviceTokens =
         {
             DriveService.Scope.DriveFile
         };

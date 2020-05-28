@@ -10,7 +10,7 @@ namespace ProtocolMaster.Component.Model
     public interface IInterpreter
     {
         List<DriveData> Data { get; }
-        void Run();
+        void Generate(string protocolName);
         void Cancel();
     }
 }

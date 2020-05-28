@@ -55,8 +55,8 @@ namespace ProtocolMaster.Component.Debug
             }
         }
 
-        public static void Error(string message) => App.Current.Dispatcher.Invoke(new Action(() => { Log.Instance._Error(message); }));
-        public void _Error(string message)
+        public static void Error(string message) => App.Current.Dispatcher.Invoke(new Action(() => { Log.Instance.WriteError(message); }));
+        public void WriteError(string message)
         {
             lfErr.Write(message);
             if (PrintErrors && App.Window != null && App.Window.Log != null)
@@ -64,8 +64,8 @@ namespace ProtocolMaster.Component.Debug
                 App.Window.Log.Log(message.Replace("\t", "\n"));
             }
         }
-        public static void Out(string message) => App.Current.Dispatcher.Invoke(new Action(() => { Log.Instance._Out(message); }));
-        public void _Out(string message)
+        public static void Out(string message) => App.Current.Dispatcher.Invoke(new Action(() => { Log.Instance.WriteOut(message); }));
+        public void WriteOut(string message)
         {
             lfOut.Write(message);
             if (PrintErrors && App.Window != null && App.Window.Log != null)

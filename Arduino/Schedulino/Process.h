@@ -35,18 +35,20 @@ void _Process_Setup()
 
 void _Process_Running()
 {
-  uint16_t firstIndex = schedule.firstIndex();
-  uint16_t lastIndex = schedule.lastIndex();
   if (time > run_offset)
     run_time = time - run_offset;
   else
     run_time = UINT32_MAX - run_offset + time;
-  while (firstIndex < lastIndex && schedule.time[firstIndex] <= run_time)
+
+  uint16_t firstIndex = schedule.firstIndex();
+
+  while (schedule.first < schedule.last && schedule.time[firstIndex] <= run_time)
   {
     digitalWrite(schedule.pin[firstIndex], schedule.state[firstIndex]);
     schedule.time[firstIndex] = run_time;
-    Report(firstIndex);
+    Report(schedule.first);
     schedule.first++;
+    firstIndex = schedule.firstIndex();
   }
   if (schedule.first >= schedule.last)
   {
@@ -56,16 +58,8 @@ void _Process_Running()
 
 void _Process_Reset()
 {
-  _Process_Done();
-  schedule.last = 0;
-  Capacity();
-}
-
-void _Process_Done()
-{
-  Done();
-
   schedule.first = 0;
+  schedule.last = 0;
   run_time = 0;
   run_offset = 0;
 
@@ -75,6 +69,27 @@ void _Process_Done()
     digitalWrite(i, LOW);
   }
 
+  state = SETUP;
+  Capacity();
+}
+
+void _Process_Done()
+{
+  state = RESET;
+
+  Capacity();
+  schedule.first = 0;
+  schedule.last = 0;
+  Done();
+  run_time = 0;
+  run_offset = 0;
+
+  for (byte i = 2; i < 19; i++)
+  {
+    pinMode(i, OUTPUT);
+    digitalWrite(i, LOW);
+  }
+  
   state = SETUP;
 }
 

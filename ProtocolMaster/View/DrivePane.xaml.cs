@@ -11,7 +11,7 @@ namespace ProtocolMaster.View
     /// </summary>
     public partial class DrivePane : Page
     {
-        Dictionary<string, TreeViewItem> idDictionary;
+        readonly Dictionary<string, TreeViewItem> idDictionary;
 
         public DrivePane()
         {
@@ -84,8 +84,7 @@ namespace ProtocolMaster.View
 
             if (parentName != null)
             {
-                TreeViewItem parent;
-                idDictionary.TryGetValue(parentName, out parent);
+                idDictionary.TryGetValue(parentName, out TreeViewItem parent);
                 if (parent != null)
                     parent.Items.Add(child);
                 else

@@ -6,14 +6,20 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Net.Http.Headers;
 using System.Collections.Concurrent;
+using System;
+using System.Xml;
+using System.Diagnostics;
 
 namespace Schedulino
 {
     [DriverMeta("Schedulino", "1.1", "DigitalDuration", "DigitalPulse", "DigitalStringDuration")]
     public class SchedulinoDriver : IDriver
     {
-        private enum enum_state { SETUP = 0, RUNNING, RESET }
-        enum_state _state;
+        List<SchedulePinState> schedule;
+        int scheduleIndex = 0;
+        int reportIndex = 0;
+        private enum ScheduleState { SETUP = 0, RUNNING, RESET }
+        ScheduleState _state;
         uint _run_time;
         byte _serial_available;
         private uint _capacity;
@@ -21,78 +27,159 @@ namespace Schedulino
         SerialPort serial;
         public SerialPort Serial { get => serial; set => serial = value; }
 
-        public ConcurrentQueue<VisualData> visualData { get; private set; }
+        public ConcurrentQueue<VisualData> VisualData { get; private set; }
 
         // Data processing handlers
         delegate void Handler(DriveData item);
-        Dictionary<string, Handler> handlers;
-        Handler invalidKeyHander;
+        readonly Dictionary<string, Handler> handlers;
+        readonly Handler invalidKeyHander;
 
         // Arduino Serial receivers
         delegate void Receiver();
-        Dictionary<char, Receiver> receivers;
-        Receiver invalidKeyReceiver;
+        readonly Dictionary<char, Receiver> receivers;
+        readonly Receiver invalidKeyReceiver;
 
         public SchedulinoDriver()
         {
-            _state = enum_state.SETUP;
+            schedule = new List<SchedulePinState>();
+            _state = ScheduleState.SETUP;
             _run_time = 0;
             _serial_available = 0;
             _capacity = 0;
 
             // Handlers for processing data
-            handlers = new Dictionary<string, Handler>();
-            handlers.Add("DigitalDuration", DigitalDurationHandler);
-            handlers.Add("DigitalPulse", DigitalPulseHandler);
-            handlers.Add("DigitalStringDuration", DigitalStringDurationHandler);
+            handlers = new Dictionary<string, Handler>
+            {
+                { "DigitalDuration", DigitalDurationHandler },
+                { "DigitalPulse", DigitalPulseHandler },
+                { "DigitalStringDuration", DigitalStringDurationHandler }
+            };
             invalidKeyHander = InvalidKeyHandler;
 
             // Reveivers for receiving data from Arduino
-            receivers = new Dictionary<char, Receiver>();
-            receivers.Add('C', CapacityReceiver);
-            receivers.Add('E', ErrorReceiver);
-            receivers.Add('D', DoneReceiver);
-            receivers.Add('P', ReportReceiver);
-            receivers.Add('R', ReplyReceiver);
+            receivers = new Dictionary<char, Receiver>
+            {
+                { 'C', CapacityReceiver },
+                { 'D', DoneReceiver },
+                { 'E', ErrorReceiver },
+                { 'P', ReportReceiver },
+                { 'R', ReplyReceiver }
+            };
             invalidKeyReceiver = InvalidKeyReceiver;
         }
 
         public void Cancel()
         {
             Log.Error("Cancelling Schedulino");
-        }
-
-        public void ProcessData(List<DriveData> dataList)
-        {
-            foreach(DriveData data in dataList)
-            {
-                Handle(data);
-            }
-        }
-
-        public void Run()
-        {
-            // SerialPort setup
-            Serial = new SerialPort();
-            Serial.RtsEnable = true;
-            Serial.DtrEnable = true;
-            Serial.PortName = "COM3";
-            Serial.BaudRate = 9600;
-            Serial.Open();
-
-            while (true)
+            scheduleIndex = schedule.Count;
+            while (serial.BytesToRead >= 1)
             {
                 int read = Serial.ReadByte();
                 if (read != -1)
                     Receive((char)read);
             }
+            Serial.Write("X");
+            while (serial.BytesToRead >= 1)
+            {
+                int read = Serial.ReadByte();
+                if (read != -1)
+                    Receive((char)read);
+            }
+            Serial.Close();
+        }
+
+        public void ProcessData(List<DriveData> dataList)
+        {
+            foreach (DriveData data in dataList)
+            {
+                Handle(data);
+            }
+            schedule.Sort();
+        }
+
+        public void Run()
+        {
+            // SerialPort setup
+            Serial = new SerialPort
+            {
+                RtsEnable = true,
+                DtrEnable = true,
+                PortName = "COM3",
+                BaudRate = 9600,
+                NewLine = "\n"
+            };
+            Serial.Open();
+
+            // Handshake
+            while (_capacity == 0)
+            {
+                while (serial.IsOpen && serial.BytesToRead >= 1)
+                {
+                    int read = Serial.ReadByte();
+                    if (read != -1)
+                        Receive((char)read);
+                }
+            }
+            // Pre-Load as much as possible
+            while (_capacity > 0 && scheduleIndex < schedule.Count)
+            {
+                if (serial.IsOpen && _capacity > 0 && _serial_available >= 7 && scheduleIndex < schedule.Count)
+                {
+                    byte[] bytes = schedule[scheduleIndex].ToBytes();
+                    Serial.Write("E");
+                    Serial.Write(bytes, 0, bytes.Length);
+                    _serial_available -= 7;
+                    _capacity--;
+                    scheduleIndex++;
+                }
+                while (serial.IsOpen && serial.BytesToRead >= 1)
+                {
+                    int read = Serial.ReadByte();
+                    if (read != -1)
+                        Receive((char)read);
+                }
+            }
+            // Start
+            if (_state != ScheduleState.RESET)
+            {
+                while (serial.IsOpen && _state != ScheduleState.RUNNING)
+                {
+                    int read = Serial.ReadByte();
+                    if (read != -1)
+                        Receive((char)read);
+                    if (serial.IsOpen && _serial_available > 0)
+                    {
+                        Serial.Write("S");
+                        _state = ScheduleState.RUNNING;
+                    }
+                }
+            }
+           
+            while (_state == ScheduleState.RUNNING)
+            {
+                if (serial.IsOpen && _capacity > 0 && _serial_available >= 7 && scheduleIndex < schedule.Count)
+                {
+                    byte[] bytes = schedule[scheduleIndex].ToBytes();
+                    Serial.Write("E");
+                    Serial.Write(bytes, 0, bytes.Length);
+                    _serial_available -= 7;
+                    _capacity--;
+                    scheduleIndex++;
+                }
+                while (serial.IsOpen && serial.BytesToRead >= 1)
+                {
+                    int read = Serial.ReadByte();
+                    if (read != -1)
+                        Receive((char)read);
+                }
+            }
+            Serial.Close();
         }
 
         private void Handle(DriveData data)
         {
             Log.Error("Handling: " + data.Handler);
-            Handler thisKeyHandler;
-            if (handlers.TryGetValue(data.Handler, out thisKeyHandler))
+            if (handlers.TryGetValue(data.Handler, out Handler thisKeyHandler))
             {
                 thisKeyHandler(data);
             }
@@ -103,16 +190,131 @@ namespace Schedulino
         }
 
         #region Handler Functions
+
+        private byte PinMnemonicToNumeric(string pinstring)
+        {
+            try
+            {
+                byte value = Convert.ToByte(pinstring);
+                return value;
+            }
+            catch(FormatException)
+            {
+                if (pinstring == "A0") return 14;
+                if (pinstring == "A1") return 15;
+                if (pinstring == "A2") return 16;
+                if (pinstring == "A3") return 17;
+                if (pinstring == "A4") return 18;
+                if (pinstring == "A5") return 19;
+                throw new FormatException("Invalid Pinstring");
+            }
+        }
+
+        private byte[] PinSetParseHelper(string pinstring)
+        {
+            if (pinstring.Length == 0) return null;
+
+            string[] pinstrings = pinstring.Split(',');
+            byte[] pins = new byte[pinstrings.Length];
+            for (int i = 0; i < pinstrings.Length; i++)
+            {
+                pins[i] = PinMnemonicToNumeric(pinstrings[i]);
+            }
+            return pins;
+        }
+
+        private byte[] PinRangeParseHelper(string pinstring)
+        {
+            // there should only be 2 strings, add error checking for that
+            string[] pinstrings = pinstring.Split(':');
+            byte[] pins = new byte[pinstrings.Length];
+            for (int i = 0; i < pinstrings.Length; i++)
+            {
+                pins[i] = PinMnemonicToNumeric(pinstrings[i]);
+            }
+            Array.Sort(pins);
+            return pins;
+        }
+
+        private byte PinStateStringHelper(byte value, byte place)
+        {
+            return (byte)((value >> place) & 1);
+        }
         private void DigitalDurationHandler(DriveData item)
         {
+            item.Arguments.TryGetValue("SignalPin", out string commStr);
+            byte[] pins_signal = PinSetParseHelper(commStr);
+            item.Arguments.TryGetValue("DurationPin", out commStr);
+            byte[] pins_dur = PinSetParseHelper(commStr);
+            item.Arguments.TryGetValue("TimeStartMs", out commStr);
+            uint time_start = Convert.ToUInt32(commStr);
+            item.Arguments.TryGetValue("TimeEndMs", out commStr);
+            uint time_end = Convert.ToUInt32(commStr);
 
+            if (pins_signal != null)
+                for (int i = 0; i < pins_signal.Length; i++)
+                {
+                    schedule.Add(new SchedulePinState(pins_signal[i], (byte)1, time_start));
+                    schedule.Add(new SchedulePinState(pins_signal[i], (byte)0, time_end));
+                }
+            if (pins_dur != null)
+                for (int i = 0; i < pins_dur.Length; i++)
+                {
+                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)1, time_start));
+                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)0, time_end));
+                }
         }
         private void DigitalPulseHandler(DriveData item)
         {
+            item.Arguments.TryGetValue("SignalPin", out string commStr);
+            byte[] pins_signal = PinSetParseHelper(commStr);
+            item.Arguments.TryGetValue("DurationPin", out commStr);
+            byte[] pins_dur = PinSetParseHelper(commStr);
+            item.Arguments.TryGetValue("TimeStartMs", out commStr);
+            uint time_start = Convert.ToUInt32(commStr);
+            item.Arguments.TryGetValue("TimeEndMs", out commStr);
+            uint time_end = Convert.ToUInt32(commStr);
 
+            if (pins_signal != null)
+                for (int i = 0; i < pins_signal.Length; i++)
+                {
+                    schedule.Add(new SchedulePinState(pins_signal[i], (byte)1, time_start));
+                    schedule.Add(new SchedulePinState(pins_signal[i], (byte)0, time_start + 5));
+                }
+            if (pins_dur != null)
+                for (int i = 0; i < pins_dur.Length; i++)
+                {
+                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)1, time_start));
+                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)0, time_end));
+                }
         }
         private void DigitalStringDurationHandler(DriveData item)
         {
+            // This uses a pin range instead of a pin swr
+            item.Arguments.TryGetValue("SignalPin", out string commStr);
+            byte[] pins_signal = PinRangeParseHelper(commStr);
+            item.Arguments.TryGetValue("DurationPin", out commStr);
+            byte[] pins_dur = PinSetParseHelper(commStr);
+            item.Arguments.TryGetValue("Value", out commStr);
+            byte value = Convert.ToByte(commStr);
+            item.Arguments.TryGetValue("TimeStartMs", out commStr);
+            uint time_start = Convert.ToUInt32(commStr);
+            item.Arguments.TryGetValue("TimeEndMs", out commStr);
+            uint time_end = Convert.ToUInt32(commStr);
+
+
+            if (pins_signal != null)
+                for (int i = pins_signal[0]; i <= pins_signal[1]; i++)
+                {
+                    schedule.Add(new SchedulePinState((byte)i, PinStateStringHelper(value, (byte)(i - pins_signal[0])), time_start));
+                    schedule.Add(new SchedulePinState((byte)i, (byte)0, time_end));
+                }
+            if (pins_dur != null)
+                for (int i = 0; i < pins_dur.Length; i++)
+                {
+                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)1, time_start));
+                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)0, time_end));
+                }
 
         }
         private void InvalidKeyHandler(DriveData item)
@@ -123,14 +325,14 @@ namespace Schedulino
 
         private void Receive(char input)
         {
-            Log.Error("Receiving: " + input);
-            Receiver thisKeyReceiver;
-            if (receivers.TryGetValue(input, out thisKeyReceiver))
+            //Log.Error("Receiving: " + input);
+            if (receivers.TryGetValue(input, out Receiver thisKeyReceiver))
             {
                 thisKeyReceiver();
             }
             else
             {
+                Log.Error("Byte:" + (byte)input);
                 invalidKeyReceiver();
             }
         }
@@ -138,36 +340,38 @@ namespace Schedulino
         #region Receiver Functions
         private void CapacityReceiver()
         {
-            _capacity = NumReadSerial(2);
-            Log.Error("Schedulino CAPACITY\ncapacity:" + _capacity);
+            _capacity = Convert.ToUInt16(Serial.ReadLine());
+            _serial_available = Convert.ToByte(Serial.ReadLine());
+            Log.Error("Schedulino CAPACITY\ncapacity:" + _capacity + "\nserial_available:" + _serial_available);
         }
         private void ErrorReceiver()
         {
             byte file, error, ext;
-            file = (byte)NumReadSerial(1);
-            error = (byte)NumReadSerial(1);
-            ext = (byte)NumReadSerial(1);
+            file = Convert.ToByte(Serial.ReadLine());
+            error = Convert.ToByte(Serial.ReadLine());
+            ext = Convert.ToByte(Serial.ReadLine());
             Log.Error("Schedulino ERROR\nfile:" + file + "\nerror:" + error + "\next:" + ext); ;
 
         }
         private void DoneReceiver()
         {
-            _run_time = NumReadSerial(4);
-            _state = (enum_state)NumReadSerial(1);
+            _run_time = Convert.ToUInt32(Serial.ReadLine());
+            _state = (ScheduleState)Convert.ToByte(Serial.ReadLine());
             Log.Error("Schedulino DONE\nrun_time:" + _run_time + "\nstate:" + _state);
         }
         private void ReportReceiver()
         {
-            ushort index = (ushort)NumReadSerial(2);
-            uint time = (uint)NumReadSerial(4);
-            byte pin = (byte)NumReadSerial(1);
-            byte pinstate = (byte)NumReadSerial(1);
-            Log.Error("Schedulino REPORT\nindex:" + index + "\ntime:" + time + "\npin:" + pin + "\npinstate:" + pinstate);
+            ushort index = Convert.ToUInt16(Serial.ReadLine());
+            uint time = Convert.ToUInt32(Serial.ReadLine());
+            byte pin = Convert.ToByte(Serial.ReadLine());
+            byte pinstate = Convert.ToByte(Serial.ReadLine());
+            _capacity++;
+            Log.Error("Schedulino REPORT\nindex:" + index + "\ntime/otime:" + time + "/" + schedule[index].Time + "\npin:" + pin + "\npinstate:" + pinstate);
         }
         private void ReplyReceiver()
         {
-            _serial_available = (byte)NumReadSerial(1);
-            Log.Error("Schedulino REPLY\nserial_available:" + _serial_available);
+            _serial_available += 7;
+            //Log.Error("Schedulino REPLY\nserial_available:" + _serial_available);
         }
         private void InvalidKeyReceiver()
         {
@@ -181,7 +385,10 @@ namespace Schedulino
         private uint NumReadSerial(int length)
         {
             byte[] readBytes = new byte[length];
-            Serial.Read(readBytes, 0, length);
+            for (int i = 0; i < length; i++)
+            {
+                readBytes[i] = (byte)Serial.ReadByte();
+            }
             return NumRead(readBytes);
         }
         private static uint NumRead(byte[] input)
@@ -191,27 +398,48 @@ namespace Schedulino
             for (int i = input.Length - 1; i >= 0; i--)
             {
                 result += input[i] * pow;
-                pow = pow << 8;
+                pow <<= 8;
             }
             return result;
         }
-        private void NumWriteSerial(uint num, int length)
-        {
-            Serial.Write(NumWrite(num, length), 0, length);
-        }
-        private static byte[] NumWrite(uint num, int length)
-        {
-            byte[] response = new byte[length];
 
-            for (int i = 0; i < length; i++)
-            {
-                num = num >> (i * 8);
-                response[i] = (byte)num;
-            }
-            return response;
-        }
         #endregion
 
+        struct SchedulePinState : IComparable<SchedulePinState>
+        {
+            public readonly byte Pin;
+            public readonly byte State;
+            public readonly uint Time;
+            public SchedulePinState(byte pin, byte state, uint time)
+            {
+                this.Pin = pin;
+                this.State = state;
+                this.Time = time;
+            }
+            public byte[] ToBytes()
+            {
+                byte[] response = new byte[6];
+                response[4] = Pin;
+                response[5] = State;
 
+                uint tempTime = Time;
+                for (int i = 0; i < 4; i++)
+                {
+                    response[i] = (byte)tempTime;
+                    tempTime >>= 8;
+                }
+                return response;
+            }
+            public override int GetHashCode()
+            {
+                long lTime = Time + int.MinValue;
+                return (int)lTime;
+            }
+
+            public int CompareTo(SchedulePinState other)
+            {
+                return (int)(this.Time - other.Time + this.State - other.State);
+            }
+        }
     }
 }
