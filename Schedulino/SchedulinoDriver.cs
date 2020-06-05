@@ -1,4 +1,5 @@
-﻿using ProtocolMaster.Component.Model;
+﻿using ProtocolMaster.Component.Model.Driver;
+using ProtocolMaster.Component.Model;
 using ProtocolMaster.Component.Debug;
 using System.ComponentModel.Composition;
 using System.IO.Ports;
@@ -17,7 +18,6 @@ namespace Schedulino
     {
         List<SchedulePinState> schedule;
         int scheduleIndex = 0;
-        int reportIndex = 0;
         private enum ScheduleState { SETUP = 0, RUNNING, RESET }
         ScheduleState _state;
         uint _run_time;
@@ -28,6 +28,7 @@ namespace Schedulino
         public SerialPort Serial { get => serial; set => serial = value; }
 
         public ConcurrentQueue<VisualData> VisualData { get; private set; }
+        public Progress<DriverProgress> CurrentProgress { get; set; }
 
         // Data processing handlers
         delegate void Handler(DriveData item);
@@ -154,7 +155,7 @@ namespace Schedulino
                     }
                 }
             }
-           
+
             while (_state == ScheduleState.RUNNING)
             {
                 if (serial.IsOpen && _capacity > 0 && _serial_available >= 7 && scheduleIndex < schedule.Count)
@@ -198,7 +199,7 @@ namespace Schedulino
                 byte value = Convert.ToByte(pinstring);
                 return value;
             }
-            catch(FormatException)
+            catch (FormatException)
             {
                 if (pinstring == "A0") return 14;
                 if (pinstring == "A1") return 15;
@@ -338,6 +339,7 @@ namespace Schedulino
         }
 
         #region Receiver Functions
+        // These functions may be broken out into their own classes
         private void CapacityReceiver()
         {
             _capacity = Convert.ToUInt16(Serial.ReadLine());
@@ -381,7 +383,8 @@ namespace Schedulino
 
         #endregion
 
-        #region Read/Write Functions
+        #region Read Helper Functions
+        /*
         private uint NumReadSerial(int length)
         {
             byte[] readBytes = new byte[length];
@@ -402,6 +405,7 @@ namespace Schedulino
             }
             return result;
         }
+        */
 
         #endregion
 

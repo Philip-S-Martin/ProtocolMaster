@@ -1,4 +1,5 @@
 ﻿using ProtocolMaster.Component.Debug;
+using ProtocolMaster.Component.Model.Visualizer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProtocolMaster.Component.Model
+namespace ProtocolMaster.Component.Model.Visualizer
 {
     internal interface IVisualizerManager
     {
@@ -16,7 +17,7 @@ namespace ProtocolMaster.Component.Model
 
     }
 
-    [Export(typeof(ProtocolMaster.Component.Model.IVisualizerManager))]
+    [Export(typeof(IVisualizerManager))]
     internal class VisualizerManager : IVisualizerManager
     {
         [ImportMany]
@@ -24,7 +25,7 @@ namespace ProtocolMaster.Component.Model
 
         ExportFactory<IVisualizer, VisualizerMeta> visualizerFactory;
         ExportLifetimeContext<IVisualizer> visualizerContext;
-        IInterpreter visualizer;
+        IVisualizer visualizer;
         public VisualizerMeta Selected { get { return visualizerFactory.Metadata; } }
 
         public void Load()

@@ -1,4 +1,5 @@
 ﻿using ProtocolMaster.Component.Model;
+using ProtocolMaster.Component.Model.Driver;
 using ProtocolMaster.Component.Debug;
 using System.ComponentModel.Composition;
 using System.IO.Ports;
@@ -16,7 +17,7 @@ namespace ProtocolMaster.Component.Model.NullExtensions
     public class NullDriver : IDriver
     {
         public ConcurrentQueue<VisualData> VisualData { get { return null; } }
-
+        public Progress<DriverProgress> CurrentProgress { get; set; }
         public void Cancel()
         {
         }

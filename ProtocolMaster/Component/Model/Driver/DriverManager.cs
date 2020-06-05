@@ -7,15 +7,16 @@ using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
-namespace ProtocolMaster.Component.Model
+namespace ProtocolMaster.Component.Model.Driver
 {
     internal interface IDriverManager
     {
         void Load();
         void Select(DriverMeta target);
         DriverMeta Selected { get; }
-        void Run(List<DriveData> data);
+        void Run(List<DriveData> data, Progress<DriverProgress> progress);
         void Cancel();
         bool IsRunning { get; }
     }
@@ -26,10 +27,6 @@ namespace ProtocolMaster.Component.Model
         ExportFactory<IDriver, DriverMeta> driverFactory;
         ExportLifetimeContext<IDriver> driverContext;
         IDriver driver;
-
-        private Task runTask;
-        private CancellationToken cancelToken;
-        private CancellationTokenSource tokenSource;
         public bool IsRunning { get; private set; }
 
         [ImportMany]
@@ -37,7 +34,6 @@ namespace ProtocolMaster.Component.Model
 
         public DriverMeta Selected { get { return driverFactory.Metadata; } }
 
-        // Driver thread management
         public void Load()
         {
             foreach (ExportFactory<IDriver, DriverMeta> i in Drivers)
@@ -63,15 +59,17 @@ namespace ProtocolMaster.Component.Model
             }
         }
 
-        public void Run(List<DriveData> data)
+        public void Run(List<DriveData> data, Progress<DriverProgress> progress)
         {
             driverContext = driverFactory.CreateExport();
             driver = driverContext.Value;
+            driver.CurrentProgress = progress;
 
             IsRunning = true;
             // pre-fill event data
             driver.ProcessData(data);
             // Loop through driver
+            App.Current.Dispatcher.Invoke(() => App.Window.Timeline.StartAnimation());
             driver.Run();
             IsRunning = false;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 
-namespace ProtocolMaster.Component.Model
+namespace ProtocolMaster.Component.Model.Visualizer
 {
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]

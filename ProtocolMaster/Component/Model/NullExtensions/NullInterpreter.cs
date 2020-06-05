@@ -1,4 +1,4 @@
-﻿using ProtocolMaster.Component.Model;
+﻿using ProtocolMaster.Component.Model.Interpreter;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;

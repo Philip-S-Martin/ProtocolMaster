@@ -1,4 +1,5 @@
-﻿using ProtocolMaster.Component.Model;
+﻿using ProtocolMaster.Component.Model.Visualizer;
+using ProtocolMaster.Component.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;

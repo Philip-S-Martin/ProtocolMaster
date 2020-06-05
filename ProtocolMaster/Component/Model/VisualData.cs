@@ -8,5 +8,9 @@ namespace ProtocolMaster.Component.Model
 {
     public class VisualData
     {
+        public string category;
+        public DateTime timeStart;
+        public DateTime timeEnd;
+
     }
 }

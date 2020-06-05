@@ -2,8 +2,18 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace ProtocolMaster.Component.Model
+namespace ProtocolMaster.Component.Model.Driver
 {
+    public enum DriverProgress
+    {
+        LOADING,
+        READY,
+        PRERUN,
+        RUNNING,
+        DONE,
+        CANCELLED
+    }
+
     /// <summary>
     /// Primary interface for Drivers
     /// Functions should be executed in order ProcessData() -> Run()
@@ -12,6 +22,7 @@ namespace ProtocolMaster.Component.Model
     public interface IDriver
     {
         ConcurrentQueue<VisualData> VisualData { get; }
+        Progress<DriverProgress> CurrentProgress { get; set; }
         /// <summary>
         /// Data processing function, this takes DriverData and converts it into hardware-compatible data
         /// </summary>

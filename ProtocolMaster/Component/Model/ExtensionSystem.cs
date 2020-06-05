@@ -9,6 +9,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Documents;
+using ProtocolMaster.Component.Model.Interpreter;
+using ProtocolMaster.Component.Model.Driver;
+using ProtocolMaster.Component.Model.Visualizer;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace ProtocolMaster.Component.Model
 {
@@ -28,11 +33,14 @@ namespace ProtocolMaster.Component.Model
         // Composition Objects
         private readonly CompositionContainer _container;
 
+        public List<DriveData> Data { get; private set; }
+
         bool isRunning;
 
         private Task runTask;
         private CancellationToken cancelToken;
         private CancellationTokenSource tokenSource;
+        private Progress<List<DriveData>> progress;
 
         public ExtensionSystem()
         {
@@ -67,18 +75,32 @@ namespace ProtocolMaster.Component.Model
                 isRunning = true;
                 tokenSource = new CancellationTokenSource();
                 cancelToken = tokenSource.Token;
+                Progress<DriverProgress> driverProgress = new Progress<DriverProgress>();
+                //DriverProgress.
 
-                runTask = Task.Run(new Action(() =>
+                Task<List<DriveData>> generator = Task.Factory.StartNew<List<DriveData>>(
+                    () => Interpreters.Generate(), TaskCreationOptions.LongRunning);
+
+                Task UITask = generator.ContinueWith((data) =>
                 {
-                    cancelToken.Register(new Action(() =>
+                    Data = generator.Result;
+                    App.Window.Timeline.LoadPlotData(Data);
+
+                    runTask = Task.Run(new Action(() =>
+                    {
+                        cancelToken.Register(new Action(() =>
                         {
                             //Interpreters.Cancel(); 
                             Drivers.Cancel();
                         }));
-                    Drivers.Run(Interpreters.Generate());
-                }), tokenSource.Token);
+                        Drivers.Run(Data, driverProgress);
+                    }), tokenSource.Token);
+
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+                
             }
         }
+
         public void Cancel()
         {
             if (Drivers.IsRunning == true)

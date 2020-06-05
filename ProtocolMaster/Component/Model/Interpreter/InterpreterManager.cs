@@ -9,7 +9,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ProtocolMaster.Component.Model
+namespace ProtocolMaster.Component.Model.Interpreter
 {
     internal interface IInterpreterManager
     {
@@ -33,12 +33,6 @@ namespace ProtocolMaster.Component.Model
         IInterpreter interpreter;
         public InterpreterMeta Selected { get { return interpreterFactory.Metadata; } }
 
-
-        private Task runTask;
-        private CancellationToken cancelToken;
-        private CancellationTokenSource tokenSource;
-
-        // interpreter thread management
         public void Load()
         {
             foreach (ExportFactory<IInterpreter, InterpreterMeta> i in Interpreters)

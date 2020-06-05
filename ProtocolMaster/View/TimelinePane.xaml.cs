@@ -4,8 +4,13 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using ProtocolMaster.Component.Debug;
 using ProtocolMaster.Component.Model;
+using ProtocolMaster.Component.Model.Driver;
+using ProtocolMaster.Component.Model.Interpreter;
+using ProtocolMaster.Component.Model.Visualizer;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -40,7 +45,7 @@ namespace ProtocolMaster.View
         {
             MenuItem src = e.Source as MenuItem;
             DriverMeta data = src.Resources["data"] as DriverMeta;
-            
+
             App.Instance.Extensions.Drivers.Select(data);
             ShowSelectedDriver();
         }
@@ -98,27 +103,85 @@ namespace ProtocolMaster.View
             SelectedVisualizer.Header = "Selected: " + App.Instance.Extensions.Visualizers.Selected.ToString();
         }
 
+        DateTime start;
         public void Start_Click(object sender, RoutedEventArgs e)
         {
+            StartButton.IsEnabled = false;
+            CancelButton.IsEnabled = true;
+            ResetButton.IsEnabled = false;
+
+            start = DateTime.Now;
+
+            
             App.Instance.Extensions.Run();
         }
 
-        public void Stop_Click(object sender, RoutedEventArgs e)
+        public void Cancel_Click(object sender, RoutedEventArgs e)
         {
+            StartButton.IsEnabled = false;
+            CancelButton.IsEnabled = false;
+            ResetButton.IsEnabled = true;
+
+            bgWorker.CancelAsync();
             App.Instance.Extensions.Cancel();
         }
 
+        public void Reset_Click(object sender, RoutedEventArgs e)
+        {
+            StartButton.IsEnabled = true;
+            CancelButton.IsEnabled = false;
+            ResetButton.IsEnabled = false;
+
+            Line.X = 0;
+            plot.Model.InvalidatePlot(true);
+        }
+
+        private void GeneratePlotModel()
+        {
+
+        }
+
+        LineAnnotation Line;
+        CategoryAxis categoryAxis;
+        public void LoadPlotData(List<DriveData> driveDataList)
+        {
+            IntervalBarSeries targetSeries = new IntervalBarSeries { Title = "Preload Series" };
+
+            List<double> gridLines = new List<double>();
+
+            foreach (DriveData data in driveDataList)
+            {
+                if (data.HasCategory)
+                {
+                    if (!categoryAxis.Labels.Contains(data.CategoryLabel))
+                    {
+                        categoryAxis.Labels.Add(data.CategoryLabel);
+                        gridLines.Add(gridLines.Count);
+                    }
+                    targetSeries.Items.Add(new IntervalBarItem
+                    {
+                        CategoryIndex = categoryAxis.Labels.IndexOf(data.CategoryLabel),
+                        Start = new DateTime(Convert.ToInt64(data.Arguments["TimeStartMs"]) * 10000).ToOADate(),
+                        End = new DateTime(Convert.ToInt64(data.Arguments["TimeEndMs"]) * 10000).ToOADate()
+                    });
+                }
+            }
+
+            gridLines.CopyTo(categoryAxis.ExtraGridlines, 0);
+            plot.Model.Series.Clear();
+            plot.Model.Series.Add(targetSeries);
+
+            plot.Model.InvalidatePlot(true);
+            plot.ResetAllAxes();
+        }
         private void SetUpPlot()
         {
-            DateTime start = new DateTime(2017, 1, 1, 15, 20, 0);
-            DateTime end = new DateTime(2017, 1, 1, 15, 30, 0);
-
             var model = new PlotModel
             {
                 IsLegendVisible = false
             };
 
-            model.Axes.Add(new OxyPlot.Axes.DateTimeAxis()
+            model.Axes.Add(new DateTimeAxis()
             {
                 Position = AxisPosition.Bottom,
                 TicklineColor = OxyColors.Gray,
@@ -128,9 +191,10 @@ namespace ProtocolMaster.View
                 TitleColor = OxyColors.WhiteSmoke,
                 ExtraGridlineColor = OxyColors.Gray,
                 MinorGridlineColor = OxyColors.Gray,
-                MajorGridlineColor = OxyColors.Gray
+                MajorGridlineColor = OxyColors.Gray,
+                StartPosition = 0
             });
-            var categoryAxis = new OxyPlot.Axes.CategoryAxis()
+            categoryAxis = new CategoryAxis()
             {
                 Position = AxisPosition.Left,
                 TicklineColor = OxyColors.Transparent,
@@ -141,55 +205,91 @@ namespace ProtocolMaster.View
                 ExtraGridlineColor = OxyColors.Gray,
                 MinorGridlineColor = OxyColors.Gray,
                 MajorGridlineColor = OxyColors.Gray,
-                ExtraGridlines = new double[] {0,1,2,3}
+                ExtraGridlines = new double[32]
             };
-            categoryAxis.Labels.Add("Sound");
-            categoryAxis.Labels.Add("VNS");
-            categoryAxis.Labels.Add("Shock");
-            categoryAxis.Labels.Add("Opto");
-
             model.Axes.Add(categoryAxis);
-            plot.Model = model;
 
+            
 
-            var series = new OxyPlot.Series.IntervalBarSeries { Title = "Series 1", StrokeThickness = 1 };
-            model.Series.Add(series);
-
-            Random random = new Random();
-
-            plot.Model.DefaultColors = new List<OxyColor>
+            model.DefaultColors = new List<OxyColor>
                 {
                 OxyColors.Gray,
                 OxyColors.Gray,
                 OxyColors.Gray,
                 OxyColors.Gray
                 };
-            plot.Model.TextColor = OxyColors.White;
-            plot.Model.PlotAreaBorderColor = OxyColors.Transparent;
 
-            
+            model.TextColor = OxyColors.White;
+            model.PlotAreaBorderColor = OxyColors.Transparent;
 
-            for (int i = 0; i < 10; i++)
-            {
-                var targetSeries = new OxyPlot.Series.IntervalBarSeries { Title = "Series " + i.ToString(), StrokeThickness = 1 };
-                for (int j = 0; j < random.Next(0, i); j++)
-                    targetSeries.Items.Add(new IntervalBarItem { CategoryIndex = j, Start = start.AddHours(random.NextDouble() + i).ToOADate(), End = end.AddHours(random.NextDouble() + i).ToOADate() });
-                model.Series.Add(targetSeries);
-            }
 
-            LineAnnotation Line = new LineAnnotation()
+            Line = new LineAnnotation()
             {
                 StrokeThickness = 2,
                 Color = OxyColors.Green,
                 Type = LineAnnotationType.Vertical,
-                X = start.AddHours(6).ToOADate(),
+                X = 0,
                 Y = 0
             };
 
-            plot.Model.Annotations.Add(Line);
+            model.Annotations.Add(Line);
+
+            plot.Model = model;
+            Animate();
+        }
+
+        BackgroundWorker bgWorker = new BackgroundWorker();
+        private void Animate()
+        {
+            bgWorker.DoWork +=
+                new DoWorkEventHandler(bgWorker_DoWork);
+            bgWorker.ProgressChanged +=
+                new ProgressChangedEventHandler(bgWorker_ProgressChanged);
+            bgWorker.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(bgWorker_RunWorkerCompleted);
+            bgWorker.WorkerReportsProgress = true;
+            bgWorker.WorkerSupportsCancellation = true;
+        }
+
+        public void StartAnimation()
+        {
+            bgWorker.RunWorkerAsync();
+        }
+        void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
 
         }
 
+        void bgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            //Log.Error(e.UserState.GetType().ToString());
+            Line.X = (DateTime.Now.ToOADate() - start.ToOADate());
+            plot.Model.InvalidatePlot(true);
+        }
+
+        void bgWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            DateTime workerstart = DateTime.Now;
+            DateTime end = workerstart.AddSeconds(120);
+            DateTime now = workerstart;
+            DateTime nextFrame = workerstart.AddTicks(30000);
+            while (now < end)
+            {
+                while (now < nextFrame)
+                {
+                    Thread.Sleep(25);
+                    now = DateTime.Now;
+                }
+
+                bgWorker.ReportProgress(1);
+                nextFrame = now.AddTicks(30000);
+
+                if(this.bgWorker.CancellationPending == true)
+                {
+                    break;
+                }
+            }
+        }
         private void MenuItem_Click(object sender, System.Windows.RoutedEventArgs e)
         {
 

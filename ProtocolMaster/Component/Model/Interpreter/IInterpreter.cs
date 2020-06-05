@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 
-namespace ProtocolMaster.Component.Model
+namespace ProtocolMaster.Component.Model.Interpreter
 {
     public interface IInterpreter
     {
