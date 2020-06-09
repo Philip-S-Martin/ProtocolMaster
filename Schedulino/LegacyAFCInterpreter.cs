@@ -1,6 +1,6 @@
-﻿using ProtocolMaster.Component.Debug;
-using ProtocolMaster.Component.Model;
-using ProtocolMaster.Component.Model.Interpreter;
+﻿using ProtocolMaster.Model.Debug;
+using ProtocolMaster.Model.Protocol;
+using ProtocolMaster.Model.Protocol.Interpreter;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -108,7 +108,7 @@ namespace Schedulino
                     sb.Append(": ");
                     sb.Append(value);
                 }
-                Log.Error(sb.ToString());
+                //Log.Error(sb.ToString());
             }
         }
 
@@ -334,7 +334,7 @@ namespace Schedulino
 
                 for (int i = 0; i < presoundCount; i++)
                 {
-                    events.Add(new DriveData(SoundRef_1.Handler,
+                    events.Add(new DriveData(SoundRef_1.Handler, "Sound",
                        new KeyValuePair<string, string>("SignalPin", SoundRef_1.BehaviorPin),
                        new KeyValuePair<string, string>("DurationPin", SoundRef_1.DurationPin),
                        new KeyValuePair<string, string>("Value", SoundRef_1.SoundID),
@@ -344,7 +344,7 @@ namespace Schedulino
                 }
                 for (int i = 0; i < soundCount; i++)
                 {
-                    events.Add(new DriveData(SoundRef_1.Handler,
+                    events.Add(new DriveData(SoundRef_1.Handler, "Sound",
                        new KeyValuePair<string, string>("SignalPin", SoundRef_1.BehaviorPin),
                        new KeyValuePair<string, string>("DurationPin", SoundRef_1.DurationPin),
                        new KeyValuePair<string, string>("Value", SoundRef_1.SoundID),
@@ -408,7 +408,7 @@ namespace Schedulino
                     for (int i = 0; i < stimuliPerSound; i++)
                     {
                         int duration = random.Next(DurationMinimumMs, DurationMaximumMs);
-                        events.Add(new DriveData(StimulatorRef.Handler,
+                        events.Add(new DriveData(StimulatorRef.Handler, Name,
                            new KeyValuePair<string, string>("SignalPin", StimulatorRef.BehaviorPin),
                            new KeyValuePair<string, string>("DurationPin", StimulatorRef.DurationPin),
                            new KeyValuePair<string, string>("TimeStartMs", timeMs.ToString()),

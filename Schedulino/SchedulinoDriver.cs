@@ -1,5 +1,6 @@
-﻿using ProtocolMaster.Component.Model;
-using ProtocolMaster.Component.Debug;
+﻿using ProtocolMaster.Model.Protocol.Driver;
+using ProtocolMaster.Model.Protocol;
+using ProtocolMaster.Model.Debug;
 using System.ComponentModel.Composition;
 using System.IO.Ports;
 using System.Collections.Generic;
@@ -17,8 +18,7 @@ namespace Schedulino
     {
         List<SchedulePinState> schedule;
         int scheduleIndex = 0;
-        int reportIndex = 0;
-        private enum ScheduleState { SETUP = 0, RUNNING, RESET }
+        private enum ScheduleState { SETUP = 0, RUNNING, RESET, CANCEL }
         ScheduleState _state;
         uint _run_time;
         byte _serial_available;
@@ -28,6 +28,7 @@ namespace Schedulino
         public SerialPort Serial { get => serial; set => serial = value; }
 
         public ConcurrentQueue<VisualData> VisualData { get; private set; }
+        public Progress<DriverProgress> CurrentProgress { get; set; }
 
         // Data processing handlers
         delegate void Handler(DriveData item);
@@ -71,13 +72,7 @@ namespace Schedulino
         public void Cancel()
         {
             Log.Error("Cancelling Schedulino");
-            scheduleIndex = schedule.Count;
-            while (serial.BytesToRead >= 1)
-            {
-                int read = Serial.ReadByte();
-                if (read != -1)
-                    Receive((char)read);
-            }
+            //scheduleIndex = schedule.Count;
             Serial.Write("X");
             while (serial.BytesToRead >= 1)
             {
@@ -85,7 +80,7 @@ namespace Schedulino
                 if (read != -1)
                     Receive((char)read);
             }
-            Serial.Close();
+            _state = ScheduleState.CANCEL;
         }
 
         public void ProcessData(List<DriveData> dataList)
@@ -111,7 +106,7 @@ namespace Schedulino
             Serial.Open();
 
             // Handshake
-            while (_capacity == 0)
+            while (_state != ScheduleState.CANCEL && _capacity == 0)
             {
                 while (serial.IsOpen && serial.BytesToRead >= 1)
                 {
@@ -121,7 +116,7 @@ namespace Schedulino
                 }
             }
             // Pre-Load as much as possible
-            while (_capacity > 0 && scheduleIndex < schedule.Count)
+            while (_state != ScheduleState.CANCEL && _capacity > 0 && scheduleIndex < schedule.Count)
             {
                 if (serial.IsOpen && _capacity > 0 && _serial_available >= 7 && scheduleIndex < schedule.Count)
                 {
@@ -140,7 +135,7 @@ namespace Schedulino
                 }
             }
             // Start
-            if (_state != ScheduleState.RESET)
+            if (_state != ScheduleState.CANCEL && _state != ScheduleState.RESET)
             {
                 while (serial.IsOpen && _state != ScheduleState.RUNNING)
                 {
@@ -154,8 +149,8 @@ namespace Schedulino
                     }
                 }
             }
-           
-            while (_state == ScheduleState.RUNNING)
+
+            while (_state != ScheduleState.CANCEL && _state == ScheduleState.RUNNING)
             {
                 if (serial.IsOpen && _capacity > 0 && _serial_available >= 7 && scheduleIndex < schedule.Count)
                 {
@@ -178,7 +173,7 @@ namespace Schedulino
 
         private void Handle(DriveData data)
         {
-            Log.Error("Handling: " + data.Handler);
+            //Log.Error("Handling: " + data.Handler);
             if (handlers.TryGetValue(data.Handler, out Handler thisKeyHandler))
             {
                 thisKeyHandler(data);
@@ -198,7 +193,7 @@ namespace Schedulino
                 byte value = Convert.ToByte(pinstring);
                 return value;
             }
-            catch(FormatException)
+            catch (FormatException)
             {
                 if (pinstring == "A0") return 14;
                 if (pinstring == "A1") return 15;
@@ -332,17 +327,18 @@ namespace Schedulino
             }
             else
             {
-                Log.Error("Byte:" + (byte)input);
+                //Log.Error("Byte:" + (byte)input);
                 invalidKeyReceiver();
             }
         }
 
         #region Receiver Functions
+        // These functions may be broken out into their own classes
         private void CapacityReceiver()
         {
             _capacity = Convert.ToUInt16(Serial.ReadLine());
             _serial_available = Convert.ToByte(Serial.ReadLine());
-            Log.Error("Schedulino CAPACITY\ncapacity:" + _capacity + "\nserial_available:" + _serial_available);
+            //Log.Error("Schedulino CAPACITY\ncapacity:" + _capacity + "\nserial_available:" + _serial_available);
         }
         private void ErrorReceiver()
         {
@@ -350,14 +346,14 @@ namespace Schedulino
             file = Convert.ToByte(Serial.ReadLine());
             error = Convert.ToByte(Serial.ReadLine());
             ext = Convert.ToByte(Serial.ReadLine());
-            Log.Error("Schedulino ERROR\nfile:" + file + "\nerror:" + error + "\next:" + ext); ;
+            //Log.Error("Schedulino ERROR\nfile:" + file + "\nerror:" + error + "\next:" + ext); ;
 
         }
         private void DoneReceiver()
         {
             _run_time = Convert.ToUInt32(Serial.ReadLine());
             _state = (ScheduleState)Convert.ToByte(Serial.ReadLine());
-            Log.Error("Schedulino DONE\nrun_time:" + _run_time + "\nstate:" + _state);
+            //Log.Error("Schedulino DONE\nrun_time:" + _run_time + "\nstate:" + _state);
         }
         private void ReportReceiver()
         {
@@ -366,7 +362,7 @@ namespace Schedulino
             byte pin = Convert.ToByte(Serial.ReadLine());
             byte pinstate = Convert.ToByte(Serial.ReadLine());
             _capacity++;
-            Log.Error("Schedulino REPORT\nindex:" + index + "\ntime/otime:" + time + "/" + schedule[index].Time + "\npin:" + pin + "\npinstate:" + pinstate);
+            //Log.Error("Schedulino REPORT\nindex:" + index + "\ntime/otime:" + time + "/" + schedule[index].Time + "\npin:" + pin + "\npinstate:" + pinstate);
         }
         private void ReplyReceiver()
         {
@@ -381,7 +377,8 @@ namespace Schedulino
 
         #endregion
 
-        #region Read/Write Functions
+        #region Read Helper Functions
+        /*
         private uint NumReadSerial(int length)
         {
             byte[] readBytes = new byte[length];
@@ -402,6 +399,7 @@ namespace Schedulino
             }
             return result;
         }
+        */
 
         #endregion
 
