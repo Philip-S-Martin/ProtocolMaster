@@ -63,7 +63,7 @@ void _Process_Reset()
   run_time = 0;
   run_offset = 0;
 
-  for (byte i = 2; i < 19; i++)
+  for (byte i = 2; i <= 19; i++)
   {
     pinMode(i, OUTPUT);
     digitalWrite(i, LOW);
@@ -84,7 +84,9 @@ void _Process_Done()
   run_time = 0;
   run_offset = 0;
 
-  for (byte i = 2; i < 19; i++)
+  // Skip the digital io pins 
+  // reset all pins all the way to A5 (19)
+  for (byte i = 2; i <= 19; i++)
   {
     pinMode(i, OUTPUT);
     digitalWrite(i, LOW);

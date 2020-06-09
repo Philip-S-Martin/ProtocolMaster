@@ -1,6 +1,6 @@
-﻿using ProtocolMaster.Component.Debug;
-using ProtocolMaster.Component.Model;
-using ProtocolMaster.Component.Model.Interpreter;
+﻿using ProtocolMaster.Model.Debug;
+using ProtocolMaster.Model.Protocol;
+using ProtocolMaster.Model.Protocol.Interpreter;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -108,7 +108,7 @@ namespace Schedulino
                     sb.Append(": ");
                     sb.Append(value);
                 }
-                Log.Error(sb.ToString());
+                //Log.Error(sb.ToString());
             }
         }
 

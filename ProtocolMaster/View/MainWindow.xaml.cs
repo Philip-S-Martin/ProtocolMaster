@@ -9,26 +9,9 @@ namespace ProtocolMaster.View
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        public DrivePane Drive { get; private set; }
-        public LogPane Log { get; private set; }
-        public PropertiesPane Properties { get; private set; }
-        public TimelinePane Timeline { get; private set; }
-        public VideoPane Video { get; private set; }
-
         public MainWindow()
         {
             InitializeComponent();
-
-            Drive = new DrivePane();
-            Log = new LogPane();
-            Properties = new PropertiesPane();
-            Timeline = new TimelinePane();
-            Video = new VideoPane();
-            DriveView.Navigate(Drive);
-            LogView.Navigate(Log);
-            //PropertiesView.Navigate(Properties);
-            TimelineView.Navigate(Timeline);
-            VideoView.Navigate(Video);
         }
 
         private void Click_Documentation(object sender, EventArgs e)
@@ -60,7 +43,7 @@ namespace ProtocolMaster.View
 
         private void Click_Log_Folder(object sender, EventArgs e)
         {
-            ProtocolMaster.Component.Debug.Log.Instance.OpenFolder();
+            ProtocolMaster.Model.Debug.Log.Instance.OpenFolder();
         }
 
         private void OnLoad(object sender, EventArgs e)
