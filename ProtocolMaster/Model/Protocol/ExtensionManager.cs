@@ -11,7 +11,7 @@ using System.Windows.Threading;
 
 namespace ProtocolMaster.Model.Protocol
 {
-    abstract class IExtensionManager<E, T> where T : IExtensionMeta where E : IExtension
+    abstract class ExtensionManager<E, T> where T : IExtensionMeta where E : IExtension
     {
         [ImportMany]
         IEnumerable<ExportFactory<E, T>> AvailableExtensions { get; set; }

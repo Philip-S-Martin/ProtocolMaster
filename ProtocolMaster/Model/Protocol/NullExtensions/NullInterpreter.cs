@@ -11,7 +11,7 @@ namespace ProtocolMaster.Model.Protocol.NullExtensions
     [InterpreterMeta("None", "")]
     public class NullInterpreter : IInterpreter
     {
-        public List<DriveData> Data { get { return null; } }
+        public List<ProtocolEvent> Data { get { return null; } }
 
         public void Cancel()
         {

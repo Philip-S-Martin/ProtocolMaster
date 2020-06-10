@@ -136,7 +136,7 @@ namespace ProtocolMaster.View
 
         LineAnnotation Line;
         CategoryAxis categoryAxis;
-        public void LoadPlotData(List<DriveData> driveDataList)
+        public void LoadPlotData(List<ProtocolEvent> driveDataList)
         {
             IntervalBarSeries targetSeries = new IntervalBarSeries { Title = "Preload Series" };
 
@@ -144,7 +144,7 @@ namespace ProtocolMaster.View
 
             if (driveDataList != null)
             {
-                foreach (DriveData data in driveDataList)
+                foreach (ProtocolEvent data in driveDataList)
                 {
                     if (data.HasCategory)
                     {
@@ -167,6 +167,7 @@ namespace ProtocolMaster.View
             targetSeries.StrokeThickness = 1.5;
             targetSeries.StrokeColor = OxyColors.Gray;
             targetSeries.FillColor = OxyColor.FromArgb(255, 16, 16, 16);
+
             plot.Model.Series.Clear();
             plot.Model.Series.Add(targetSeries);
 

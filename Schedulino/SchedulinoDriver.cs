@@ -28,7 +28,7 @@ namespace Schedulino
         public SerialPort Serial { get => serial; set => serial = value; }
 
         // Data processing handlers
-        delegate void Handler(DriveData item);
+        delegate void Handler(ProtocolEvent item);
         readonly Dictionary<string, Handler> handlers;
         readonly Handler invalidKeyHander;
 
@@ -80,9 +80,9 @@ namespace Schedulino
             _state = ScheduleState.CANCEL;
         }
 
-        public void Setup(List<DriveData> dataList)
+        public void Setup(List<ProtocolEvent> dataList)
         {
-            foreach (DriveData data in dataList)
+            foreach (ProtocolEvent data in dataList)
             {
                 Handle(data);
             }
@@ -165,7 +165,7 @@ namespace Schedulino
             }
         }
 
-        private void Handle(DriveData data)
+        private void Handle(ProtocolEvent data)
         {
             //Log.Error("Handling: " + data.Handler);
             if (handlers.TryGetValue(data.Handler, out Handler thisKeyHandler))
@@ -229,7 +229,7 @@ namespace Schedulino
         {
             return (byte)((value >> place) & 1);
         }
-        private void DigitalDurationHandler(DriveData item)
+        private void DigitalDurationHandler(ProtocolEvent item)
         {
             item.Arguments.TryGetValue("SignalPin", out string commStr);
             byte[] pins_signal = PinSetParseHelper(commStr);
@@ -253,7 +253,7 @@ namespace Schedulino
                     schedule.Add(new SchedulePinState(pins_dur[i], (byte)0, time_end));
                 }
         }
-        private void DigitalPulseHandler(DriveData item)
+        private void DigitalPulseHandler(ProtocolEvent item)
         {
             item.Arguments.TryGetValue("SignalPin", out string commStr);
             byte[] pins_signal = PinSetParseHelper(commStr);
@@ -277,7 +277,7 @@ namespace Schedulino
                     schedule.Add(new SchedulePinState(pins_dur[i], (byte)0, time_end));
                 }
         }
-        private void DigitalStringDurationHandler(DriveData item)
+        private void DigitalStringDurationHandler(ProtocolEvent item)
         {
             // This uses a pin range instead of a pin swr
             item.Arguments.TryGetValue("SignalPin", out string commStr);
@@ -306,7 +306,7 @@ namespace Schedulino
                 }
 
         }
-        private void InvalidKeyHandler(DriveData item)
+        private void InvalidKeyHandler(ProtocolEvent item)
         {
 
         }
