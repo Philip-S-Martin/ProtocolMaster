@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProtocolMaster.Model.Protocol.Visualizer
+namespace ProtocolMaster.Model.Protocol
 {
-    public interface IVisualizer
+    public interface IExtension
     {
+        void Cancel();
     }
 }

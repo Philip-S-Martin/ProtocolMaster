@@ -6,7 +6,7 @@ namespace ProtocolMaster.Model.Protocol.Interpreter
 {
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class InterpreterMeta : ExportAttribute
+    public class InterpreterMeta : ExportAttribute, IExtensionMeta
     {
         public string Name { get; private set; }
         public string Version { get; private set; }

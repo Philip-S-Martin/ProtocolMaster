@@ -1,4 +1,5 @@
-﻿using OxyPlot;
+﻿using MahApps.Metro.Controls;
+using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Series;
@@ -6,7 +7,6 @@ using ProtocolMaster.Model.Debug;
 using ProtocolMaster.Model.Protocol;
 using ProtocolMaster.Model.Protocol.Driver;
 using ProtocolMaster.Model.Protocol.Interpreter;
-using ProtocolMaster.Model.Protocol.Visualizer;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,8 +27,20 @@ namespace ProtocolMaster.View
         {
             InitializeComponent();
             SetUpPlot();
+            App.Instance.ExtensionSystem.InterpreterManager.OnOptionsLoaded += LoadInterpreters;
+            App.Instance.ExtensionSystem.DriverManager.OnOptionsLoaded += LoadDrivers;
+            App.Instance.ExtensionSystem.DriverManager.OnProtocolStart += StartAnimation;
+
         }
 
+        public void LoadDrivers(object sender, EventArgs e)
+        {
+            DriverDropdown.Items.Clear();
+            foreach (DriverMeta meta in App.Instance.ExtensionSystem.DriverManager.Options)
+            {
+                ListDriver(meta);
+            }
+        }
         public void ListDriver(DriverMeta data)
         {
             MenuItem newDriver = new MenuItem
@@ -45,13 +57,22 @@ namespace ProtocolMaster.View
             MenuItem src = e.Source as MenuItem;
             DriverMeta data = src.Resources["data"] as DriverMeta;
 
-            App.Instance.Extensions.Drivers.Select(data);
+            App.Instance.ExtensionSystem.DriverManager.Selected = data;
             ShowSelectedDriver();
         }
 
         public void ShowSelectedDriver()
         {
-            SelectedDriver.Header = "Selected: " + App.Instance.Extensions.Drivers.Selected.ToString();
+            SelectedDriver.Header = "Selected: " + App.Instance.ExtensionSystem.DriverManager.Selected.ToString();
+        }
+
+        public void LoadInterpreters(object sender, EventArgs e)
+        {
+            InterpreterDropdown.Items.Clear();
+            foreach (InterpreterMeta meta in App.Instance.ExtensionSystem.InterpreterManager.Options)
+            {
+                ListInterpreter(meta);
+            }
         }
 
         public void ListInterpreter(InterpreterMeta data)
@@ -69,37 +90,13 @@ namespace ProtocolMaster.View
         {
             MenuItem src = e.Source as MenuItem;
             InterpreterMeta data = src.Resources["data"] as InterpreterMeta;
-            App.Instance.Extensions.Interpreters.Select(data);
+            App.Instance.ExtensionSystem.InterpreterManager.Selected = data;
             ShowSelectedInterpreter();
         }
 
         public void ShowSelectedInterpreter()
         {
-            SelectedInterpreter.Header = "Selected: " + App.Instance.Extensions.Interpreters.Selected.ToString();
-        }
-
-        public void ListVisualizer(VisualizerMeta data)
-        {
-            MenuItem newVis = new MenuItem
-            {
-                Header = data.Name + " " + data.Version
-            };
-            newVis.Resources.Add("data", data);
-            newVis.Click += new RoutedEventHandler(VisualizerClickHandler);
-            VisualizerDropdown.Items.Add(newVis);
-        }
-
-        public void VisualizerClickHandler(object sender, RoutedEventArgs e)
-        {
-            MenuItem src = e.Source as MenuItem;
-            VisualizerMeta data = src.Resources["data"] as VisualizerMeta;
-            App.Instance.Extensions.Visualizers.Select(data);
-            ShowSelectedInterpreter();
-        }
-
-        public void ShowSelectedVisualizer()
-        {
-            SelectedVisualizer.Header = "Selected: " + App.Instance.Extensions.Visualizers.Selected.ToString();
+            SelectedInterpreter.Header = "Selected: " + App.Instance.ExtensionSystem.InterpreterManager.Selected.ToString();
         }
 
         DateTime start;
@@ -109,10 +106,7 @@ namespace ProtocolMaster.View
             CancelButton.IsEnabled = true;
             ResetButton.IsEnabled = false;
 
-            start = DateTime.Now;
-
-
-            App.Instance.Extensions.Run();
+            App.Instance.ExtensionSystem.Run();
         }
 
         public void Cancel_Click(object sender, RoutedEventArgs e)
@@ -121,8 +115,8 @@ namespace ProtocolMaster.View
             CancelButton.IsEnabled = false;
             ResetButton.IsEnabled = true;
 
-            bgWorker.CancelAsync();
-            App.Instance.Extensions.Cancel();
+            tokenSource.Cancel();
+            App.Instance.ExtensionSystem.Cancel();
         }
 
         public void Reset_Click(object sender, RoutedEventArgs e)
@@ -148,21 +142,24 @@ namespace ProtocolMaster.View
 
             List<double> gridLines = new List<double>();
 
-            foreach (DriveData data in driveDataList)
+            if (driveDataList != null)
             {
-                if (data.HasCategory)
+                foreach (DriveData data in driveDataList)
                 {
-                    if (!categoryAxis.Labels.Contains(data.CategoryLabel))
+                    if (data.HasCategory)
                     {
-                        categoryAxis.Labels.Add(data.CategoryLabel);
-                        gridLines.Add(gridLines.Count);
+                        if (!categoryAxis.Labels.Contains(data.CategoryLabel))
+                        {
+                            categoryAxis.Labels.Add(data.CategoryLabel);
+                            gridLines.Add(gridLines.Count);
+                        }
+                        targetSeries.Items.Add(new IntervalBarItem
+                        {
+                            CategoryIndex = categoryAxis.Labels.IndexOf(data.CategoryLabel),
+                            Start = new DateTime(Convert.ToInt64(data.Arguments["TimeStartMs"]) * 10000).ToOADate(),
+                            End = new DateTime(Convert.ToInt64(data.Arguments["TimeEndMs"]) * 10000).ToOADate()
+                        });
                     }
-                    targetSeries.Items.Add(new IntervalBarItem
-                    {
-                        CategoryIndex = categoryAxis.Labels.IndexOf(data.CategoryLabel),
-                        Start = new DateTime(Convert.ToInt64(data.Arguments["TimeStartMs"]) * 10000).ToOADate(),
-                        End = new DateTime(Convert.ToInt64(data.Arguments["TimeEndMs"]) * 10000).ToOADate()
-                    });
                 }
             }
 
@@ -173,8 +170,11 @@ namespace ProtocolMaster.View
             plot.Model.Series.Clear();
             plot.Model.Series.Add(targetSeries);
 
-            plot.Model.InvalidatePlot(true);
+
+
             plot.ResetAllAxes();
+            plot.Model.Axes[0].Minimum = 0;
+            plot.Model.InvalidatePlot(true);
         }
         private void SetUpPlot()
         {
@@ -249,42 +249,41 @@ namespace ProtocolMaster.View
             Animate();
         }
 
-        BackgroundWorker bgWorker = new BackgroundWorker();
+        Task bgWorker;
         private void Animate()
         {
-            bgWorker.DoWork +=
-                new DoWorkEventHandler(bgWorker_DoWork);
-            bgWorker.ProgressChanged +=
-                new ProgressChangedEventHandler(bgWorker_ProgressChanged);
-            bgWorker.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(bgWorker_RunWorkerCompleted);
-            bgWorker.WorkerReportsProgress = true;
-            bgWorker.WorkerSupportsCancellation = true;
+            
+        }
+        Progress<int> animationProgress;
+        CancellationTokenSource tokenSource;
+        public void StartAnimation(object sender, EventArgs e)
+        {
+            animationProgress = new Progress<int>();
+            tokenSource = new CancellationTokenSource();
+            CancellationToken cancelToken = tokenSource.Token;
+            animationProgress.ProgressChanged += bgWorker_ProgressChanged;
+            bgWorker = new Task(() =>
+            {
+                bgWorker_DoWork(animationProgress, cancelToken);
+            }, cancelToken);
+            bgWorker.Start();
+            start = DateTime.Now;
         }
 
-        public void StartAnimation()
-        {
-            bgWorker.RunWorkerAsync();
-        }
-        void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            //Log.Error("BgWorker DONE");
-        }
-
-        void bgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        void bgWorker_ProgressChanged(object sender, int e)
         {
             //Log.Error(e.UserState.GetType().ToString());
             Line.X = (DateTime.Now.ToOADate() - start.ToOADate());
             plot.Model.InvalidatePlot(true);
         }
 
-        void bgWorker_DoWork(object sender, DoWorkEventArgs e)
+        void bgWorker_DoWork(IProgress<int> progress, CancellationToken cancelToken)
         {
             DateTime workerstart = DateTime.Now;
             DateTime end = workerstart.AddSeconds(120);
             DateTime now = workerstart;
             DateTime nextFrame = workerstart.AddTicks(250000);
-            while (now < end)
+            while (now < end && !cancelToken.IsCancellationRequested)
             {
                 while (now < nextFrame)
                 {
@@ -292,14 +291,10 @@ namespace ProtocolMaster.View
                     now = DateTime.Now;
                 }
 
-                bgWorker.ReportProgress(1);
+                progress.Report(1);
                 nextFrame = now.AddTicks(250000);
-
-                if (this.bgWorker.CancellationPending == true)
-                {
-                    break;
-                }
             }
+            progress.Report(0);
         }
         private void MenuItem_Click(object sender, System.Windows.RoutedEventArgs e)
         {

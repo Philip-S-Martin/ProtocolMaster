@@ -52,6 +52,7 @@ void _Input_Start()
 {
   Serial.read();
   state = RUNNING;
+  run_offset = time;
 }
 void _Input_Cancel()
 {

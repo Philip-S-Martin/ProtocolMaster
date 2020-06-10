@@ -16,17 +16,15 @@ namespace ProtocolMaster.Model.Protocol.NullExtensions
     [DriverMeta("None", "")]
     public class NullDriver : IDriver
     {
-        public ConcurrentQueue<VisualData> VisualData { get { return null; } }
-        public Progress<DriverProgress> CurrentProgress { get; set; }
         public void Cancel()
         {
         }
 
-        public void ProcessData(List<DriveData> dataList)
+        public void Setup(List<DriveData> dataList)
         {
         }
 
-        public void Run()
+        public void Start()
         {
         }
     }

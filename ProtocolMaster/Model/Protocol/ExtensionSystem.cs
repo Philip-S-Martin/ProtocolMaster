@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Windows.Documents;
 using ProtocolMaster.Model.Protocol.Interpreter;
 using ProtocolMaster.Model.Protocol.Driver;
-using ProtocolMaster.Model.Protocol.Visualizer;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
@@ -21,18 +20,10 @@ namespace ProtocolMaster.Model.Protocol
     internal class ExtensionSystem
     {
         // Import All Extensions so that they can be Composed (ComposeParts())
-        [Import(typeof(IDriverManager))]
-        public IDriverManager Drivers { get; private set; }
-
-        [Import(typeof(IInterpreterManager))]
-        public IInterpreterManager Interpreters { get; private set; }
-
-        [Import(typeof(IVisualizerManager))]
-        public IVisualizerManager Visualizers { get; private set; }
-
-        // Composition Objects
+        public DriverManager DriverManager { get; private set; }
+        public InterpreterManager InterpreterManager { get; private set; }
+        // Composition Container for all extension managers
         private readonly CompositionContainer _container;
-
         public List<DriveData> Data { get; private set; }
 
         bool isRunning;
@@ -40,37 +31,34 @@ namespace ProtocolMaster.Model.Protocol
         private Task runTask;
         private CancellationToken cancelToken;
         private CancellationTokenSource tokenSource;
-        private Progress<List<DriveData>> progress;
 
         public ExtensionSystem()
         {
             isRunning = false;
+
+            DriverManager = new DriverManager();
+            InterpreterManager = new InterpreterManager();
+
             string targetDir = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\Extensions";
             AggregateCatalog catalog = new AggregateCatalog();
-            catalog.Catalogs.Add(new AssemblyCatalog(typeof(InterpreterManager).Assembly));
+            catalog.Catalogs.Add(new AssemblyCatalog(typeof(IExtension).Assembly));
             catalog.Catalogs.Add(new DirectoryCatalog(targetDir));
             _container = new CompositionContainer(catalog);
-            Log.Error("Extension Location: " + targetDir);
-            this._container.ComposeParts(this);
-            try
-            {
-
-            }
-            catch (CompositionException compositionException)
-            {
-                Log.Error(compositionException.ToString());
-            }
+            Debug.Log.Error("Extension Location: " + targetDir);
         }
-        public void PrepExtensions()
+
+        public void LoadExtensions()
         {
-            Drivers.Load();
-            Interpreters.Load();
-            Visualizers.Load();
+            DriverManager.LoadOptions(_container);
+            InterpreterManager.LoadOptions(_container);
         }
-
         public void Run()
         {
-            if (isRunning == false)
+            if (isRunning)
+            {
+                throw new Exception("A protocol is already running");
+            }
+            else
             {
                 isRunning = true;
                 tokenSource = new CancellationTokenSource();
@@ -79,7 +67,7 @@ namespace ProtocolMaster.Model.Protocol
                 //DriverProgress.
 
                 Task<List<DriveData>> generator = Task.Factory.StartNew<List<DriveData>>(
-                    () => Interpreters.Generate(), TaskCreationOptions.LongRunning);
+                    () => InterpreterManager.GenerateData(), TaskCreationOptions.LongRunning);
 
                 Task UITask = generator.ContinueWith((data) =>
                 {
@@ -91,21 +79,24 @@ namespace ProtocolMaster.Model.Protocol
                         cancelToken.Register(new Action(() =>
                         {
                             //Interpreters.Cancel(); 
-                            Drivers.Cancel();
+                            DriverManager.Cancel();
                         }));
-                        Drivers.Run(Data, driverProgress);
+                        DriverManager.Run(Data);
                     }), tokenSource.Token);
 
                 }, TaskScheduler.FromCurrentSynchronizationContext());
-                
             }
         }
 
         public void Cancel()
         {
-            if (Drivers.IsRunning == true)
+            if(InterpreterManager.IsRunning)
             {
-                Drivers.Cancel();
+                InterpreterManager.Cancel();
+            }
+            if (DriverManager.IsRunning)
+            {
+                DriverManager.Cancel();
             }
             isRunning = false;
         }

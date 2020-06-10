@@ -27,9 +27,6 @@ namespace Schedulino
         SerialPort serial;
         public SerialPort Serial { get => serial; set => serial = value; }
 
-        public ConcurrentQueue<VisualData> VisualData { get; private set; }
-        public Progress<DriverProgress> CurrentProgress { get; set; }
-
         // Data processing handlers
         delegate void Handler(DriveData item);
         readonly Dictionary<string, Handler> handlers;
@@ -83,17 +80,14 @@ namespace Schedulino
             _state = ScheduleState.CANCEL;
         }
 
-        public void ProcessData(List<DriveData> dataList)
+        public void Setup(List<DriveData> dataList)
         {
             foreach (DriveData data in dataList)
             {
                 Handle(data);
             }
             schedule.Sort();
-        }
 
-        public void Run()
-        {
             // SerialPort setup
             Serial = new SerialPort
             {
@@ -106,69 +100,69 @@ namespace Schedulino
             Serial.Open();
 
             // Handshake
+            // Read serial buffer until arduino tells us how much capacity it has
             while (_state != ScheduleState.CANCEL && _capacity == 0)
             {
-                while (serial.IsOpen && serial.BytesToRead >= 1)
-                {
-                    int read = Serial.ReadByte();
-                    if (read != -1)
-                        Receive((char)read);
-                }
+                ReadSerialBuffer();
             }
-            // Pre-Load as much as possible
+            // Pre-Load as many events as possible
             while (_state != ScheduleState.CANCEL && _capacity > 0 && scheduleIndex < schedule.Count)
             {
-                if (serial.IsOpen && _capacity > 0 && _serial_available >= 7 && scheduleIndex < schedule.Count)
-                {
-                    byte[] bytes = schedule[scheduleIndex].ToBytes();
-                    Serial.Write("E");
-                    Serial.Write(bytes, 0, bytes.Length);
-                    _serial_available -= 7;
-                    _capacity--;
-                    scheduleIndex++;
-                }
-                while (serial.IsOpen && serial.BytesToRead >= 1)
-                {
-                    int read = Serial.ReadByte();
-                    if (read != -1)
-                        Receive((char)read);
-                }
+                SendNextEvent();
+                ReadSerialBuffer();
             }
-            // Start
+        }
+
+        public void Start()
+        {
+            // Send start signal
             if (_state != ScheduleState.CANCEL && _state != ScheduleState.RESET)
             {
-                while (serial.IsOpen && _state != ScheduleState.RUNNING)
+                while (serial.IsOpen && !TrySendStartSignal())
                 {
-                    int read = Serial.ReadByte();
-                    if (read != -1)
-                        Receive((char)read);
-                    if (serial.IsOpen && _serial_available > 0)
-                    {
-                        Serial.Write("S");
-                        _state = ScheduleState.RUNNING;
-                    }
+                    ReadSerialBuffer();
                 }
             }
-
+            // Send events and send serial data until Done event is recieved
             while (_state != ScheduleState.CANCEL && _state == ScheduleState.RUNNING)
             {
-                if (serial.IsOpen && _capacity > 0 && _serial_available >= 7 && scheduleIndex < schedule.Count)
-                {
-                    byte[] bytes = schedule[scheduleIndex].ToBytes();
-                    Serial.Write("E");
-                    Serial.Write(bytes, 0, bytes.Length);
-                    _serial_available -= 7;
-                    _capacity--;
-                    scheduleIndex++;
-                }
-                while (serial.IsOpen && serial.BytesToRead >= 1)
-                {
-                    int read = Serial.ReadByte();
-                    if (read != -1)
-                        Receive((char)read);
-                }
+                SendNextEvent();
+                ReadSerialBuffer();
             }
             Serial.Close();
+        }
+        private void SendNextEvent()
+        {
+            if (serial.IsOpen && _capacity > 0 && _serial_available >= 7 && scheduleIndex < schedule.Count)
+            {
+                byte[] bytes = schedule[scheduleIndex].ToBytes();
+                Serial.Write("E");
+                Serial.Write(bytes, 0, bytes.Length);
+                _serial_available -= 7;
+                _capacity--;
+                scheduleIndex++;
+            }
+        }
+
+        private bool TrySendStartSignal()
+        {
+            if (serial.IsOpen && _serial_available > 0)
+            {
+                Serial.Write("S");
+                _state = ScheduleState.RUNNING;
+                return true;
+            }
+            return false;
+        }
+
+        private void ReadSerialBuffer()
+        {
+            while (serial.IsOpen && serial.BytesToRead >= 1)
+            {
+                int read = Serial.ReadByte();
+                if (read != -1)
+                    Receive((char)read);
+            }
         }
 
         private void Handle(DriveData data)

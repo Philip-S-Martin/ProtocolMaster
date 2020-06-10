@@ -35,7 +35,7 @@ void _Process_Setup()
 
 void _Process_Running()
 {
-  if (time > run_offset)
+  if (time >= run_offset)
     run_time = time - run_offset;
   else
     run_time = UINT32_MAX - run_offset + time;

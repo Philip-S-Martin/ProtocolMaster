@@ -27,8 +27,7 @@
         </DockPanel>
         <!--Camera/Video Content-->
         <Grid>
-
-
+            
         </Grid>
     </DockPanel>
 </UserControl>
