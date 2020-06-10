@@ -13,16 +13,17 @@ namespace ProtocolMaster
         public static View.MainWindow Window { get { return (View.MainWindow)Application.Current.MainWindow; } }
         public bool LoggedIn => Model.Google.GAuth.Instance.IsAuthenticated();
 
-        internal Model.Protocol.ExtensionSystem Extensions { get; private set; }
+        internal Model.Protocol.ExtensionSystem ExtensionSystem { get; private set; }
         void App_Startup(object sender, StartupEventArgs e)
         {
+            ExtensionSystem = new Model.Protocol.ExtensionSystem();
+
             Model.Debug.Log.Error("ProtocolMaster Starting up");
             MainWindow = new View.MainWindow();
             MainWindow.Show();
             Model.Debug.Log.Out("Application Data: " + Model.Debug.Log.Instance.AppData);
 
-            Extensions = new Model.Protocol.ExtensionSystem();
-            Extensions.PrepExtensions();
+            ExtensionSystem.LoadExtensions();
         }
 
         // Full Login Routine

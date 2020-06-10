@@ -7,10 +7,9 @@ using System.Windows.Documents;
 
 namespace ProtocolMaster.Model.Protocol.Interpreter
 {
-    public interface IInterpreter
+    public interface IInterpreter : IExtension
     {
         List<DriveData> Data { get; }
         void Generate(string protocolName);
-        void Cancel();
     }
 }

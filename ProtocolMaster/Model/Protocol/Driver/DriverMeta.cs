@@ -6,7 +6,7 @@ namespace ProtocolMaster.Model.Protocol.Driver
 {
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class DriverMeta : ExportAttribute
+    public class DriverMeta : ExportAttribute, IExtensionMeta
     {
         public string Name { get; private set; }
         public string Version { get; private set; }
