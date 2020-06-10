@@ -12,7 +12,7 @@ using System.Windows.Threading;
 
 namespace ProtocolMaster.Model.Protocol.Driver
 {
-    internal class DriverManager : IExtensionManager<IDriver, DriverMeta>
+    internal class DriverManager : ExtensionManager<IDriver, DriverMeta>
     {
         IDriver driver;
 
@@ -21,7 +21,7 @@ namespace ProtocolMaster.Model.Protocol.Driver
         {
             OnProtocolStart?.Invoke(this, new EventArgs());
         }
-        public async void Run(List<DriveData> data)
+        public async void Run(List<ProtocolEvent> data)
         {
             driver = CreateSelectedExtension();
 

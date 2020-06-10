@@ -25,7 +25,7 @@ namespace ProtocolMaster.Model.Protocol.Driver
         /// Data processing function, this takes DriverData and converts it into hardware-compatible data
         /// </summary>
         /// <param name="dataList">List of DriverData for the driver to handle, such as events or behaviors</param>
-        void Setup(List<DriveData> dataList);
+        void Setup(List<ProtocolEvent> dataList);
         /// <summary>
         /// Driver Run Function, this is called after all Data Processing is complete
         /// </summary>

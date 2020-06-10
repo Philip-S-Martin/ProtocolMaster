@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 
 namespace ProtocolMaster.Model.Protocol.Interpreter
 {
-    internal class InterpreterManager : IExtensionManager<IInterpreter, InterpreterMeta>
+    internal class InterpreterManager : ExtensionManager<IInterpreter, InterpreterMeta>
     {        
         IInterpreter interpreter;
 
-        public List<DriveData> GenerateData()
+        public List<ProtocolEvent> GenerateData()
         {
             interpreter = CreateSelectedExtension();
 
@@ -30,7 +30,7 @@ namespace ProtocolMaster.Model.Protocol.Interpreter
             // pre-fill event data
             interpreter.Generate("TEST");
 
-            List<DriveData> result = interpreter.Data;
+            List<ProtocolEvent> result = interpreter.Data;
             DisposeSelectedExtension();
             return result;
         }

@@ -20,7 +20,7 @@ namespace ProtocolMaster.Model.Protocol.NullExtensions
         {
         }
 
-        public void Setup(List<DriveData> dataList)
+        public void Setup(List<ProtocolEvent> dataList)
         {
         }
 

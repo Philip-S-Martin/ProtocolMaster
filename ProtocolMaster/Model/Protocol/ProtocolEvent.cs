@@ -2,14 +2,14 @@
 
 namespace ProtocolMaster.Model.Protocol
 {
-    public class DriveData
+    public class ProtocolEvent
     {
         public string Handler { get; private set; }
         public string CategoryLabel { get; private set; }
         public bool HasCategory { get; private set; }
         public Dictionary<string, string> Arguments { get; private set; }
 
-        public DriveData(string handler, params KeyValuePair<string, string>[] args)
+        public ProtocolEvent(string handler, params KeyValuePair<string, string>[] args)
         {
             this.Handler = handler;
             Arguments = new Dictionary<string, string>();
@@ -20,7 +20,7 @@ namespace ProtocolMaster.Model.Protocol
             HasCategory = false;
         }
 
-        public DriveData(string handler, string categoryLabel, params KeyValuePair<string, string>[] args) : this(handler, args)
+        public ProtocolEvent(string handler, string categoryLabel, params KeyValuePair<string, string>[] args) : this(handler, args)
         {
             this.CategoryLabel = categoryLabel;
             HasCategory = true;

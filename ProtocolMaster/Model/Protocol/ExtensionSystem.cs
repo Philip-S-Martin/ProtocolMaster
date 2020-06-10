@@ -24,7 +24,7 @@ namespace ProtocolMaster.Model.Protocol
         public InterpreterManager InterpreterManager { get; private set; }
         // Composition Container for all extension managers
         private readonly CompositionContainer _container;
-        public List<DriveData> Data { get; private set; }
+        public List<ProtocolEvent> Data { get; private set; }
 
         bool isRunning;
 
@@ -66,7 +66,7 @@ namespace ProtocolMaster.Model.Protocol
                 Progress<DriverProgress> driverProgress = new Progress<DriverProgress>();
                 //DriverProgress.
 
-                Task<List<DriveData>> generator = Task.Factory.StartNew<List<DriveData>>(
+                Task<List<ProtocolEvent>> generator = Task.Factory.StartNew<List<ProtocolEvent>>(
                     () => InterpreterManager.GenerateData(), TaskCreationOptions.LongRunning);
 
                 Task UITask = generator.ContinueWith((data) =>

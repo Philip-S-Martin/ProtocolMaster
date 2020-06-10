@@ -30,7 +30,7 @@ namespace Schedulino
     */
     public class LegacyAFCInterpreter : SpreadSheetInterpreter, IInterpreter
     {
-        public List<DriveData> Data { get; private set; }
+        public List<ProtocolEvent> Data { get; private set; }
         internal Dictionary<string, Protocol> Protocols { get; private set; }
         internal Dictionary<string, Sound> Sounds { get; private set; }
         internal Dictionary<string, Stimulator> Stimulators { get; private set; }
@@ -324,17 +324,17 @@ namespace Schedulino
                     stim.GetRefs(interpreter);
                 }
             }
-            public List<DriveData> Generate(LegacyAFCInterpreter interpreter)
+            public List<ProtocolEvent> Generate(LegacyAFCInterpreter interpreter)
             {
                 GetRefs(interpreter);
-                List<DriveData> events = new List<DriveData>();
+                List<ProtocolEvent> events = new List<ProtocolEvent>();
 
                 Random random = new Random();
                 int timeMs = ExtraTime;
 
                 for (int i = 0; i < presoundCount; i++)
                 {
-                    events.Add(new DriveData(SoundRef_1.Handler, "Sound",
+                    events.Add(new ProtocolEvent(SoundRef_1.Handler, "Sound",
                        new KeyValuePair<string, string>("SignalPin", SoundRef_1.BehaviorPin),
                        new KeyValuePair<string, string>("DurationPin", SoundRef_1.DurationPin),
                        new KeyValuePair<string, string>("Value", SoundRef_1.SoundID),
@@ -344,7 +344,7 @@ namespace Schedulino
                 }
                 for (int i = 0; i < soundCount; i++)
                 {
-                    events.Add(new DriveData(SoundRef_1.Handler, "Sound",
+                    events.Add(new ProtocolEvent(SoundRef_1.Handler, "Sound",
                        new KeyValuePair<string, string>("SignalPin", SoundRef_1.BehaviorPin),
                        new KeyValuePair<string, string>("DurationPin", SoundRef_1.DurationPin),
                        new KeyValuePair<string, string>("Value", SoundRef_1.SoundID),
@@ -397,9 +397,9 @@ namespace Schedulino
                 IntraSoundDeliveryRef = interpreter.Deliveries[IntraSoundDelivery];
                 StimulusSoundPairingRef = interpreter.Pairings[StimulusSoundPairing];
             }
-            public List<DriveData> Generate(int timeMs, int soundDuration, int sound)
+            public List<ProtocolEvent> Generate(int timeMs, int soundDuration, int sound)
             {
-                List<DriveData> events = new List<DriveData>();
+                List<ProtocolEvent> events = new List<ProtocolEvent>();
                 Random random = new Random();
                 timeMs += random.Next(DelayMinimumMs, DelayMaximumMs);
                 if (sound == SoundGroup)
@@ -408,7 +408,7 @@ namespace Schedulino
                     for (int i = 0; i < stimuliPerSound; i++)
                     {
                         int duration = random.Next(DurationMinimumMs, DurationMaximumMs);
-                        events.Add(new DriveData(StimulatorRef.Handler, Name,
+                        events.Add(new ProtocolEvent(StimulatorRef.Handler, Name,
                            new KeyValuePair<string, string>("SignalPin", StimulatorRef.BehaviorPin),
                            new KeyValuePair<string, string>("DurationPin", StimulatorRef.DurationPin),
                            new KeyValuePair<string, string>("TimeStartMs", timeMs.ToString()),

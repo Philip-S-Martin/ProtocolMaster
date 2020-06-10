@@ -9,7 +9,7 @@ namespace ProtocolMaster.Model.Protocol.Interpreter
 {
     public interface IInterpreter : IExtension
     {
-        List<DriveData> Data { get; }
+        List<ProtocolEvent> Data { get; }
         void Generate(string protocolName);
     }
 }
