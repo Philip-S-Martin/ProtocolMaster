@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Security.AccessControl;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,10 +30,10 @@ namespace ProtocolMaster.View
             SetUpPlot();
             App.Instance.ExtensionSystem.InterpreterManager.OnOptionsLoaded += LoadInterpreters;
             App.Instance.ExtensionSystem.DriverManager.OnOptionsLoaded += LoadDrivers;
+
             App.Instance.ExtensionSystem.DriverManager.OnProtocolStart += StartAnimation;
-
+            App.Instance.ExtensionSystem.DriverManager.OnProtocolEnd += EndAnimation;
         }
-
         public void LoadDrivers(object sender, EventArgs e)
         {
             DriverDropdown.Items.Clear();
@@ -114,8 +115,7 @@ namespace ProtocolMaster.View
             StartButton.IsEnabled = false;
             CancelButton.IsEnabled = false;
             ResetButton.IsEnabled = true;
-
-            tokenSource.Cancel();
+            
             App.Instance.ExtensionSystem.Cancel();
         }
 
@@ -142,6 +142,7 @@ namespace ProtocolMaster.View
 
             List<double> gridLines = new List<double>();
 
+            categoryAxis.Labels.Clear();
             if (driveDataList != null)
             {
                 foreach (ProtocolEvent data in driveDataList)
@@ -259,6 +260,7 @@ namespace ProtocolMaster.View
         CancellationTokenSource tokenSource;
         public void StartAnimation(object sender, EventArgs e)
         {
+
             animationProgress = new Progress<int>();
             tokenSource = new CancellationTokenSource();
             CancellationToken cancelToken = tokenSource.Token;
@@ -270,12 +272,16 @@ namespace ProtocolMaster.View
             bgWorker.Start();
             start = DateTime.Now;
         }
+        public void EndAnimation(object sender, EventArgs e)
+        {
+            tokenSource.Cancel();
+        }
 
         void bgWorker_ProgressChanged(object sender, int e)
         {
             //Log.Error(e.UserState.GetType().ToString());
             Line.X = (DateTime.Now.ToOADate() - start.ToOADate());
-            plot.Model.InvalidatePlot(true);
+            plot.InvalidatePlot();
         }
 
         void bgWorker_DoWork(IProgress<int> progress, CancellationToken cancelToken)
@@ -286,20 +292,21 @@ namespace ProtocolMaster.View
             DateTime nextFrame = workerstart.AddTicks(250000);
             while (now < end && !cancelToken.IsCancellationRequested)
             {
+                /*
                 while (now < nextFrame)
                 {
-                    Thread.Sleep(5);
+                    Thread.Sleep(7);
                     now = DateTime.Now;
-                }
-
+                }*/
+                Thread.Sleep(40);
                 progress.Report(1);
-                nextFrame = now.AddTicks(250000);
+                nextFrame = now.AddMilliseconds(35);
             }
             progress.Report(0);
         }
         private void MenuItem_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-
+            
         }
     }
 }

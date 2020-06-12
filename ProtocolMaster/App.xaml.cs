@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -39,6 +40,7 @@ namespace ProtocolMaster
 
         public async void Window_Closed()
         {
+            ExtensionSystem.Cancel();
             await Model.Google.GAuth.Instance.DeAuthenticate();
 
 

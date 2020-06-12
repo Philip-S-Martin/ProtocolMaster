@@ -93,8 +93,6 @@ namespace ProtocolMaster.Model.Protocol
         public void Cancel()
         {
             extension.Cancel();
-            extensionContext.Dispose();
-            isDisposed = true;
         }
     }
 }
