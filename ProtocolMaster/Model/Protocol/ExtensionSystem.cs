@@ -66,8 +66,17 @@ namespace ProtocolMaster.Model.Protocol
                 Progress<DriverProgress> driverProgress = new Progress<DriverProgress>();
                 //DriverProgress.
 
-                Task<List<ProtocolEvent>> generator = Task.Factory.StartNew<List<ProtocolEvent>>(
-                    () => InterpreterManager.GenerateData(), TaskCreationOptions.LongRunning);
+                Task<List<ProtocolEvent>> generator = Task.Factory.StartNew<List<ProtocolEvent>>(() =>
+                {
+                    cancelToken.Register(new Action(() =>
+                    {
+                        if (InterpreterManager.IsRunning)
+                        {
+                            InterpreterManager.Cancel();
+                        }
+                    }));
+                    return InterpreterManager.GenerateData();
+                }, TaskCreationOptions.LongRunning);
 
                 Task UITask = generator.ContinueWith((data) =>
                 {
@@ -78,8 +87,10 @@ namespace ProtocolMaster.Model.Protocol
                     {
                         cancelToken.Register(new Action(() =>
                         {
-                            //Interpreters.Cancel(); 
-                            DriverManager.Cancel();
+                            if (DriverManager.IsRunning)
+                            {
+                                DriverManager.Cancel();
+                            }
                         }));
                         DriverManager.Run(Data);
                     }), tokenSource.Token);
@@ -90,14 +101,8 @@ namespace ProtocolMaster.Model.Protocol
 
         public void Cancel()
         {
-            if(InterpreterManager.IsRunning)
-            {
-                InterpreterManager.Cancel();
-            }
-            if (DriverManager.IsRunning)
-            {
-                DriverManager.Cancel();
-            }
+            if(tokenSource != null && !tokenSource.IsCancellationRequested)
+                tokenSource.Cancel();
             isRunning = false;
         }
     }

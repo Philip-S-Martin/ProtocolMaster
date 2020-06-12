@@ -55,7 +55,7 @@ namespace ProtocolMaster.Model.Debug
             }
         }
 
-        public static void Error(string message) => App.Current.Dispatcher.Invoke(new Action(() => { Log.Instance.WriteError(message); }));
+        public static void Error(string message) => App.Current.Dispatcher.InvokeAsync(new Action(() => { Log.Instance.WriteError(message); }));
         public void WriteError(string message)
         {
             lfErr.Write(message);
@@ -64,7 +64,7 @@ namespace ProtocolMaster.Model.Debug
                 App.Window.LogView.LogToView(message.Replace("\t", "\n"));
             }
         }
-        public static void Out(string message) => App.Current.Dispatcher.Invoke(new Action(() => { Log.Instance.WriteOut(message); }));
+        public static void Out(string message) => App.Current.Dispatcher.InvokeAsync(new Action(() => { Log.Instance.WriteOut(message); }));
         public void WriteOut(string message)
         {
             lfOut.Write(message);

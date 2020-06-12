@@ -78,6 +78,7 @@ namespace Schedulino
                     Receive((char)read);
             }
             _state = ScheduleState.CANCEL;
+            Serial.Close();
         }
 
         public void Setup(List<ProtocolEvent> dataList)
@@ -129,7 +130,7 @@ namespace Schedulino
                 SendNextEvent();
                 ReadSerialBuffer();
             }
-            Serial.Close();
+            if(serial.IsOpen) Serial.Close();
         }
         private void SendNextEvent()
         {
