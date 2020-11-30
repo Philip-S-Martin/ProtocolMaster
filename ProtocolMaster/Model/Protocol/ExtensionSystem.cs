@@ -27,7 +27,9 @@ namespace ProtocolMaster.Model.Protocol
         public List<ProtocolEvent> Data { get; private set; }
 
         bool isRunning;
+        bool isReady;
 
+        Task<List<ProtocolEvent>> generator;
         private Task runTask;
         private CancellationToken cancelToken;
         private CancellationTokenSource tokenSource;
@@ -35,6 +37,7 @@ namespace ProtocolMaster.Model.Protocol
         public ExtensionSystem()
         {
             isRunning = false;
+            isReady = false;
 
             DriverManager = new DriverManager();
             InterpreterManager = new InterpreterManager();
@@ -47,10 +50,46 @@ namespace ProtocolMaster.Model.Protocol
             Debug.Log.Error("Extension Location: " + targetDir);
         }
 
+        ~ExtensionSystem()
+        {
+            Terminate();
+        }
         public void LoadExtensions()
         {
             DriverManager.LoadOptions(_container);
             InterpreterManager.LoadOptions(_container);
+        }
+        public void Interpret(string selectionID)
+        {
+            if (isRunning)
+            {
+                throw new Exception("Cannot interpret a new protocol while a protocol is running");
+            }
+            else if (isReady)
+            {
+                Reset();
+                //then fall through
+            }
+            isReady = true;
+            tokenSource = new CancellationTokenSource();
+            cancelToken = tokenSource.Token;
+            generator = Task.Factory.StartNew<List<ProtocolEvent>>(() =>
+            {
+                cancelToken.Register(new Action(() =>
+                {
+                    if (InterpreterManager.IsRunning)
+                    {
+                        InterpreterManager.Cancel();
+                    }
+                }));
+                return InterpreterManager.GenerateData(selectionID);
+            }, TaskCreationOptions.LongRunning);
+
+            Task UITask = generator.ContinueWith((data) =>
+            {
+                Data = generator.Result;
+                App.Window.TimelineView.LoadPlotData(Data);
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
         public void Run()
         {
@@ -58,31 +97,18 @@ namespace ProtocolMaster.Model.Protocol
             {
                 throw new Exception("A protocol is already running");
             }
+            else if (!isReady)
+            {
+                throw new Exception("A protocol cannot be run before it is ready");
+            }
             else
             {
+                isReady = false;
                 isRunning = true;
-                tokenSource = new CancellationTokenSource();
-                cancelToken = tokenSource.Token;
                 Progress<DriverProgress> driverProgress = new Progress<DriverProgress>();
-                //DriverProgress.
-
-                Task<List<ProtocolEvent>> generator = Task.Factory.StartNew<List<ProtocolEvent>>(() =>
-                {
-                    cancelToken.Register(new Action(() =>
-                    {
-                        if (InterpreterManager.IsRunning)
-                        {
-                            InterpreterManager.Cancel();
-                        }
-                    }));
-                    return InterpreterManager.GenerateData();
-                }, TaskCreationOptions.LongRunning);
 
                 Task UITask = generator.ContinueWith((data) =>
                 {
-                    Data = generator.Result;
-                    App.Window.TimelineView.LoadPlotData(Data);
-
                     runTask = Task.Run(new Action(() =>
                     {
                         cancelToken.Register(new Action(() =>
@@ -99,9 +125,25 @@ namespace ProtocolMaster.Model.Protocol
             }
         }
 
-        public void Cancel()
+        public void End()
         {
-            if(tokenSource != null && !tokenSource.IsCancellationRequested)
+            if(!isRunning)
+            {
+                throw new Exception("A protocol cannot be cancelled/ended when not running");
+            }
+            Terminate();
+        }
+        public void Reset()
+        {
+            if (isRunning)
+            {
+                throw new Exception("A protocol cannot be reset when running");
+            }
+            Terminate();
+        }
+        public void Terminate()
+        {
+            if (tokenSource != null && !tokenSource.IsCancellationRequested)
                 tokenSource.Cancel();
             isRunning = false;
         }

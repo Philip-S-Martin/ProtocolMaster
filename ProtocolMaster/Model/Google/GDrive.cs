@@ -4,6 +4,8 @@ using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
 using ProtocolMaster.Model.Debug;
 using System.Collections.Generic;
+using System.IO;
+using File = Google.Apis.Drive.v3.Data.File;
 
 namespace ProtocolMaster.Model.Google
 {
@@ -24,6 +26,12 @@ namespace ProtocolMaster.Model.Google
             }
         }
 
+        public Stream Download(string fileID)
+        {
+            if (fileID != null)
+                return service.Files.Export(fileID, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").ExecuteAsStream();
+            else return null;
+        }
 
         // Core Drive Functionality. 
         // This all needs to be abstracted somewhere else (Model)

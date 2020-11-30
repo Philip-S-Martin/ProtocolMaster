@@ -101,8 +101,18 @@ namespace ProtocolMaster.View
         }
 
         DateTime start;
+
+        public void Load_Click(object sender, RoutedEventArgs e)
+        {
+            LoadButton.IsEnabled = true;
+            StartButton.IsEnabled = true;
+            CancelButton.IsEnabled = false;
+            ResetButton.IsEnabled = true;
+            App.Instance.ExtensionSystem.Interpret(App.Window.DriveView.GetSelectedItemID());
+        }
         public void Start_Click(object sender, RoutedEventArgs e)
         {
+            LoadButton.IsEnabled = false;
             StartButton.IsEnabled = false;
             CancelButton.IsEnabled = true;
             ResetButton.IsEnabled = false;
@@ -112,20 +122,25 @@ namespace ProtocolMaster.View
 
         public void Cancel_Click(object sender, RoutedEventArgs e)
         {
+            LoadButton.IsEnabled = true;
             StartButton.IsEnabled = false;
             CancelButton.IsEnabled = false;
             ResetButton.IsEnabled = true;
             
-            App.Instance.ExtensionSystem.Cancel();
+            App.Instance.ExtensionSystem.End();
         }
 
         public void Reset_Click(object sender, RoutedEventArgs e)
         {
-            StartButton.IsEnabled = true;
+            LoadButton.IsEnabled = true;
+            StartButton.IsEnabled = false;
             CancelButton.IsEnabled = false;
             ResetButton.IsEnabled = false;
 
+            App.Instance.ExtensionSystem.Reset();
             Line.X = 0;
+            plot.Model.Series.Clear();
+            categoryAxis.Labels.Clear();
             plot.Model.InvalidatePlot(true);
         }
 

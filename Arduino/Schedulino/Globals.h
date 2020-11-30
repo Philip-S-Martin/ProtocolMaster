@@ -9,7 +9,7 @@ typedef enum
 {
   SETUP = 0,
   RUNNING,
-  RESET
+  DONE
 } enum_state;
 enum_state state = SETUP;
 
@@ -60,33 +60,7 @@ uint16_t _schedule_index(uint16_t index)
   return index % SCHEDULE_MAX_EVENTS;
 }
 
-// SERIAL HELPERS
-
-/*
-void WriteBytes(uint32_t target)
-{
-  byte sendBuf[4];
-  sendBuf[3] = (byte)target & 255;
-  sendBuf[2] = (byte)(target >> 8) & 255;
-  sendBuf[1] = (byte)(target >> 16) & 255;
-  sendBuf[0] = (byte)(target >> 24) & 255;
-  Serial.write(sendBuf, 4);
-}
-
-void WriteBytes(uint16_t target)
-{
-  byte sendBuf[2];
-  sendBuf[1] = (byte)target & 255;
-  sendBuf[0] = (byte)(target >> 8) & 255;
-  Serial.write(sendBuf, 2);
-}
-
-void WriteBytes(byte target)
-{
-  Serial.write((byte)target);
-}
-*/
-// SERIAL IO
+// SERIAL OUTPUT
 
 void Error(byte file, byte error, byte ext)
 {
@@ -105,7 +79,6 @@ void Done()
 {
   Serial.write((byte)'D');
   Serial.println(run_time);
-  Serial.println((byte)state);
 }
 
 void Report(uint16_t index)

@@ -6,12 +6,12 @@
 #define FILE_PROCESS 2
 
 // THE FIRST SECTION OF THIS FILE IS A FANCY SWITCH
-void _Process_Setup(), _Process_Running(), _Process_Reset(), _Process_Done();
+void _Process_Setup(), _Process_Running(), _Process_Init(), _Process_Done();
 
 // The following is a map,
 // THESE ARRAYS MUST HAVE AN ENTRY FOR EACH enum_state!
-enum_state Process_Map_States[enum_state_count] = {SETUP, RUNNING, RESET};
-void (*Process_Map_Functions[enum_state_count])() = {_Process_Setup, _Process_Running, _Process_Reset};
+enum_state Process_Map_States[enum_state_count] = {SETUP, RUNNING, DONE};
+void (*Process_Map_Functions[enum_state_count])() = {_Process_Setup, _Process_Running, _Process_Done};
 
 // This processes the global state using the Process Map
 void Schedule_Process()
@@ -29,8 +29,26 @@ void Schedule_Process()
   Error(FILE_PROCESS, 1, 0);
 }
 
+void _Process_Init()
+{
+  schedule.first = 0;
+  schedule.last = 0;
+  run_time = 0;
+  run_offset = 0;
+
+  for (byte i = 2; i <= 19; i++)
+  {
+    pinMode(i, OUTPUT);
+    digitalWrite(i, LOW);
+  }
+
+  state = SETUP;
+  Capacity();
+}
+
 void _Process_Setup()
 {
+  // Do nothing. No actions can be taken in the setup phase.
 }
 
 void _Process_Running()
@@ -56,26 +74,9 @@ void _Process_Running()
   }
 }
 
-void _Process_Reset()
-{
-  schedule.first = 0;
-  schedule.last = 0;
-  run_time = 0;
-  run_offset = 0;
-
-  for (byte i = 2; i <= 19; i++)
-  {
-    pinMode(i, OUTPUT);
-    digitalWrite(i, LOW);
-  }
-
-  state = SETUP;
-  Capacity();
-}
-
 void _Process_Done()
 {
-  state = RESET;
+  state = DONE;
 
   Capacity();
   schedule.first = 0;

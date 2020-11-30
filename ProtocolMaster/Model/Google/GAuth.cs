@@ -1,4 +1,6 @@
 ﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.Auth.OAuth2.Flows;
+using Google.Apis.Auth.OAuth2.Requests;
 using Google.Apis.Util.Store;
 using ProtocolMaster.Model.Debug;
 using System.Collections.Generic;
@@ -32,6 +34,7 @@ namespace ProtocolMaster.Model.Google
             Log.Error("Authenticate(): AUTHENTICATING");
 
             userStore = new FileDataStore(Log.Instance.AppData + "\\Auth", true);
+            ICodeReceiver receiver = new GAuthReceiver();
             CancellationTokenSource cts = new CancellationTokenSource();
             cts.CancelAfter(40000);
 
@@ -44,9 +47,10 @@ namespace ProtocolMaster.Model.Google
                    ClientSecret = "LbVHZSa-rtPBMl9odwMBkJi_"
                },
                CombineServiceTokens(services),
-               "user", cts.Token, userStore);
+               "user", cts.Token, userStore,receiver);
             CreateServices(services);
             Log.Error("Authenticate(): User Fully Authenticated");
+            App.Window.Activate();
         }
         private void CreateServices(IService[] services)
         {

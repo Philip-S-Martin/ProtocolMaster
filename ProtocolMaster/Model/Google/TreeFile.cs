@@ -55,7 +55,7 @@ namespace ProtocolMaster.Model.Google
         }
         public void Callback(MarkupCallback callback)
         {
-                callback(null, File.Id, File.Name);
+            callback(null, File.Id, File.Name);
         }
     }
 }

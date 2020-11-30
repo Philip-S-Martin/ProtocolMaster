@@ -11,11 +11,14 @@ namespace ProtocolMaster.View
     /// </summary>
     public partial class Drive : UserControl
     {
-        readonly Dictionary<string, TreeViewItem> idDictionary;
+        readonly Dictionary<string, TreeViewItem> idChildDictionary;
+        readonly Dictionary<TreeViewItem, string> childIdDictionary;
 
+        String selectedItemID = null;
         public Drive()
         {
-            idDictionary = new Dictionary<string, TreeViewItem>();
+            idChildDictionary = new Dictionary<string, TreeViewItem>();
+            childIdDictionary = new Dictionary<TreeViewItem, string>();
             InitializeComponent();
         }
 
@@ -51,6 +54,7 @@ namespace ProtocolMaster.View
                 AccountButton.IsEnabled = true;
             }
             Refresh();
+            FileTree.IsExpanded = true;
         }
 
         public void Refresh_Click(object sender, RoutedEventArgs e)
@@ -61,8 +65,8 @@ namespace ProtocolMaster.View
         public void Refresh()
         {
             FileTree.Items.Clear();
-            idDictionary.Clear();
-
+            idChildDictionary.Clear();
+            childIdDictionary.Clear();
             // Refresh Google Drive Private
             if (App.Instance.LoggedIn)
             {
@@ -79,12 +83,15 @@ namespace ProtocolMaster.View
         public void Display_Tree_Child(string parentName, string name, string header)
         {
             TreeViewItem child = new TreeViewItem();
-            idDictionary.Add(name, child);
+            idChildDictionary.Add(name, child);
+            childIdDictionary.Add(child, name);
             child.Header = header;
+            // this should be removed if the type is a folder!!!
+            child.Selected += SelectionHandler;
 
             if (parentName != null)
             {
-                idDictionary.TryGetValue(parentName, out TreeViewItem parent);
+                idChildDictionary.TryGetValue(parentName, out TreeViewItem parent);
                 if (parent != null)
                     parent.Items.Add(child);
                 else
@@ -94,6 +101,18 @@ namespace ProtocolMaster.View
             {
                 FileTree.Items.Add(child);
             }
+        }
+
+        void SelectionHandler(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem selected = sender as TreeViewItem;
+            
+            selectedItemID = childIdDictionary[selected];
+        }
+
+        public string GetSelectedItemID()
+        {
+            return selectedItemID;
         }
     }
 }

@@ -27,7 +27,8 @@
                     <MenuItem Header="Select Driver" Name="DriverDropdown"/>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Name ="StartButton" Header="Start" Click="Start_Click"/>
+                <MenuItem Name ="LoadButton" Header="Load" Click="Load_Click" IsEnabled="True"/>
+                <MenuItem Name ="StartButton" Header="Start" Click="Start_Click" IsEnabled="False"/>
                 <MenuItem Name ="CancelButton" Header="Cancel" Click="Cancel_Click" IsEnabled="False"/>
                 <MenuItem Name ="ResetButton" Header="Reset" Click="Reset_Click" IsEnabled="False"/>
             </Menu>

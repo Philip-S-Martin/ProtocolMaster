@@ -15,7 +15,6 @@
                 <ResourceDictionary Source="pack://application:,,,/Selen.Wpf.SystemStyles;component/Styles.xaml"/>
                 <!-- Theme cohesion updates -->
                 <ResourceDictionary Source="Theme/Dark.xaml"/>
-                <!-- Charts theme -->
             </ResourceDictionary.MergedDictionaries>
 
         </ResourceDictionary>

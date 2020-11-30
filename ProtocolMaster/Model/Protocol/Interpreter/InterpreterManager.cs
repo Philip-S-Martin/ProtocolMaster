@@ -17,20 +17,21 @@ namespace ProtocolMaster.Model.Protocol.Interpreter
     {        
         IInterpreter interpreter;
 
-        public List<ProtocolEvent> GenerateData()
+        public List<ProtocolEvent> GenerateData(string selectionID)
         {
             interpreter = CreateSelectedExtension();
 
-            if (typeof(SpreadSheetInterpreter).IsAssignableFrom(interpreter.GetType()))
+            if (typeof(ExcelDataInterpreter).IsAssignableFrom(interpreter.GetType()))
             {
-                SpreadSheetInterpreter spreadSheetInterpreter = interpreter as SpreadSheetInterpreter;
-                FileStream nfs = File.Open(Log.Instance.AppData + "\\Protocols\\Copy of example_protocols.xlsx", FileMode.Open, FileAccess.Read);
-                spreadSheetInterpreter.SetReader(ExcelReaderFactory.CreateReader(nfs));
+                ExcelDataInterpreter spreadSheetInterpreter = interpreter as ExcelDataInterpreter;
+                Stream nfs = Model.Google.GDrive.Instance.Download(selectionID);
+
+                if (nfs != null)
+                    spreadSheetInterpreter.SetReader(ExcelReaderFactory.CreateReader(nfs));
+                else return null;
             }
             // pre-fill event data
-            interpreter.Generate("TEST");
-
-            List<ProtocolEvent> result = interpreter.Data;
+            List<ProtocolEvent> result = interpreter.Generate("Protocol");
             DisposeSelectedExtension();
             return result;
         }

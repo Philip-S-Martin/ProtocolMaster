@@ -18,7 +18,7 @@ namespace Schedulino
     {
         List<SchedulePinState> schedule;
         int scheduleIndex = 0;
-        private enum ScheduleState { SETUP = 0, RUNNING, RESET, CANCEL }
+        private enum ScheduleState { SETUP = 0, RUNNING, DONE }
         ScheduleState _state;
         uint _run_time;
         byte _serial_available;
@@ -77,7 +77,6 @@ namespace Schedulino
                 if (read != -1)
                     Receive((char)read);
             }
-            _state = ScheduleState.CANCEL;
             //Serial.Close();
         }
 
@@ -102,12 +101,12 @@ namespace Schedulino
 
             // Handshake
             // Read serial buffer until arduino tells us how much capacity it has
-            while (_state != ScheduleState.CANCEL && _capacity == 0)
+            while (_state != ScheduleState.DONE && _capacity == 0)
             {
                 ReadSerialBuffer();
             }
             // Pre-Load as many events as possible
-            while (_state != ScheduleState.CANCEL && _capacity > 0 && scheduleIndex < schedule.Count)
+            while (_state != ScheduleState.DONE && _capacity > 0 && scheduleIndex < schedule.Count)
             {
                 SendNextEvent();
                 ReadSerialBuffer();
@@ -117,7 +116,7 @@ namespace Schedulino
         public void Start()
         {
             // Send start signal
-            if (_state != ScheduleState.CANCEL && _state != ScheduleState.RESET)
+            if (_state != ScheduleState.DONE)
             {
                 while (serial.IsOpen && !TrySendStartSignal())
                 {
@@ -125,7 +124,7 @@ namespace Schedulino
                 }
             }
             // Send events and send serial data until Done event is recieved
-            while (_state != ScheduleState.CANCEL && _state == ScheduleState.RUNNING)
+            while (_state == ScheduleState.RUNNING)
             {
                 SendNextEvent();
                 ReadSerialBuffer();
@@ -347,7 +346,7 @@ namespace Schedulino
         private void DoneReceiver()
         {
             _run_time = Convert.ToUInt32(Serial.ReadLine());
-            _state = (ScheduleState)Convert.ToByte(Serial.ReadLine());
+            _state = ScheduleState.DONE;
             //Log.Error("Schedulino DONE\nrun_time:" + _run_time + "\nstate:" + _state);
         }
         private void ReportReceiver()

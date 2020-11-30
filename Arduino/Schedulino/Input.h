@@ -14,13 +14,13 @@ void _Input_Start(), _Input_Cancel(), _Input_Event(), _Input_Reply(), _Input_Err
 
 // THESE ARRAYS MUST HAVE AN ENTRY FOR EACH POSSIBLE enum_state OR input_state!
 // These are row/column labels for a matrix
-enum_state Input_Map_States[enum_state_count] = {SETUP, RUNNING, RESET};
+enum_state Input_Map_States[enum_state_count] = {SETUP, RUNNING, DONE};
 byte Input_Map_Bytes[] = {'S', 'X', 'E', 'R', 'C'};
 // And this is the matrix!
 void (*Input_Map_Functions[enum_state_count][input_state_count])() = {
-    {_Input_Start, _Input_Cancel, _Input_Event, _Input_Reply, _Input_Capacity},
-    {_Input_Error, _Input_Cancel,  _Input_Event, _Input_Reply, _Input_Capacity},
-    {_Input_Error, _Input_Error, _Input_Error, _Input_Error, _Input_Capacity}};
+    {_Input_Start, _Input_Cancel, _Input_Event, _Input_Reply, _Input_Capacity},   // SETUP MAP
+    {_Input_Error, _Input_Cancel,  _Input_Event, _Input_Reply, _Input_Capacity},  // RUNNING MAP
+    {_Input_Error, _Input_Error, _Input_Error, _Input_Error, _Input_Capacity}};   // DONE MAP
 
 void Schedule_Input()
 {
@@ -57,7 +57,7 @@ void _Input_Start()
 void _Input_Cancel()
 {
   Serial.read();
-  state = RESET;
+  state = DONE;
 }
 
 long input_event_wait = 0;

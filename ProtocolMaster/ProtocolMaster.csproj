@@ -5,6 +5,7 @@
     <TargetFramework>net48</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>ProtocolMaster.ico</ApplicationIcon>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -18,20 +18,9 @@
         </DockPanel>
         <!--Google Drive Treeview-->
         <TreeView BorderThickness="0" Background="Transparent">
-            <TreeViewItem Header="Google Drive Published" Focusable="False"/>
-            <TreeViewItem Header="Google Drive Private" Name="FileTree" Focusable="False"/>
-            <TreeViewItem Header="Local Folder" Focusable="False">
-                <TreeViewItem Header="example_protocols" Focusable="False">
-                    <TreeViewItem Header="NO-AFC"/>
-                    <TreeViewItem Header="PAC Day 1"/>
-                    <TreeViewItem Header="AFC Recordings"/>
-                </TreeViewItem>
-                <TreeViewItem Header="Philip's Protocols" Focusable="False">
-                    <TreeViewItem Header="Example a"/>
-                    <TreeViewItem Header="Example b"/>
-                    <TreeViewItem Header="Example c"/>
-                </TreeViewItem>
-            </TreeViewItem>
+            <TreeViewItem Header="Google Drive Public" Focusable="False"/>
+            <TreeViewItem Header="Google Drive Personal" Name="FileTree" Focusable="False"/>
+            <TreeViewItem Header="Local Protocols" Focusable="False"/>
         </TreeView>
     </DockPanel>
 </UserControl>
