@@ -34,7 +34,7 @@ namespace Schedulino
         }
         public void Cancel()
         {
-            
+
         }
         public List<ProtocolEvent> Generate(string protocolName)
         {
@@ -53,7 +53,10 @@ namespace Schedulino
                 }
                 // Select a filler function (sheetFiller) based on sheet name (DataReader.Name)
                 // such as FillProtocols for sheet name "Protocols"
-                RowReader readRow = mappedRowReaders[DataReader.Name];
+                RowReader readRow;
+                if (mappedRowReaders.ContainsKey(DataReader.Name))
+                    readRow = mappedRowReaders[DataReader.Name];
+                else readRow = ReadNothing;
                 // Run the selected filler function until end of sheet
                 while (readRow(sheetMap)) { }
                 // Go to next sheet
@@ -78,8 +81,6 @@ namespace Schedulino
                 protocol.Sounds.Add(new Sound(DataReader.GetValue(headerMap["Sound A"]).ToString()));
                 if (!DataReader.IsDBNull(headerMap["Sound B"]))
                     protocol.Sounds.Add(new Sound(DataReader.GetValue(headerMap["Sound B"]).ToString()));
-                if (!DataReader.IsDBNull(headerMap["Sound C"]))
-                    protocol.Sounds.Add(new Sound(DataReader.GetValue(headerMap["Sound C"]).ToString()));
 
                 protocol.extra_time = Convert.ToUInt32(extra_time_str) * 1000;
                 protocol.num_presounds = Convert.ToUInt32(presounds_str);
@@ -97,7 +98,7 @@ namespace Schedulino
             {
                 if (DataReader.IsDBNull(0)) return true;
                 Stimulus stim = new Stimulus();
-                stim.stimulus_id = DataReader.GetValue(headerMap["Stimulus"]).ToString();
+                stim.name = DataReader.GetValue(headerMap["Stimulus"]).ToString();
                 stim.sound_group = DataReader.GetValue(headerMap["Sound Group"]).ToString();
                 stim.stim_sound_pairing = DataReader.GetValue(headerMap["Stim-Sound Pairing"]).ToString();
                 stim.stim_sound_window = DataReader.GetValue(headerMap["Stim-Sound Window"]).ToString();
@@ -106,7 +107,7 @@ namespace Schedulino
                 // This is a very hacky way to handle timeline integer underflow, but it works
                 // It should probably be replaced by allowing intervals to have negative values
                 // and then increasing all intervals by the most negative value
-                if(stim.stim_sound_window == "Before" && protocol.extra_time < stim.dur_max)
+                if (stim.stim_sound_window == "Before" && protocol.extra_time < stim.dur_max)
                 {
                     protocol.extra_time = stim.dur_max;
                 }
@@ -155,7 +156,7 @@ namespace Schedulino
 
                     string duration_str = DataReader.GetValue(headerMap["Duration (seconds)"]).ToString();
 
-                    sound.duration = Convert.ToUInt32(duration_str)*1000;
+                    sound.duration = Convert.ToUInt32(duration_str) * 1000;
                 }
                 return true;
             }
@@ -167,7 +168,7 @@ namespace Schedulino
             {
                 if (DataReader.IsDBNull(0)) return true;
                 string name = DataReader.GetValue(headerMap["Stimulator"]).ToString();
-                List<Stimulus> stims = protocol.Stimuli.Where(a => a.stimulus_id == name) as List<Stimulus>;
+                IEnumerable<Stimulus> stims = protocol.Stimuli.Where(a => a.name == name);
                 if (stims != null)
                 {
                     string handler = DataReader.GetValue(headerMap["Handler"]).ToString();
@@ -184,9 +185,12 @@ namespace Schedulino
             }
             return false;
         }
+        private bool ReadNothing(Dictionary<string, int> headerMap)
+        {
+            return false;
+        }
+
     }
-
-
 
 
 }

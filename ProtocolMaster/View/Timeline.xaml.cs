@@ -126,7 +126,7 @@ namespace ProtocolMaster.View
             StartButton.IsEnabled = false;
             CancelButton.IsEnabled = false;
             ResetButton.IsEnabled = true;
-            
+
             App.Instance.ExtensionSystem.End();
         }
 
@@ -141,6 +141,10 @@ namespace ProtocolMaster.View
             Line.X = 0;
             plot.Model.Series.Clear();
             categoryAxis.Labels.Clear();
+            dateTimeAxis.AbsoluteMaximum = 1.035;
+            categoryAxis.AbsoluteMaximum = 0.5;
+            categoryAxis.MaximumRange = 1.0;
+            categoryAxis.MinimumRange = 1.0;
             plot.Model.InvalidatePlot(true);
         }
 
@@ -149,48 +153,144 @@ namespace ProtocolMaster.View
 
         }
 
-        LineAnnotation Line;
-        CategoryAxis categoryAxis;
-        public void LoadPlotData(List<ProtocolEvent> driveDataList)
+        static OxyColor[] pallete = { OxyColors.DarkRed, OxyColors.DodgerBlue, OxyColors.Green };
+
+        internal class CategoryNode
         {
-            IntervalBarSeries targetSeries = new IntervalBarSeries { Title = "Preload Series" };
-
-            List<double> gridLines = new List<double>();
-
-            categoryAxis.Labels.Clear();
-            if (driveDataList != null)
+            public string Name { get; private set; }
+            public CategoryNode Parent { get; private set; }
+            public List<CategoryNode> Children { get; private set; }
+            public IntervalBarSeries Series { get; private set; }
+            public CategoryNode(string name)
             {
-                foreach (ProtocolEvent data in driveDataList)
+                this.Name = name;
+                this.Children = new List<CategoryNode>();
+                Series = new IntervalBarSeries() { Title = name, StrokeThickness = 1.5, StrokeColor = OxyColors.Gray, FillColor = OxyColor.FromArgb(255, 16, 16, 16), BarWidth = 1.0, ToolTip = name};
+            }
+            public CategoryNode(string name, CategoryNode parent) : this(name)
+            {
+                this.Parent = parent;
+                Series.BarWidth = 0.35;
+                parent.Children.Add(this);
+            }
+            public void SetSeriesData(int categoryIndex, OxyColor color)
+            {
+                Series.StrokeColor = OxyColor.FromArgb(255, (byte)((color.R * 3 + 255) / 4), (byte)((color.G * 3 + 255) / 4), (byte)((color.B * 3 + 255) / 4));
+                foreach (IntervalBarItem item in Series.Items)
                 {
-                    if (data.HasCategory)
+                    item.CategoryIndex = categoryIndex;
+                    item.Color = color;
+                }
+            }
+            public static void GeneratePlotData(List<CategoryNode> rootNodes, out List<IntervalBarSeries> allSeries, out List<string> labels, out List<double> gridLines)
+            {
+                double linePos = 0.0;
+                int fullIndex = 0;
+                int palleteIndex = 0;
+                allSeries = new List<IntervalBarSeries>();
+                labels = new List<string>();
+                gridLines = new List<double>();
+                for (int i = 0; i < rootNodes.Count; i++)
+                {
+                    CategoryNode root = rootNodes[i];
+                    root.SetSeriesData(fullIndex++, pallete[palleteIndex]);
+                    allSeries.Add(root.Series);
+                    labels.Add(root.Name);
+                    gridLines.Add(linePos++);
+                    Stack<CategoryNode> subtree = new Stack<CategoryNode>(root.Children);
+                    while (subtree.Count != 0)
                     {
-                        if (!categoryAxis.Labels.Contains(data.CategoryLabel))
-                        {
-                            categoryAxis.Labels.Add(data.CategoryLabel);
-                            gridLines.Add(gridLines.Count);
-                        }
-                        targetSeries.Items.Add(new IntervalBarItem
-                        {
-                            CategoryIndex = categoryAxis.Labels.IndexOf(data.CategoryLabel),
-                            Start = new DateTime(Convert.ToInt64(data.Arguments["TimeStartMs"]) * 10000).ToOADate(),
-                            End = new DateTime(Convert.ToInt64(data.Arguments["TimeEndMs"]) * 10000).ToOADate()
-                        });
+                        CategoryNode subNode = subtree.Pop();
+                        subNode.SetSeriesData(fullIndex++, pallete[palleteIndex]);
+                        allSeries.Add(subNode.Series);
+                        labels.Add(subNode.Name);
+                        gridLines.Add(linePos++);
+                        foreach (CategoryNode child in subNode.Children)
+                            subtree.Push(child);
+                    }
+                    if (i < rootNodes.Count - 1)
+                    {
+                        palleteIndex = (palleteIndex + 1) % pallete.Length;
+                        linePos++;
+                        fullIndex++;
+                        labels.Add("");
                     }
                 }
             }
+            // The biggest ugliest mess in the universe!
+            public static List<CategoryNode> BuildTrees(List<ProtocolEvent> eventList)
+            {
+                Dictionary<string, CategoryNode> nodeDictionary = new Dictionary<string, CategoryNode>();
+                List<CategoryNode> rootNodes = new List<CategoryNode>();
+                if (eventList != null)
+                {
+                    foreach (ProtocolEvent plotEvent in eventList)
+                    {
+                        List<ProtocolEvent> childEvents = new List<ProtocolEvent>();
+                        if (plotEvent.HasCategory())
+                        {
+                            CategoryNode targetNode;
+                            if (plotEvent.HasParent())
+                            {
+                                if (nodeDictionary.ContainsKey(plotEvent.ParentLabel))
+                                {
+                                    if (!nodeDictionary.TryGetValue(plotEvent.FullLabel(), out targetNode))
+                                    {
+                                        targetNode = new CategoryNode(plotEvent.CategoryLabel, nodeDictionary[plotEvent.ParentLabel]);
+                                        nodeDictionary.Add(plotEvent.FullLabel(), targetNode);
+                                    }
+                                }
+                                else
+                                {
+                                    childEvents.Add(plotEvent);
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                if (!nodeDictionary.TryGetValue(plotEvent.FullLabel(), out targetNode))
+                                {
+                                    targetNode = new CategoryNode(plotEvent.CategoryLabel);
+                                    nodeDictionary.Add(plotEvent.FullLabel(), targetNode);
+                                    rootNodes.Add(targetNode);
+                                }
+                            }
+                            targetNode.Series.Items.Add(new IntervalBarItem
+                            {
+                                Start = new DateTime(Convert.ToInt64(plotEvent.Arguments["TimeStartMs"]) * 10000).ToOADate(),
+                                End = new DateTime(Convert.ToInt64(plotEvent.Arguments["TimeEndMs"]) * 10000).ToOADate()
+                            });
+                        }
+                        eventList = childEvents;
+                    }
+                }
+                return rootNodes;
+            }
+        }
 
+        LineAnnotation Line;
+        CategoryAxis categoryAxis;
+        DateTimeAxis dateTimeAxis;
+        public void LoadPlotData(List<ProtocolEvent> eventList)
+        {
+            List<IntervalBarSeries> allSeries;
+            List<string> labels;
+            List<double> gridLines;
+            CategoryNode.GeneratePlotData(CategoryNode.BuildTrees(eventList), out allSeries, out labels, out gridLines);
+
+            // GENERATE LABELS, GRIDLINES, ETC. FROM TREE!
+            categoryAxis.Labels.Clear();
+            categoryAxis.Labels.AddRange(labels);
             gridLines.CopyTo(categoryAxis.ExtraGridlines, 0);
-            targetSeries.StrokeThickness = 1.5;
-            targetSeries.StrokeColor = OxyColors.Gray;
-            targetSeries.FillColor = OxyColor.FromArgb(255, 16, 16, 16);
 
             plot.Model.Series.Clear();
-            plot.Model.Series.Add(targetSeries);
-
-
-
+            foreach (IntervalBarSeries series in allSeries)
+                plot.Model.Series.Add(series);
             plot.ResetAllAxes();
-            plot.Model.Axes[0].Minimum = 0;
+            dateTimeAxis.Minimum = 0;
+            categoryAxis.AbsoluteMaximum = gridLines[gridLines.Count - 1] + 0.5;
+            categoryAxis.MaximumRange = gridLines[gridLines.Count - 1] + 1.0;
+            categoryAxis.MinimumRange = gridLines[gridLines.Count - 1] + 1.0;
             plot.Model.InvalidatePlot(true);
         }
         private void SetUpPlot()
@@ -200,7 +300,7 @@ namespace ProtocolMaster.View
                 IsLegendVisible = false
             };
 
-            model.Axes.Add(new DateTimeAxis()
+            dateTimeAxis = new DateTimeAxis()
             {
                 Position = AxisPosition.Bottom,
                 AxislineThickness = 1.5,
@@ -215,8 +315,11 @@ namespace ProtocolMaster.View
                 ExtraGridlineColor = OxyColors.Gray,
                 MinorGridlineColor = OxyColors.Gray,
                 MajorGridlineColor = OxyColors.Gray,
-                StartPosition = 0
-            });
+                StartPosition = 0,
+                AbsoluteMinimum = 0,
+                AbsoluteMaximum = 1.035,
+            };
+            model.Axes.Add(dateTimeAxis);
             categoryAxis = new CategoryAxis()
             {
                 Position = AxisPosition.Left,
@@ -232,11 +335,14 @@ namespace ProtocolMaster.View
                 ExtraGridlineColor = OxyColors.Gray,
                 MinorGridlineColor = OxyColors.Gray,
                 MajorGridlineColor = OxyColors.Gray,
-                ExtraGridlines = new double[32]
+                GapWidth = 0.0f,
+                ExtraGridlines = new double[32],
+                AbsoluteMinimum = -0.5,
+                AbsoluteMaximum = 0.5,
+                MaximumRange = 1.0,
+                MinimumRange = 1.0,
             };
             model.Axes.Add(categoryAxis);
-
-
 
             model.DefaultColors = new List<OxyColor>
                 {
@@ -248,7 +354,10 @@ namespace ProtocolMaster.View
 
             model.TextColor = OxyColors.White;
             model.PlotAreaBorderColor = OxyColors.Transparent;
-
+            plot.ActualController.UnbindMouseDown(OxyMouseButton.Left);
+            plot.ActualController.BindMouseDown(OxyMouseButton.Left, PlotCommands.PanAt);
+            plot.ActualController.UnbindMouseDown(OxyMouseButton.Right);
+            plot.ActualController.BindMouseDown(OxyMouseButton.Right, PlotCommands.ResetAt);
 
             Line = new LineAnnotation()
             {
@@ -261,16 +370,11 @@ namespace ProtocolMaster.View
             };
 
             model.Annotations.Add(Line);
-
+            dateTimeAxis.Minimum = 0;
             plot.Model = model;
-            Animate();
         }
 
         Task bgWorker;
-        private void Animate()
-        {
-            
-        }
         Progress<int> animationProgress;
         CancellationTokenSource tokenSource;
         public void StartAnimation(object sender, EventArgs e)
@@ -307,21 +411,19 @@ namespace ProtocolMaster.View
             DateTime nextFrame = workerstart.AddTicks(250000);
             while (now < end && !cancelToken.IsCancellationRequested)
             {
-                /*
                 while (now < nextFrame)
                 {
-                    Thread.Sleep(7);
+                    Thread.Sleep(5);
                     now = DateTime.Now;
-                }*/
-                Thread.Sleep(40);
+                }
                 progress.Report(1);
-                nextFrame = now.AddMilliseconds(35);
+                nextFrame = now.AddMilliseconds(200);
             }
             progress.Report(0);
         }
         private void MenuItem_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            
+
         }
     }
 }

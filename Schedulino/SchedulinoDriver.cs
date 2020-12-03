@@ -93,7 +93,7 @@ namespace Schedulino
             {
                 RtsEnable = true,
                 DtrEnable = true,
-                PortName = "COM3",
+                PortName = "COM4",
                 BaudRate = 9600,
                 NewLine = "\n"
             };

@@ -150,7 +150,7 @@ namespace SchedulinoDriver.Generator
                 }
                 while (randomList.Contains(randomIndex));
                 randomList.Add(randomIndex);
-                Interval interval = windowDictionary[stim.stim_sound_window](stim.sound.expSoundIntervals[i]);
+                Interval interval = windowDictionary[stim.stim_sound_window](stim.sound.expSoundIntervals[randomIndex]);
                 deliveryDictionary[stim.stim_delivery](stim, interval.begin, interval.end);
             }
         }
