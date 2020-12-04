@@ -21,5 +21,16 @@ namespace SchedulinoDriver.Generator
             expSoundIntervals = new List<SoundInterval>();
             stimuli = new List<Stimulus>();
         }
+
+        public Sound CloneSoundWithoutProtocolData()
+        {
+            Sound clone = new Sound(this.name);
+            clone.handler = this.handler;
+            clone.behavior_pin = this.behavior_pin;
+            clone.duration_pin = this.duration_pin;
+            clone.sound_id = this.sound_id;
+            clone.duration = this.duration;
+            return clone;
+        }
     }
 }

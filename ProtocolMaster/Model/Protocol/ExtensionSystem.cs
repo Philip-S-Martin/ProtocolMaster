@@ -85,10 +85,15 @@ namespace ProtocolMaster.Model.Protocol
                 return InterpreterManager.GenerateData(selectionID);
             }, TaskCreationOptions.LongRunning);
 
+
             Task UITask = generator.ContinueWith((data) =>
             {
-                Data = generator.Result;
-                App.Window.TimelineView.LoadPlotData(Data);
+                List<ProtocolEvent> result = generator.Result;
+                Data = result;
+                if (result != null)
+                {
+                    App.Window.TimelineView.LoadPlotData(result);
+                }
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
         public void Run()
@@ -127,7 +132,7 @@ namespace ProtocolMaster.Model.Protocol
 
         public void End()
         {
-            if(!isRunning)
+            if (!isRunning)
             {
                 throw new Exception("A protocol cannot be cancelled/ended when not running");
             }

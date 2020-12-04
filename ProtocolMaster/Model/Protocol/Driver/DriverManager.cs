@@ -30,11 +30,13 @@ namespace ProtocolMaster.Model.Protocol.Driver
         {
             driver = CreateSelectedExtension();
 
-            driver.Setup(data);
-            UIDispatcher.Invoke(() => { ProtocolStart(); }, DispatcherPriority.Send);
-            driver.Start();
-            UIDispatcher.Invoke(() => { ProtocolEnd(); }, DispatcherPriority.Send);
-
+            if (driver.Setup(data))
+            {
+                UIDispatcher.Invoke(() => { ProtocolStart(); }, DispatcherPriority.Send);
+                driver.Start();
+                UIDispatcher.Invoke(() => { ProtocolEnd(); }, DispatcherPriority.Send);
+            }
+            else Log.Error("Could not start device driver");
             DisposeSelectedExtension();
         }
     }

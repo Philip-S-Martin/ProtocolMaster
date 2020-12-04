@@ -55,14 +55,7 @@
     <Compile Include="Generator\Sound.cs" />
     <Compile Include="Generator\Stimulus.cs" />
     <Compile Include="Generator\StimulusInterval.cs" />
-    <Compile Include="InterpreterData\DeliveryData.cs" />
-    <Compile Include="InterpreterData\PairingData.cs" />
-    <Compile Include="InterpreterData\ProtocolData.cs" />
-    <Compile Include="InterpreterData\SoundData.cs" />
-    <Compile Include="InterpreterData\StimulatorData.cs" />
-    <Compile Include="InterpreterData\StimulusData.cs" />
     <Compile Include="SpreadsheetAFC.cs" />
-    <Compile Include="LegacyAFCInterpreter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchedulinoDriver.cs" />
   </ItemGroup>

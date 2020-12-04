@@ -30,6 +30,7 @@ namespace ProtocolMaster.Model.Protocol.Interpreter
                     spreadSheetInterpreter.SetReader(ExcelReaderFactory.CreateReader(nfs));
                 else return null;
             }
+            
             // pre-fill event data
             List<ProtocolEvent> result = interpreter.Generate("Protocol");
             DisposeSelectedExtension();

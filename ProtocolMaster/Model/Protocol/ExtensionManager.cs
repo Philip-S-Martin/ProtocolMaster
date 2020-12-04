@@ -78,6 +78,10 @@ namespace ProtocolMaster.Model.Protocol
                 isDisposed = false;
                 extensionContext = extensionFactory.CreateExport();
                 extension = extensionContext.Value;
+                if (typeof(ICallDropdown).IsAssignableFrom(extension.GetType()))
+                {
+                    (extension as ICallDropdown).CallDropdown = CallHandler.CallDropdown;
+                }
                 return extension;
             }
             else

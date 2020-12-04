@@ -143,8 +143,8 @@ namespace ProtocolMaster.View
             categoryAxis.Labels.Clear();
             dateTimeAxis.AbsoluteMaximum = 1.035;
             categoryAxis.AbsoluteMaximum = 0.5;
-            categoryAxis.MaximumRange = 1.0;
-            categoryAxis.MinimumRange = 1.0;
+            categoryAxis.MaximumRange = 1.1;
+            categoryAxis.MinimumRange = 1.1;
             plot.Model.InvalidatePlot(true);
         }
 
@@ -165,7 +165,7 @@ namespace ProtocolMaster.View
             {
                 this.Name = name;
                 this.Children = new List<CategoryNode>();
-                Series = new IntervalBarSeries() { Title = name, StrokeThickness = 1.5, StrokeColor = OxyColors.Gray, FillColor = OxyColor.FromArgb(255, 16, 16, 16), BarWidth = 1.0, ToolTip = name};
+                Series = new IntervalBarSeries() { Title = name, StrokeThickness = 1.5, StrokeColor = OxyColors.Gray, FillColor = OxyColor.FromArgb(255, 16, 16, 16), BarWidth = 1.0, ToolTip = name };
             }
             public CategoryNode(string name, CategoryNode parent) : this(name)
             {
@@ -222,11 +222,12 @@ namespace ProtocolMaster.View
             {
                 Dictionary<string, CategoryNode> nodeDictionary = new Dictionary<string, CategoryNode>();
                 List<CategoryNode> rootNodes = new List<CategoryNode>();
+                Queue<ProtocolEvent> eventQueue = new Queue<ProtocolEvent>(eventList);
                 if (eventList != null)
                 {
-                    foreach (ProtocolEvent plotEvent in eventList)
+                    while (eventQueue.Count != 0)
                     {
-                        List<ProtocolEvent> childEvents = new List<ProtocolEvent>();
+                        ProtocolEvent plotEvent = eventQueue.Dequeue();
                         if (plotEvent.HasCategory())
                         {
                             CategoryNode targetNode;
@@ -242,7 +243,7 @@ namespace ProtocolMaster.View
                                 }
                                 else
                                 {
-                                    childEvents.Add(plotEvent);
+                                    eventQueue.Enqueue(plotEvent);
                                     continue;
                                 }
                             }
@@ -261,7 +262,6 @@ namespace ProtocolMaster.View
                                 End = new DateTime(Convert.ToInt64(plotEvent.Arguments["TimeEndMs"]) * 10000).ToOADate()
                             });
                         }
-                        eventList = childEvents;
                     }
                 }
                 return rootNodes;
@@ -289,8 +289,8 @@ namespace ProtocolMaster.View
             plot.ResetAllAxes();
             dateTimeAxis.Minimum = 0;
             categoryAxis.AbsoluteMaximum = gridLines[gridLines.Count - 1] + 0.5;
-            categoryAxis.MaximumRange = gridLines[gridLines.Count - 1] + 1.0;
-            categoryAxis.MinimumRange = gridLines[gridLines.Count - 1] + 1.0;
+            categoryAxis.MaximumRange = gridLines[gridLines.Count - 1] + 1.1;
+            categoryAxis.MinimumRange = gridLines[gridLines.Count - 1] + 1.1;
             plot.Model.InvalidatePlot(true);
         }
         private void SetUpPlot()
@@ -337,10 +337,10 @@ namespace ProtocolMaster.View
                 MajorGridlineColor = OxyColors.Gray,
                 GapWidth = 0.0f,
                 ExtraGridlines = new double[32],
-                AbsoluteMinimum = -0.5,
+                AbsoluteMinimum = -0.6,
                 AbsoluteMaximum = 0.5,
-                MaximumRange = 1.0,
-                MinimumRange = 1.0,
+                MaximumRange = 1.1,
+                MinimumRange = 1.1,
             };
             model.Axes.Add(categoryAxis);
 

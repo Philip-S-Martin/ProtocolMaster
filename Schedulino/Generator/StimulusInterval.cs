@@ -10,7 +10,6 @@ namespace SchedulinoDriver.Generator
     class StimulusInterval : Interval
     {
         public Stimulus stim;
-
         public StimulusInterval(Stimulus stim, uint begin, uint end) : base(begin, end)
         {
             this.stim = stim;

@@ -37,6 +37,19 @@ namespace SchedulinoDriver.Generator
                 return true;
             else return false;
         }
+        public bool BufferOverlap(Interval other, uint bufferleft, uint bufferright)
+        {
+            uint tBegin = this.begin - bufferleft;
+            uint tEnd = this.end + bufferright;
+            uint oBegin = other.begin - bufferleft;
+            uint oEnd = other.end + bufferright;
+            if ((tBegin < oEnd && tEnd >= oEnd) ||
+                (oBegin < tEnd && oEnd >= tEnd) ||
+                (tBegin < oBegin && tEnd >= oBegin) ||
+                (oBegin < tBegin && oEnd >= tBegin))
+                return true;
+            else return false;
+        }
         public virtual ProtocolEvent ToProtocolEvent()
         {
             return null;

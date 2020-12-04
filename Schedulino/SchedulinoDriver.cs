@@ -10,11 +10,12 @@ using System.Collections.Concurrent;
 using System;
 using System.Xml;
 using System.Diagnostics;
+using ProtocolMaster.Model;
 
 namespace Schedulino
 {
     [DriverMeta("Schedulino", "1.1", "DigitalDuration", "DigitalPulse", "DigitalStringDuration")]
-    public class SchedulinoDriver : IDriver
+    public class SchedulinoDriver : IDriver, ICallDropdown
     {
         List<SchedulePinState> schedule;
         int scheduleIndex = 0;
@@ -26,6 +27,7 @@ namespace Schedulino
 
         SerialPort serial;
         public SerialPort Serial { get => serial; set => serial = value; }
+        public CallDropdownHandler CallDropdown { private get;  set; }
 
         // Data processing handlers
         delegate void Handler(ProtocolEvent item);
@@ -80,7 +82,7 @@ namespace Schedulino
             //Serial.Close();
         }
 
-        public void Setup(List<ProtocolEvent> dataList)
+        public bool Setup(List<ProtocolEvent> dataList)
         {
             foreach (ProtocolEvent data in dataList)
             {
@@ -88,12 +90,23 @@ namespace Schedulino
             }
             schedule.Sort();
 
+            string[] portOptions = SerialPort.GetPortNames();
+            string port;
+            if (portOptions.Length == 0)
+            {
+                return false;
+            }
+            else if (portOptions.Length == 1)
+                port = portOptions[0];
+            else
+                port = CallDropdown(portOptions);
+
             // SerialPort setup
             Serial = new SerialPort
             {
                 RtsEnable = true,
                 DtrEnable = true,
-                PortName = "COM4",
+                PortName = port,
                 BaudRate = 9600,
                 NewLine = "\n"
             };
@@ -111,6 +124,7 @@ namespace Schedulino
                 SendNextEvent();
                 ReadSerialBuffer();
             }
+            return true;
         }
 
         public void Start()

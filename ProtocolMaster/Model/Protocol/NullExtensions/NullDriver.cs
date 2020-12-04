@@ -20,8 +20,9 @@ namespace ProtocolMaster.Model.Protocol.NullExtensions
         {
         }
 
-        public void Setup(List<ProtocolEvent> dataList)
+        public bool Setup(List<ProtocolEvent> dataList)
         {
+            return false;
         }
 
         public void Start()
