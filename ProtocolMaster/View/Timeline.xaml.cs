@@ -142,9 +142,10 @@ namespace ProtocolMaster.View
             plot.Model.Series.Clear();
             categoryAxis.Labels.Clear();
             dateTimeAxis.AbsoluteMaximum = 1.035;
-            categoryAxis.AbsoluteMaximum = 0.5;
-            categoryAxis.MaximumRange = 1.1;
-            categoryAxis.MinimumRange = 1.1;
+
+            categoryAxis.AbsoluteMaximum = 0.6;
+            categoryAxis.MaximumRange = categoryAxis.AbsoluteMaximum - categoryAxis.AbsoluteMinimum;
+            categoryAxis.MinimumRange = categoryAxis.AbsoluteMaximum - categoryAxis.AbsoluteMinimum;
             plot.Model.InvalidatePlot(true);
         }
 
@@ -288,9 +289,9 @@ namespace ProtocolMaster.View
                 plot.Model.Series.Add(series);
             plot.ResetAllAxes();
             dateTimeAxis.Minimum = 0;
-            categoryAxis.AbsoluteMaximum = gridLines[gridLines.Count - 1] + 0.5;
-            categoryAxis.MaximumRange = gridLines[gridLines.Count - 1] + 1.1;
-            categoryAxis.MinimumRange = gridLines[gridLines.Count - 1] + 1.1;
+            categoryAxis.AbsoluteMaximum = gridLines[gridLines.Count - 1] + 0.6;
+            categoryAxis.MaximumRange = categoryAxis.AbsoluteMaximum - categoryAxis.AbsoluteMinimum;
+            categoryAxis.MinimumRange = categoryAxis.AbsoluteMaximum - categoryAxis.AbsoluteMinimum;
             plot.Model.InvalidatePlot(true);
         }
         private void SetUpPlot()
@@ -338,9 +339,9 @@ namespace ProtocolMaster.View
                 GapWidth = 0.0f,
                 ExtraGridlines = new double[32],
                 AbsoluteMinimum = -0.6,
-                AbsoluteMaximum = 0.5,
-                MaximumRange = 1.1,
-                MinimumRange = 1.1,
+                AbsoluteMaximum = 0.6,
+                MaximumRange = 1.2,
+                MinimumRange = 1.2,
             };
             model.Axes.Add(categoryAxis);
 
