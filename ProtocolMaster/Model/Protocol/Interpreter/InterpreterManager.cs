@@ -17,7 +17,7 @@ namespace ProtocolMaster.Model.Protocol.Interpreter
     {        
         IInterpreter interpreter;
 
-        public List<ProtocolEvent> GenerateData(string selectionID)
+        public List<ProtocolEvent> GenerateData(string selectionID, string argument)
         {
             interpreter = CreateSelectedExtension();
 
@@ -32,7 +32,8 @@ namespace ProtocolMaster.Model.Protocol.Interpreter
             }
             
             // pre-fill event data
-            List<ProtocolEvent> result = interpreter.Generate("Protocol");
+            List<ProtocolEvent> result = interpreter.Generate(argument);
+            if (interpreter.IsCanceled) return null;
             DisposeSelectedExtension();
             return result;
         }

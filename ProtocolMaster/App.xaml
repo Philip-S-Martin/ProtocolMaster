@@ -13,8 +13,11 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
                 <!-- Visual-Studio like Theme basis -->
                 <ResourceDictionary Source="pack://application:,,,/Selen.Wpf.SystemStyles;component/Styles.xaml"/>
+                <ResourceDictionary Source="Theme/TabControlStyles.xaml"/>
+
                 <!-- Theme cohesion updates -->
                 <ResourceDictionary Source="Theme/Dark.xaml"/>
+                
             </ResourceDictionary.MergedDictionaries>
 
         </ResourceDictionary>

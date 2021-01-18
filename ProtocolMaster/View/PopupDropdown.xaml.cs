@@ -22,8 +22,8 @@ namespace ProtocolMaster.View
         public PopupDropdown(string[] options)
         {
             InitializeComponent();
-            this.Left = (App.Window.Width - this.Width) / 2;
-            this.Top = (App.Window.Height - this.Height) / 2;
+            this.Left = App.Window.Left + (App.Window.Width - this.Width) / 2;
+            this.Top = App.Window.Top + (App.Window.Height - this.Height) / 2;
             foreach (string s in options)
                 Dropdown.Items.Add(s);
             Dropdown.SelectionChanged += DropdownSelectionHandler;

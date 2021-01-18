@@ -20,6 +20,7 @@ namespace ProtocolMaster.Model.Protocol
         E extension;
         public bool IsRunning { get => !isDisposed; }
         bool isDisposed = true;
+        bool isCanceled = false;
 
         public event EventHandler OnOptionsLoaded;
         protected Dispatcher UIDispatcher { get; set; }
@@ -78,9 +79,9 @@ namespace ProtocolMaster.Model.Protocol
                 isDisposed = false;
                 extensionContext = extensionFactory.CreateExport();
                 extension = extensionContext.Value;
-                if (typeof(ICallDropdown).IsAssignableFrom(extension.GetType()))
+                if (typeof(IPromptUserSelect).IsAssignableFrom(extension.GetType()))
                 {
-                    (extension as ICallDropdown).CallDropdown = CallHandler.CallDropdown;
+                    (extension as IPromptUserSelect).UserSelectPrompt = PromptHandler.CallDropdown;
                 }
                 return extension;
             }
@@ -96,7 +97,7 @@ namespace ProtocolMaster.Model.Protocol
         }
         public void Cancel()
         {
-            extension.Cancel();
+            extension.IsCanceled = true;
             DisposeSelectedExtension();
         }
     }

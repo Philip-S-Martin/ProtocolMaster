@@ -10,13 +10,13 @@ namespace Schedulino
 {
     [InterpreterMeta("SpreadsheetAFC", "1.1")]
 
-    public class SpreadsheetAFC : ExcelDataInterpreter, IInterpreter, ICallDropdown
+    public class SpreadsheetAFC : ExcelDataInterpreter, IInterpreter, IPromptUserSelect
     {
         private delegate bool RowReader(Dictionary<string, int> map);
         Dictionary<string, RowReader> mappedRowReaders;
         Dictionary<string, Protocol> protocols;
         Protocol baseData;
-        public CallDropdownHandler CallDropdown { get; set; }
+        public UserSelectHandler UserSelectPrompt { get; set; }
         public SpreadsheetAFC()
         {
             mappedRowReaders = new Dictionary<string, RowReader>(){
@@ -28,10 +28,7 @@ namespace Schedulino
             };
             protocols = new Dictionary<string, Protocol>();
         }
-        public void Cancel()
-        {
-
-        }
+        public bool IsCanceled { get; set; }
         private Protocol GetOrCreateProtocol(string protocolName)
         {
             Protocol result;
@@ -45,7 +42,7 @@ namespace Schedulino
                 return result;
             }
         }
-        public List<ProtocolEvent> Generate(string protocolName)
+        public List<ProtocolEvent> Generate(string protocolName = null)
         {
             if (DataReader == null) return null;
             do
@@ -72,9 +69,20 @@ namespace Schedulino
             } while (DataReader.NextResult());
             DataReader.Close();
 
-            string dropdownResponse = CallDropdown(protocols.Keys.ToArray());
-            if (dropdownResponse != null)
-                return protocols[dropdownResponse].Generate();
+            if (!IsCanceled)
+            {
+                if (protocolName == null)
+                {
+                    string dropdownResponse = UserSelectPrompt(protocols.Keys.ToArray());
+                    if (dropdownResponse != null)
+                        return protocols[dropdownResponse].Generate();
+                    else return null;
+                }
+                else
+                {
+                    return protocols[protocolName].Generate();
+                }
+            }
             else return null;
         }
         private bool ReadExperimentRow(Dictionary<string, int> headerMap)

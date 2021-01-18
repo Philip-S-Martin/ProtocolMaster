@@ -11,10 +11,7 @@ namespace ProtocolMaster.Model.Protocol.NullExtensions
     [InterpreterMeta("None", "")]
     public class NullInterpreter : IInterpreter
     {
-        public void Cancel()
-        {
-        }
-
+        public bool IsCanceled { get; set; }
         public List<ProtocolEvent> Generate(string protocolName)
         {
             return null;

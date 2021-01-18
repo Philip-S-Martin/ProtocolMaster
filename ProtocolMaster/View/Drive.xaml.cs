@@ -13,8 +13,6 @@ namespace ProtocolMaster.View
     {
         readonly Dictionary<string, TreeViewItem> idChildDictionary;
         readonly Dictionary<TreeViewItem, string> childIdDictionary;
-
-        String selectedItemID = null;
         public Drive()
         {
             idChildDictionary = new Dictionary<string, TreeViewItem>();
@@ -107,12 +105,7 @@ namespace ProtocolMaster.View
         {
             TreeViewItem selected = sender as TreeViewItem;
             
-            selectedItemID = childIdDictionary[selected];
-        }
-
-        public string GetSelectedItemID()
-        {
-            return selectedItemID;
+            App.Window.TimelineView.SetSelection(childIdDictionary[selected], selected.Header as string);
         }
     }
 }

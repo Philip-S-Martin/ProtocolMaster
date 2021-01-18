@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ProtocolMaster.Model
 {
-    public delegate string CallDropdownHandler(string[] keys);
-    public interface ICallDropdown
+    public delegate string UserSelectHandler(string[] keys);
+    public interface IPromptUserSelect
     {
-        public CallDropdownHandler CallDropdown { set; }
+        public UserSelectHandler UserSelectPrompt { set; }
     }
 }

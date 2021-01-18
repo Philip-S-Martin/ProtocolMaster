@@ -8,6 +8,6 @@ namespace ProtocolMaster.Model.Protocol
 {
     public interface IExtension
     {
-        void Cancel();
+        bool IsCanceled { get; set; }
     }
 }

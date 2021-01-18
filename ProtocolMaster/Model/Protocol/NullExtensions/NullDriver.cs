@@ -16,9 +16,8 @@ namespace ProtocolMaster.Model.Protocol.NullExtensions
     [DriverMeta("None", "")]
     public class NullDriver : IDriver
     {
-        public void Cancel()
-        {
-        }
+        public bool IsCanceled { get; set; }
+
 
         public bool Setup(List<ProtocolEvent> dataList)
         {

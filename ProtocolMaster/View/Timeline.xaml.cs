@@ -28,130 +28,95 @@ namespace ProtocolMaster.View
         {
             InitializeComponent();
             SetUpPlot();
-            App.Instance.ExtensionSystem.InterpreterManager.OnOptionsLoaded += LoadInterpreters;
-            App.Instance.ExtensionSystem.DriverManager.OnOptionsLoaded += LoadDrivers;
+            SetSelection(null, null);
 
             App.Instance.ExtensionSystem.DriverManager.OnProtocolStart += StartAnimation;
             App.Instance.ExtensionSystem.DriverManager.OnProtocolEnd += EndAnimation;
         }
-        public void LoadDrivers(object sender, EventArgs e)
-        {
-            DriverDropdown.Items.Clear();
-            foreach (DriverMeta meta in App.Instance.ExtensionSystem.DriverManager.Options)
-            {
-                ListDriver(meta);
-            }
-        }
-        public void ListDriver(DriverMeta data)
-        {
-            MenuItem newDriver = new MenuItem
-            {
-                Header = data.ToString()
-            };
-            newDriver.Resources.Add("data", data);
-            newDriver.Click += new RoutedEventHandler(DriverClickHandler);
-            DriverDropdown.Items.Add(newDriver);
-        }
-
-        public void DriverClickHandler(object sender, RoutedEventArgs e)
-        {
-            MenuItem src = e.Source as MenuItem;
-            DriverMeta data = src.Resources["data"] as DriverMeta;
-
-            App.Instance.ExtensionSystem.DriverManager.Selected = data;
-            ShowSelectedDriver();
-        }
-
-        public void ShowSelectedDriver()
-        {
-            SelectedDriver.Header = "Selected: " + App.Instance.ExtensionSystem.DriverManager.Selected.ToString();
-        }
-
-        public void LoadInterpreters(object sender, EventArgs e)
-        {
-            InterpreterDropdown.Items.Clear();
-            foreach (InterpreterMeta meta in App.Instance.ExtensionSystem.InterpreterManager.Options)
-            {
-                ListInterpreter(meta);
-            }
-        }
-
-        public void ListInterpreter(InterpreterMeta data)
-        {
-            MenuItem newInterpreter = new MenuItem
-            {
-                Header = data.ToString()
-            };
-            newInterpreter.Resources.Add("data", data);
-            newInterpreter.Click += new RoutedEventHandler(InterpreterClickHandler);
-            InterpreterDropdown.Items.Add(newInterpreter);
-        }
-
-        public void InterpreterClickHandler(object sender, RoutedEventArgs e)
-        {
-            MenuItem src = e.Source as MenuItem;
-            InterpreterMeta data = src.Resources["data"] as InterpreterMeta;
-            App.Instance.ExtensionSystem.InterpreterManager.Selected = data;
-            ShowSelectedInterpreter();
-        }
-
-        public void ShowSelectedInterpreter()
-        {
-            SelectedInterpreter.Header = "Selected: " + App.Instance.ExtensionSystem.InterpreterManager.Selected.ToString();
-        }
 
         DateTime start;
+        Task bgWorker;
+        Progress<int> animationProgress;
+        CancellationTokenSource tokenSource;
+        private string selectionID;
+        private string selectionName;
+        private string runningName;
 
+        public void SetSelection(string selectionID, string selectionName)
+        {
+            if(selectionID == null)
+            {
+                SetControlsUsability(false, false, false, false);
+                this.selectionID = null;
+                this.selectionName = "No Selection";
+            }
+            else
+            {
+                SetControlsUsability(true, true, false, false);
+                this.selectionID = selectionID;
+                this.selectionName = selectionName;
+            }
+            Reset();
+            SelectionHeader.Text = this.selectionName;
+        }
+        private void SetControlsUsability(bool load, bool start, bool cancel, bool reset)
+        {
+            LoadButton.IsEnabled = load;
+            LoadButton.Visibility = MapVis(load);
+            StartButton.IsEnabled = start;
+            StartButton.Visibility = MapVis(start);
+            CancelButton.IsEnabled = cancel;
+            CancelButton.Visibility = MapVis(cancel);
+            ResetButton.IsEnabled = reset;
+            ResetButton.Visibility = MapVis(reset);
+        }
+        private Visibility MapVis(bool booleanValue)
+        {
+            if (booleanValue) return Visibility.Visible;
+            else return Visibility.Collapsed;
+        }
         public void Load_Click(object sender, RoutedEventArgs e)
         {
-            LoadButton.IsEnabled = true;
-            StartButton.IsEnabled = true;
-            CancelButton.IsEnabled = false;
-            ResetButton.IsEnabled = true;
-            App.Instance.ExtensionSystem.Interpret(App.Window.DriveView.GetSelectedItemID());
+            App.Instance.ExtensionSystem.Interpret(selectionID, null);
+            SetControlsUsability(false, false, false, true);
         }
         public void Start_Click(object sender, RoutedEventArgs e)
         {
-            LoadButton.IsEnabled = false;
-            StartButton.IsEnabled = false;
-            CancelButton.IsEnabled = true;
-            ResetButton.IsEnabled = false;
-
+            SetControlsUsability(false,false,true,false);
+            App.Instance.ExtensionSystem.Interpret(selectionID, null);
             App.Instance.ExtensionSystem.Run();
         }
 
         public void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            LoadButton.IsEnabled = true;
-            StartButton.IsEnabled = false;
-            CancelButton.IsEnabled = false;
-            ResetButton.IsEnabled = true;
-
+            SetControlsUsability(false, false, false, true);
             App.Instance.ExtensionSystem.End();
         }
 
         public void Reset_Click(object sender, RoutedEventArgs e)
         {
-            LoadButton.IsEnabled = true;
-            StartButton.IsEnabled = false;
-            CancelButton.IsEnabled = false;
-            ResetButton.IsEnabled = false;
+            SetControlsUsability(true, true, false, false);
+            Reset();
+        }
 
+        private void Reset()
+        {
             App.Instance.ExtensionSystem.Reset();
+            ResetPlot();
+        }
+        private void ResetPlot()
+        {
             Line.X = 0;
             plot.Model.Series.Clear();
             categoryAxis.Labels.Clear();
+            dateTimeAxis.AbsoluteMinimum = 0;
             dateTimeAxis.AbsoluteMaximum = 1.035;
 
+            categoryAxis.AbsoluteMinimum = -0.6;
             categoryAxis.AbsoluteMaximum = 0.6;
             categoryAxis.MaximumRange = categoryAxis.AbsoluteMaximum - categoryAxis.AbsoluteMinimum;
             categoryAxis.MinimumRange = categoryAxis.AbsoluteMaximum - categoryAxis.AbsoluteMinimum;
             plot.Model.InvalidatePlot(true);
-        }
-
-        private void GeneratePlotModel()
-        {
-
         }
 
         static OxyColor[] pallete = { OxyColors.DarkRed, OxyColors.DodgerBlue, OxyColors.Green };
@@ -317,8 +282,6 @@ namespace ProtocolMaster.View
                 MinorGridlineColor = OxyColors.Gray,
                 MajorGridlineColor = OxyColors.Gray,
                 StartPosition = 0,
-                AbsoluteMinimum = 0,
-                AbsoluteMaximum = 1.035,
             };
             model.Axes.Add(dateTimeAxis);
             categoryAxis = new CategoryAxis()
@@ -338,10 +301,6 @@ namespace ProtocolMaster.View
                 MajorGridlineColor = OxyColors.Gray,
                 GapWidth = 0.0f,
                 ExtraGridlines = new double[32],
-                AbsoluteMinimum = -0.6,
-                AbsoluteMaximum = 0.6,
-                MaximumRange = 1.2,
-                MinimumRange = 1.2,
             };
             model.Axes.Add(categoryAxis);
 
@@ -373,11 +332,12 @@ namespace ProtocolMaster.View
             model.Annotations.Add(Line);
             dateTimeAxis.Minimum = 0;
             plot.Model = model;
+
+            ResetPlot();
         }
 
-        Task bgWorker;
-        Progress<int> animationProgress;
-        CancellationTokenSource tokenSource;
+
+
         public void StartAnimation(object sender, EventArgs e)
         {
 
@@ -421,10 +381,6 @@ namespace ProtocolMaster.View
                 nextFrame = now.AddMilliseconds(200);
             }
             progress.Report(0);
-        }
-        private void MenuItem_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-
         }
     }
 }

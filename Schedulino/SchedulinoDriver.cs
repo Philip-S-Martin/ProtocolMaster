@@ -15,7 +15,7 @@ using ProtocolMaster.Model;
 namespace Schedulino
 {
     [DriverMeta("Schedulino", "1.1", "DigitalDuration", "DigitalPulse", "DigitalStringDuration")]
-    public class SchedulinoDriver : IDriver, ICallDropdown
+    public class SchedulinoDriver : IDriver, IPromptUserSelect
     {
         List<SchedulePinState> schedule;
         int scheduleIndex = 0;
@@ -27,7 +27,7 @@ namespace Schedulino
 
         SerialPort serial;
         public SerialPort Serial { get => serial; set => serial = value; }
-        public CallDropdownHandler CallDropdown { private get;  set; }
+        public UserSelectHandler UserSelectPrompt { private get; set; }
 
         // Data processing handlers
         delegate void Handler(ProtocolEvent item);
@@ -68,18 +68,24 @@ namespace Schedulino
             invalidKeyReceiver = InvalidKeyReceiver;
         }
 
-        public void Cancel()
+        private bool isCanceled;
+        public bool IsCanceled
         {
-            Log.Error("Cancelling Schedulino");
-            //scheduleIndex = schedule.Count;
-            Serial.Write("X");
-            while (serial.BytesToRead >= 1)
+            get => isCanceled;
+            set
             {
-                int read = Serial.ReadByte();
-                if (read != -1)
-                    Receive((char)read);
+                isCanceled = true;
+                Log.Error("Cancelling Schedulino");
+                //scheduleIndex = schedule.Count;
+                Serial.Write("X");
+                while (serial.BytesToRead >= 1)
+                {
+                    int read = Serial.ReadByte();
+                    if (read != -1)
+                        Receive((char)read);
+                }
+                //Serial.Close();} }
             }
-            //Serial.Close();
         }
 
         public bool Setup(List<ProtocolEvent> dataList)
@@ -99,7 +105,7 @@ namespace Schedulino
             else if (portOptions.Length == 1)
                 port = portOptions[0];
             else
-                port = CallDropdown(portOptions);
+                port = UserSelectPrompt(portOptions);
 
             // SerialPort setup
             Serial = new SerialPort
@@ -143,7 +149,7 @@ namespace Schedulino
                 SendNextEvent();
                 ReadSerialBuffer();
             }
-            if(serial.IsOpen) Serial.Close();
+            if (serial.IsOpen) Serial.Close();
         }
         private void SendNextEvent()
         {

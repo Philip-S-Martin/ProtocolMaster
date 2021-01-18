@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ProtocolMaster.Model
 {
-    public static class CallHandler
+    public static class PromptHandler
     {
         public static string CallDropdown(string[] keys)
         {

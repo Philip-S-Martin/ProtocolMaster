@@ -14,28 +14,57 @@
     <DockPanel >
         <!--Timeline Toolbar-->
         <DockPanel DockPanel.Dock="Top" Style="{StaticResource Menu}">
-            <TextBlock Style="{StaticResource MenuHeader}" DockPanel.Dock="Top">Timeline</TextBlock>
+            <!--<TextBlock Style="{StaticResource MenuHeader}" DockPanel.Dock="Top">Timeline</TextBlock>-->
             <Menu>
-                <MenuItem Header="Interpreter">
-                    <MenuItem Header="Selected: NULL" Name="SelectedInterpreter" IsEnabled="False"/>
-                    <Separator/>
-                    <MenuItem Header="Select Interpreter" Name="InterpreterDropdown"/>
+                <MenuItem IsEnabled="False">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Name="SelectionHeader" VerticalAlignment="Center"/>
+                            <TextBlock Text=": " VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </MenuItem.Header>
                 </MenuItem>
-                <MenuItem Header="Driver">
-                    <MenuItem Header="Selected: NULL" Name="SelectedDriver" IsEnabled="False"/>
-                    <Separator/>
-                    <MenuItem Header="Select Driver" Name="DriverDropdown"/>
+                <MenuItem Name ="LoadButton" Click="Load_Click" IsEnabled="True">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Theme/Icons/Load.png" Stretch="Fill" Width="14" Height="14" Margin="1,2,6,2" VerticalAlignment="Bottom"/>
+                            <TextBlock VerticalAlignment="Center">Load</TextBlock>
+                        </StackPanel>
+                    </MenuItem.Header>
                 </MenuItem>
-                <Separator/>
-                <MenuItem Name ="LoadButton" Header="Load" Click="Load_Click" IsEnabled="True"/>
-                <MenuItem Name ="StartButton" Header="Start" Click="Start_Click" IsEnabled="False"/>
-                <MenuItem Name ="CancelButton" Header="Cancel" Click="Cancel_Click" IsEnabled="False"/>
-                <MenuItem Name ="ResetButton" Header="Reset" Click="Reset_Click" IsEnabled="False"/>
+                <MenuItem Name ="StartButton" Click="Start_Click" IsEnabled="False">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Theme/Icons/Start.png" Stretch="Fill" Width="14" Height="14" Margin="1,2,6,2" VerticalAlignment="Center"/>
+                            <TextBlock VerticalAlignment="Center">Start</TextBlock>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Name ="CancelButton" Click="Cancel_Click" IsEnabled="False">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Theme/Icons/Cancel.png" Stretch="Fill" Width="14" Height="14" Margin="1,2,6,2" VerticalAlignment="Center"/>
+                            <TextBlock VerticalAlignment="Center">Cancel</TextBlock>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Name ="ResetButton" Click="Reset_Click" IsEnabled="False">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Theme/Icons/Reset.png" Stretch="Fill" Width="14" Height="14" Margin="1,2,6,2" VerticalAlignment="Center"/>
+                            <TextBlock VerticalAlignment="Center">Reset</TextBlock>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
             </Menu>
         </DockPanel>
         <!--Timeline Content-->
         <Grid>
-            <oxy:PlotView Name="plot" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="27*"/>
+                <ColumnDefinition Width="23*"/>
+            </Grid.ColumnDefinitions>
+            <oxy:PlotView Name="plot" Grid.ColumnSpan="2" Margin="0,0,0,-0.4" />
         </Grid>
     </DockPanel>
 </UserControl>

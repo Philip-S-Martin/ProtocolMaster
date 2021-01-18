@@ -13,6 +13,7 @@ using ProtocolMaster.Model.Protocol.Interpreter;
 using ProtocolMaster.Model.Protocol.Driver;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Windows.Threading;
 
 namespace ProtocolMaster.Model.Protocol
 {
@@ -59,7 +60,7 @@ namespace ProtocolMaster.Model.Protocol
             DriverManager.LoadOptions(_container);
             InterpreterManager.LoadOptions(_container);
         }
-        public void Interpret(string selectionID)
+        public void Interpret(string selectionID, string argument)
         {
             if (isRunning)
             {
@@ -82,19 +83,18 @@ namespace ProtocolMaster.Model.Protocol
                         InterpreterManager.Cancel();
                     }
                 }));
-                return InterpreterManager.GenerateData(selectionID);
-            }, TaskCreationOptions.LongRunning);
-
+                return InterpreterManager.GenerateData(selectionID, argument);
+            });
 
             Task UITask = generator.ContinueWith((data) =>
             {
-                List<ProtocolEvent> result = generator.Result;
+                List<ProtocolEvent> result = data.Result;
                 Data = result;
                 if (result != null)
                 {
-                    App.Window.TimelineView.LoadPlotData(result);
+                    App.Current.Dispatcher.Invoke(() => { App.Window.TimelineView.LoadPlotData(result); });
                 }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            });
         }
         public void Run()
         {
