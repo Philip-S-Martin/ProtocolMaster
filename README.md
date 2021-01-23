@@ -1,6 +1,6 @@
 # ProtocolMaster
 
-Website: protocolmaster.philipm.net
+Website: http://protocolmaster.philipm.net/
 
 Author: Philip Martin philip@novorium.com
 
