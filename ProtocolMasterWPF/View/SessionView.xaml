@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="ProtocolMasterWPF.View.SessionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ProtocolMasterWPF.View" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" MinHeight="180"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="*" MinHeight="180"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <local:CameraView/>
+        <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch"/>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" BorderBrush="{DynamicResource SecondaryHueDarkBrush}" BorderThickness="0,0,0,1">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton
+                        x:Name="TimelineTab"
+                        Style="{StaticResource MaterialDesignTabRadioButton}"
+                        IsChecked="True"
+                        Content="Timeline"/>
+                    <RadioButton
+                        x:Name="LogTab"
+                        Style="{StaticResource MaterialDesignTabRadioButton}"
+                        IsChecked="False"
+                        Content="Log"/>
+                </StackPanel>
+            </Border>
+            <local:TimelineView Grid.Row="1" Visibility="{Binding IsChecked, ElementName=TimelineTab, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <local:LogView Grid.Row="1" Visibility="{Binding IsChecked, ElementName=LogTab, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Stretch"/>
+        </Grid>
+        <Border Grid.Row="3" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0 1 0 0">
+            <local:SessionControlBarView/>
+        </Border>
+        <materialDesign:DialogHost Identifier="SessionDialog" Grid.RowSpan="4" DialogTheme="Inherit"/>
+    </Grid>
+</UserControl>

@@ -6,44 +6,54 @@
              xmlns:local="clr-namespace:ProtocolMasterWPF.View" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="50" d:DesignWidth="800">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
-        
-        <Border Grid.ColumnSpan="3" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0 0 0 1"/>
-        <Grid x:Name="AppTitleBar" MouseDown="AppTitleBar_MouseDown" Background="Transparent" Grid.Column="0" Grid.ColumnSpan="3">
-        </Grid>
-        <Menu Grid.Column="0" Margin="2,2,0,1">
-            <MenuItem Header="Item 1">
-                <MenuItem Header="Sub Item 1" />
-                <MenuItem Header="Sub Item 2" />
-                <MenuItem Header="Sub Item 3" />
-            </MenuItem>
-            <MenuItem Header="Item 2">
-                <MenuItem Header="Sub Item 1" />
-                <MenuItem Header="Sub Item 2" />
-                <MenuItem Header="Sub Item 3" />
-            </MenuItem>
-            <MenuItem Header="Item 3">
-                <MenuItem Header="Sub Item 1" />
-                <MenuItem Header="Sub Item 2" />
-                <MenuItem Header="Sub Item 3" />
-            </MenuItem>
+    <Border Grid.ColumnSpan="3" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0 0 0 1">
+        <Grid WindowChrome.IsHitTestVisibleInChrome="True">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-        </Menu>
-        <StackPanel Grid.Column="2" Orientation="Horizontal">
-            <Button Style="{StaticResource MaterialDesignIconButton}" Foreground="{StaticResource MaterialDesignDarkForeground}" Margin="2,2">
-                <materialDesign:PackIcon Kind="WindowMinimize"/>
-            </Button>
-            <Button Style="{StaticResource MaterialDesignIconButton}" Foreground="{StaticResource MaterialDesignDarkForeground}" Margin="2,2">
-                <materialDesign:PackIcon Kind="WindowMaximize"/>
-            </Button>
-            <Button Style="{StaticResource MaterialDesignIconButton}" Foreground="{StaticResource MaterialDesignDarkForeground}" Margin="2,2">
-                <materialDesign:PackIcon Kind="WindowClose"/>
-            </Button>
-        </StackPanel>
-    </Grid>
+            <Menu Grid.Column="1" Margin="2">
+                <MenuItem Padding="6">
+                    <MenuItem.Header>
+                        <Image Height="36" Width="36" Source="/ProtocolMasterWPF;component/Assets/Logo/LogoSquare480.png"></Image>
+                    </MenuItem.Header>
+                    <MenuItem Header="ProtocolMaster" IsEnabled="False" />
+                    <Separator/>
+                    <MenuItem Header="Website"/>
+                    <MenuItem Header="Github" />
+                    <MenuItem Header="Release Notes" />
+                </MenuItem>
+                <MenuItem Header="File">
+                    <MenuItem Header="Log Folder" />
+                    <MenuItem Header="Video Folder" />
+                    <MenuItem Header="Extension Folder" />
+                </MenuItem>
+                <MenuItem Header="Help">
+                    <MenuItem Header="Getting Started"/>
+                    <MenuItem Header="User Guide" />
+                    <MenuItem Header="Technical Documentation" />
+                </MenuItem>
+                <MenuItem Header="Debug">
+                    <MenuItem Header="Log Test" Click="MenuItem_Click"/>
+                    <MenuItem Header="User Guide" />
+                    <MenuItem Header="Technical Documentation" />
+                </MenuItem>
+            </Menu>
+
+            <StackPanel Grid.Column="3" Orientation="Horizontal">
+                <Button Click="Minimize_Click" Style="{DynamicResource MaterialDesignBackgroundIconButton}" Margin="2">
+                    <materialDesign:PackIcon Kind="WindowMinimize"/>
+                </Button>
+                <Button Click="Maximize_Click" Style="{DynamicResource MaterialDesignBackgroundIconButton}" Margin="2">
+                    <materialDesign:PackIcon Kind="WindowMaximize"/>
+                </Button>
+                <Button Click="Close_Click" Style="{DynamicResource MaterialDesignBackgroundIconButton}" Margin="2">
+                    <materialDesign:PackIcon Kind="WindowClose"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
 </UserControl>

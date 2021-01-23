@@ -16,11 +16,9 @@ namespace ProtocolMasterCore.Utility
         {
         }
 
-        public LogPrinter OutputPrinter;
-        public LogPrinter ErrorPrinter;
+        public static LogPrinter OutputPrinter;
+        public static LogPrinter ErrorPrinter;
 
-        private readonly string appdata;
-        public string AppData { get { return appdata; } }
         private readonly string logdata;
         private readonly string archive;
 
@@ -34,24 +32,16 @@ namespace ProtocolMasterCore.Utility
 
         private Log()
         {
-            if(AppEnvironment.TryAddLocationAppData("Log", "Log", out logdata))
-            {
-
-            }
-            if (AppEnvironment.TryAddLocationAppData("LogArchive", "Log/Archive", out logdata))
-            {
-
-            }
-
-            // First two are redundant, but it is prettier this way
+            if (AppEnvironment.TryAddLocationAppData("Log", "Log", out logdata))
+            {}
+            if (AppEnvironment.TryAddLocationAppData("LogArchive", "Log/Archive", out archive))
+            {}
 
             string timePrefix = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-
-            lfOut = new LogFile($"{logdata}{timePrefix}_Out.log");
-            lfErr = new LogFile($"{logdata}{timePrefix}_Err.log");
+            lfOut = new LogFile(Path.Combine(logdata, $"{timePrefix}_Out.log"));
+            lfErr = new LogFile(Path.Combine(logdata, $"{timePrefix}_Err.log"));
 
             PrintErrors = true;
-
             ArchiveOldest();
         }
         public static Log Instance
@@ -62,20 +52,20 @@ namespace ProtocolMasterCore.Utility
             }
         }
 
-        public static void Error(string message) => Instance.I_Error(message);
+        public static void Error(object message) => Instance.I_Error(message == null? "NULL" : message.ToString());
         public void I_Error(string message)
         {
-            string toWrite = $"{ DateTime.Now}{message}";
+            string toWrite = $"E:{DateTime.Now}:\t{message}";
             lfErr.Write(toWrite);
             if (PrintErrors)
             {
                 ErrorPrinter(toWrite);
             }
         }
-        public static void Out(string message) => Log.Instance.I_Out(message);
+        public static void Out(object message) => Log.Instance.I_Out(message == null ? "NULL" : message.ToString());
         public void I_Out(string message)
         {
-            string toWrite = $"{ DateTime.Now}{message}";
+            string toWrite = $"O:{DateTime.Now}:\t{message}";
             lfOut.Write(toWrite);
             if (PrintErrors)
             {
@@ -114,7 +104,7 @@ namespace ProtocolMasterCore.Utility
             logs = logs.OrderBy(d => d).Take(logs.Count - minUnarchived).ToList();
 
             //final archive name (I use date / time)
-            string zipFileName = DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss") + "[" + logs.Count + "].zip";
+            string zipFileName = $"{DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss")}[{logs.Count}].zip";
 
             using (MemoryStream zipMS = new MemoryStream())
             {
@@ -139,19 +129,13 @@ namespace ProtocolMasterCore.Utility
                         {
                             zipFileBinary.Write(fileToZipBytes);
                         }
-
-                        //lstLog.Items.Add("zipped: " + fileToZip);
                     }
                 }
-
-                using (FileStream finalZipFileStream = new FileStream(archive + zipFileName, FileMode.Create))
+                using (FileStream finalZipFileStream = new FileStream(Path.Combine(archive, zipFileName), FileMode.Create))
                 {
                     zipMS.Seek(0, SeekOrigin.Begin);
                     zipMS.CopyTo(finalZipFileStream);
                 }
-
-                //lstLog.Items.Add("ZIP Archive Created.");
-
                 foreach (string log in logs)
                 {
                     File.Delete(log);

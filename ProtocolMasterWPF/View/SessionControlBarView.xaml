@@ -1,0 +1,59 @@
+﻿<UserControl x:Class="ProtocolMasterWPF.View.SessionControlBarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ProtocolMasterWPF.View" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="80" d:DesignWidth="800">
+    <Grid >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel HorizontalAlignment="Left" Grid.Column="0" Orientation="Horizontal">
+            <Button x:Name="SelectButton" 
+                    Style="{DynamicResource MaterialDesignBackgroundIconButton}" 
+                    Margin="2" Height="50"
+                    Click="SelectButton_Click"
+                    IsEnabled="{Binding CanSelect}">
+                <materialDesign:PackIcon Kind="FileFind" VerticalAlignment="Center" Margin="2"/>
+            </Button>
+            <TextBlock Style="{DynamicResource MaterialDesignTextBlock}" Name="ProtocolLabel" VerticalAlignment="Center" Margin="4" FontSize="12">No Protocol</TextBlock>
+        </StackPanel>
+        <StackPanel  Grid.Column="1">
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <Button x:Name="PreviewButton" Style="{DynamicResource MaterialDesignBackgroundIconButton}" IsEnabled="{Binding CanPreview}" Click="PreviewButton_Click" Margin="2">
+                    <materialDesign:PackIcon Kind="Magnify"/>
+                </Button>
+                <Button x:Name="StartButton" Style="{DynamicResource MaterialDesignBackgroundFocusIconButton}" IsEnabled="{Binding CanStart}" Visibility="{Binding CanStop, Converter={StaticResource InverseBoolToVisConverter}}" Click="StartButton_Click" Margin="2">
+                    <materialDesign:PackIcon Kind="Play"/>
+                </Button>
+                <Button x:Name="StopButton" Style="{DynamicResource MaterialDesignNegativeFocusIconButton}" IsEnabled="{Binding CanStop}" Visibility="{Binding CanStop, Converter={StaticResource BooleanToVisibilityConverter}}" Click="StopButton_Click" Margin="2">
+                    <materialDesign:PackIcon Kind="Stop"/>
+                </Button>
+                <Button x:Name="ResetButton" Style="{DynamicResource MaterialDesignBackgroundIconButton}" IsEnabled="{Binding CanReset}" Click="ResetButton_Click" Margin="2">
+                    <materialDesign:PackIcon Kind="Clear"/>
+                </Button>
+            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Style="{DynamicResource MaterialDesignTextBlock}" FontSize="12" Margin="0,0,8,4">1:33</TextBlock>
+                <ProgressBar Grid.Column="1" Style="{DynamicResource MaterialDesignLinearProgressBar}" Value="15.5"/>
+                <TextBlock  Grid.Column="2" Style="{DynamicResource MaterialDesignTextBlock}" FontSize="12" Margin="8,0,0,4">10:00</TextBlock>
+            </Grid>
+        </StackPanel>
+
+        <StackPanel HorizontalAlignment="Right" Grid.Column="2"  Orientation="Horizontal">
+            <Button x:Name="SettingButton" Style="{DynamicResource MaterialDesignBackgroundIconButton}" Margin="2">
+                <materialDesign:PackIcon Kind="Settings"/>
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

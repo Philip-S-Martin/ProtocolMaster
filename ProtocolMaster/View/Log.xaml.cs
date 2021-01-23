@@ -13,6 +13,7 @@ namespace ProtocolMaster.View
         public Log()
         {
             InitializeComponent();
+
         }
 
         // Log Functions

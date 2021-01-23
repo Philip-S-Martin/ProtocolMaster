@@ -23,7 +23,7 @@ namespace ProtocolMasterCore.Utility
         private AppEnvironment()
         {
             locations = new Dictionary<string, string>();
-            appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ProtocolMaster";
+            appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ProtocolMaster");
             assembly = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             Directory.CreateDirectory(appData);
             Directory.CreateDirectory(assembly);
@@ -39,7 +39,7 @@ namespace ProtocolMasterCore.Utility
             }
             else return false;
         }
-        public static bool IryAddLocationAssembly(string label, string subPath, out string fullPath) => instance.I_TryAddLocationAssembly(label, subPath, out fullPath);
+        public static bool TryAddLocationAssembly(string label, string subPath, out string fullPath) => instance.I_TryAddLocationAssembly(label, subPath, out fullPath);
         private bool I_TryAddLocationAssembly(string label, string subPath, out string fullPath)
         {
             fullPath = Path.Combine(assembly, subPath);

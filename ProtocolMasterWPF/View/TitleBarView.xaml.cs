@@ -25,22 +25,25 @@ namespace ProtocolMasterWPF.View
             InitializeComponent();
         }
 
-        private void AppTitleBar_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Minimize_Click(object sender, RoutedEventArgs e)
         {
-            var window = App.Current.MainWindow;
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                if (window.WindowState == WindowState.Maximized)
-                {
-                    Point mousePos = Mouse.GetPosition(window);
-                    double relativeX = mousePos.X / window.Width / 2;
-                    double relativeY = mousePos.Y / window.Height / 2;
-                    window.WindowState = WindowState.Normal;
-                    window.Left = mousePos.X - window.Width*relativeX;
-                    window.Top = mousePos.Y - window.Height*relativeY;
-                }
-                App.Current.MainWindow.DragMove();
-            }
+            Window.GetWindow(this).WindowState = WindowState.Minimized;
+        }
+        private void Maximize_Click(object sender, RoutedEventArgs e)
+        {
+            Window window = Window.GetWindow(this);
+            if (window.WindowState == WindowState.Normal) window.WindowState = WindowState.Maximized;
+            else window.WindowState = WindowState.Normal;
+        }
+        private void Close_Click(object sender, RoutedEventArgs e)
+        {
+            Window.GetWindow(this).Close();
+        }
+
+        int logCounter = 0;
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ProtocolMasterCore.Utility.Log.Out($"Test: {logCounter}");
         }
     }
 }
