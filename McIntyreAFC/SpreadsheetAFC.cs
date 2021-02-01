@@ -1,10 +1,10 @@
-﻿using System;
+﻿using ProtocolMasterCore.Prompt;
+using ProtocolMasterCore.Protocol;
+using ProtocolMasterCore.Protocol.Interpreter;
+using Schedulino.Generator;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Schedulino.Generator;
-using ProtocolMasterCore.Protocol.Interpreter;
-using ProtocolMasterCore.Prompt;
-using ProtocolMasterCore.Protocol;
 
 namespace McIntyreAFC
 {

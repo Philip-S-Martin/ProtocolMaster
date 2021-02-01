@@ -5,11 +5,11 @@ using System.IO;
 namespace ProtocolMasterCore.Protocol.Interpreter
 {
     public delegate void ProtocolEventsLoader(List<ProtocolEvent> events);
-    internal class InterpreterManager : ExtensionManager<IInterpreter, InterpreterMeta>
-    {        
+    public class InterpreterManager : ExtensionManager<IInterpreter, InterpreterMeta>
+    {
         IInterpreter interpreter;
         public ProtocolEventsLoader OnEventsLoaded;
-        public List<ProtocolEvent> GenerateData(string selectionID, string argument, Stream stream)
+        internal List<ProtocolEvent> GenerateData(string selectionID, string argument, Stream stream)
         {
             interpreter = CreateSelectedExtension();
 

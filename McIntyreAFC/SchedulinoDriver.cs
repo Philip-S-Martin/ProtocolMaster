@@ -1,16 +1,10 @@
-﻿using System.ComponentModel.Composition;
-using System.IO.Ports;
-using System.Collections.Generic;
-using System.Threading;
-using System.Net.Http.Headers;
-using System.Collections.Concurrent;
-using System;
-using System.Xml;
-using System.Diagnostics;
-using ProtocolMasterCore.Protocol.Driver;
-using ProtocolMasterCore.Prompt;
+﻿using ProtocolMasterCore.Prompt;
 using ProtocolMasterCore.Protocol;
+using ProtocolMasterCore.Protocol.Driver;
 using ProtocolMasterCore.Utility;
+using System;
+using System.Collections.Generic;
+using System.IO.Ports;
 
 namespace McIntyreAFC
 {

@@ -2,13 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ProtocolMasterWPF.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="TargetSerialPort" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="InterpreterExtension" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="DriverExtension" Type="System.String" Scope="User">
+    <Setting Name="SessionConfig" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

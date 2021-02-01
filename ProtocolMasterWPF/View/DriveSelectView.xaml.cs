@@ -1,26 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
+﻿using ProtocolMasterWPF.Model.Google;
+using ProtocolMasterWPF.ViewModel;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ProtocolMasterWPF.View
 {
     /// <summary>
     /// Interaction logic for DriveSelectView.xaml
     /// </summary>
-    public partial class DriveSelectView : UserControl
+    public partial class DriveSelectView : UserControl, ISelectView
     {
+        public ListBox SelectList { get => SelectListBox; }
+        public DriveSelectViewModel ViewModel { get; private set; }
         public DriveSelectView()
         {
             InitializeComponent();
+            ViewModel = new DriveSelectViewModel();
+            DataContext = ViewModel;
         }
+        private void SignIn_Click(object sender, System.Windows.RoutedEventArgs e) => ((App)App.Current).GoogleAuthenticate();
     }
 }

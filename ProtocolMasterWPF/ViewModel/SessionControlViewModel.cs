@@ -1,36 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ProtocolMasterCore.Utility;
+using ProtocolMasterWPF.Model;
+using System;
 
 namespace ProtocolMasterWPF.ViewModel
 {
-    internal enum SessionState
-    {
-        NotReady,
-        Selecting,
-        Ready,
-        Running,
-        Viewing,
-    }
     internal class SessionControlViewModel : ViewModelBase
     {
-        private Object selection;
+        Session ViewSession { get; set; }
         SessionState state = SessionState.NotReady;
         SessionState State { get => state; set { state = value; NotifyStateProperties(); } }
-        private Object Selection
+        public IStreamStarter _selection;
+        public IStreamStarter Selection
         {
-            get => selection;
-            set
+            get => _selection;
+            private set
             {
-                selection = value;
+                _selection = value;
                 // Check validity and set state!
-                if (selection != null) State = SessionState.Ready;
+                if (_selection.GetType() != typeof(NoFileSelection)) State = SessionState.Ready;
                 else State = SessionState.NotReady;
                 OnPropertyChanged();
+                OnPropertyChanged("SelectionObject");
             }
         }
+        public object SelectionObject => (object)Selection;
         public bool CanStart { get => State == SessionState.Ready; }
         public bool CanStop { get => State == SessionState.Running; }
         public bool CanPreview { get => State == SessionState.Ready; }
@@ -38,9 +31,10 @@ namespace ProtocolMasterWPF.ViewModel
         public bool CanSelect { get => State == SessionState.Ready || State == SessionState.NotReady; }
         public bool IsSelecting { get => State == SessionState.Selecting; }
 
-        public SessionControlViewModel()
+        public SessionControlViewModel(Session viewSession)
         {
-            Selection = new object();
+            Selection = new NoFileSelection();
+            ViewSession = viewSession;
         }
         private void NotifyStateProperties()
         {
@@ -71,7 +65,7 @@ namespace ProtocolMasterWPF.ViewModel
         {
             if (CanReset || overrideCheck)
             {
-                if(Selection != null)
+                if (Selection != null)
                     State = SessionState.Ready;
                 else
                     State = SessionState.NotReady;
@@ -94,14 +88,23 @@ namespace ProtocolMasterWPF.ViewModel
             }
             else throw new Exception("Cannot open selection in state " + State.ToString());
         }
-        public void MakeSelection()
+        public void MakeSelection(object select)
         {
-            Selection = new Object();
-            Reset(true);
+            if (typeof(IStreamStarter).IsAssignableFrom(select.GetType()))
+            {
+                Selection = (IStreamStarter)select;
+                Log.Error($"Making selection: {Selection}");
+                Reset(true);
+            }
+            else
+            {
+                Log.Error($"Object {Selection} not of type {typeof(IStreamStarter)}");
+                CancelSelection();
+            }
         }
         public void CancelSelection()
         {
-            Selection = null;
+            Log.Error($"Cancelling selection");
         }
     }
 }

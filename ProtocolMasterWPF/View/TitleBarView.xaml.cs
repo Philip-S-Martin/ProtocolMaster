@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ProtocolMasterWPF.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ProtocolMasterWPF.View
 {
@@ -23,8 +12,8 @@ namespace ProtocolMasterWPF.View
         public TitleBarView()
         {
             InitializeComponent();
+            DataContext = new TitleBarViewModel();
         }
-
         private void Minimize_Click(object sender, RoutedEventArgs e)
         {
             Window.GetWindow(this).WindowState = WindowState.Minimized;
@@ -39,11 +28,18 @@ namespace ProtocolMasterWPF.View
         {
             Window.GetWindow(this).Close();
         }
-
-        int logCounter = 0;
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void LogTest_Click(object sender, RoutedEventArgs e)
         {
-            ProtocolMasterCore.Utility.Log.Out($"Test: {logCounter}");
+            ProtocolMasterCore.Utility.Log.Out($"Testing output log");
+            ProtocolMasterCore.Utility.Log.Error($"Testing error log");
+        }
+        private void GoogleAuthButton_Click(object sender, RoutedEventArgs e)
+        {
+            ((App)App.Current).GoogleAuthenticate();
+        }
+        private void GoogleDeauthButton_Click(object sender, RoutedEventArgs e)
+        {
+            ((App)App.Current).GoogleDeauthenticate();
         }
     }
 }

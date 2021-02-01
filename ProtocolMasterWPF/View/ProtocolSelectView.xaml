@@ -12,7 +12,7 @@
             <helpers:NotNullToBoolConverter x:Key="NotNullToBoolConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
-    <StackPanel Margin="16">
+    <StackPanel Margin="1">
         <TextBlock Text="Select a Protocol" 
                    HorizontalAlignment="Center" 
                    Margin="8"
@@ -21,41 +21,39 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition/>
+                <RowDefinition Height="300"/>
             </Grid.RowDefinitions>
-            <ListBox
-                x:Name ="SelectList" ItemsSource="{Binding Options}"
-                Grid.Row="1" Height="300"/>
-            <Border Grid.Row="0" BorderBrush="{DynamicResource SecondaryHueDarkBrush}" BorderThickness="0,0,0,1">
-                <Grid Width="500">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <RadioButton
+            <Grid Grid.Row="1" Background="{DynamicResource DefaultHueDarkBrush}">
+                <local:DriveSelectView x:Name="DriveSelect" Visibility="{Binding Path=IsChecked, ElementName=DriveTab, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </Grid>
+            <Grid Grid.Row="0" Width="500">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <RadioButton
                         Grid.Column="0"
                         x:Name="DriveTab"
                         Style="{StaticResource MaterialDesignTabRadioButton}"
                         IsChecked="True"
                         Checked="DriveTab_Checked"
                         Content="Google Drive"/>
-                    <RadioButton
+                <RadioButton
                         Grid.Column="1"
                         x:Name="PublishedTab"
                         Style="{StaticResource MaterialDesignTabRadioButton}"
                         IsChecked="False"
                         Checked="PublishedTab_Checked"
                         Content="Published"/>
-                    <RadioButton
+                <RadioButton
                         Grid.Column="2"
                         x:Name="LocalTab"
                         Style="{StaticResource MaterialDesignTabRadioButton}"
                         IsChecked="False"
                         Checked="LocalTab_Checked"
                         Content="Local Folder"/>
-                </Grid>
-            </Border>
+            </Grid>
         </Grid>
 
         <Grid>
@@ -63,26 +61,19 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="8">
-                <Button Width="Auto" Margin="8">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="Google" VerticalAlignment="Center" Margin="2,0"/>
-                        <TextBlock Text="Sign In" VerticalAlignment="Center" Margin="2,0"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
+
             <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal" Margin="8">
                 <Button x:Name="CancelButton" Click="CancelButton_Click"
                     IsCancel="True"
-                    Content="CANCEL"
-                    Style="{StaticResource MaterialDesignFlatButton}">
+                    Content="Cancel"
+                    Style="{StaticResource MaterialDesignForegroundFlatButton}">
                     <Button.CommandParameter>
                         <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">False</system:Boolean>
                     </Button.CommandParameter>
                 </Button>
 
                 <Button x:Name="SelectButton" Click="SelectButton_Click"
-                    IsEnabled="{Binding Path=SelectedItem, ElementName=SelectList, Converter={StaticResource NotNullToBoolConverter}}"
+                    IsEnabled="{Binding SelectList.SelectedItem, Converter={StaticResource NotNullToBoolConverter}}"
                     IsDefault="True"
                     Content="Select"
                     Margin="8, 0, 0, 0"

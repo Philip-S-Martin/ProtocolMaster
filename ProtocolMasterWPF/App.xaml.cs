@@ -1,10 +1,7 @@
 ﻿using ProtocolMasterCore.Utility;
+using ProtocolMasterWPF.Model.Google;
 using ProtocolMasterWPF.ViewModel;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -19,6 +16,7 @@ namespace ProtocolMasterWPF
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             InitializeLog();
+            GAuth.Instance.PostAuthentication += AuthenticationRefocus;
         }
         private void InitializeLog()
         {
@@ -29,6 +27,20 @@ namespace ProtocolMasterWPF
             Log.Error("Error Log Running");
             Task logThreadTask = new Task(() => Log.Error("Log working in parallel thread"));
             logThreadTask.Start();
+        }
+
+        private void AuthenticationRefocus(object sender, EventArgs e)
+        {
+            MainWindow.Activate();
+        }
+
+        public async void GoogleAuthenticate()
+        {
+            await GAuth.Instance.Authenticate(GDrive.Instance);
+        }
+        public async void GoogleDeauthenticate()
+        {
+            await GAuth.Instance.DeAuthenticate();
         }
     }
 }

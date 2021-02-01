@@ -1,17 +1,15 @@
-﻿using System;
+﻿using ProtocolMasterCore.Protocol.Driver;
+using ProtocolMasterCore.Protocol.Interpreter;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ProtocolMasterCore.Protocol.Interpreter;
-using ProtocolMasterCore.Protocol.Driver;
-using ProtocolMasterCore.Prompt;
 
 namespace ProtocolMasterCore.Protocol
 {
-    internal class ExtensionSystem
+    public class InterpretAndDriveProtocol
     {
         // Import All Extensions so that they can be Composed (ComposeParts())
         public DriverManager DriverManager { get; private set; }
@@ -28,7 +26,7 @@ namespace ProtocolMasterCore.Protocol
         private CancellationToken cancelToken;
         private CancellationTokenSource tokenSource;
 
-        public ExtensionSystem(string directory)
+        public InterpretAndDriveProtocol(string directory)
         {
             isRunning = false;
             isReady = false;
@@ -41,8 +39,7 @@ namespace ProtocolMasterCore.Protocol
             catalog.Catalogs.Add(new DirectoryCatalog(directory));
             _container = new CompositionContainer(catalog);
         }
-
-        ~ExtensionSystem()
+        ~InterpretAndDriveProtocol()
         {
             Terminate();
         }
@@ -76,16 +73,6 @@ namespace ProtocolMasterCore.Protocol
                 }));
                 return InterpreterManager.GenerateData(selectionID, argument, fs);
             }, TaskCreationOptions.LongRunning);
-
-            Task UITask = generator.ContinueWith((data) =>
-            {
-                List<ProtocolEvent> result = generator.Result;
-                Data = result;
-                if (result != null)
-                {
-                    InterpreterManager.OnEventsLoaded(result);
-                }
-            });
         }
         public void Run()
         {
@@ -103,21 +90,17 @@ namespace ProtocolMasterCore.Protocol
                 isRunning = true;
                 Progress<DriverProgress> driverProgress = new Progress<DriverProgress>();
 
-                Task UITask = generator.ContinueWith((data) =>
+                runTask = Task.Run(new Action(() =>
                 {
-                    runTask = Task.Run(new Action(() =>
+                    cancelToken.Register(new Action(() =>
                     {
-                        cancelToken.Register(new Action(() =>
+                        if (DriverManager.IsRunning)
                         {
-                            if (DriverManager.IsRunning)
-                            {
-                                DriverManager.CancelRunningExtension();
-                            }
-                        }));
-                        DriverManager.Run(Data);
-                    }), tokenSource.Token);
-
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                            DriverManager.CancelRunningExtension();
+                        }
+                    }));
+                    DriverManager.Run(Data);
+                }), tokenSource.Token);
             }
         }
 

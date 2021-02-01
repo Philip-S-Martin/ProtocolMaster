@@ -16,15 +16,16 @@
             </Grid.ColumnDefinitions>
 
             <Menu Grid.Column="1" Margin="2">
-                <MenuItem Padding="6">
+                <MenuItem Padding="10">
                     <MenuItem.Header>
-                        <Image Height="36" Width="36" Source="/ProtocolMasterWPF;component/Assets/Logo/LogoSquare480.png"></Image>
+                        <Image RenderOptions.BitmapScalingMode="HighQuality" Height="28" Width="28" Source="/ProtocolMasterWPF;component/Assets/Logo/LogoSquare480.png"></Image>
                     </MenuItem.Header>
                     <MenuItem Header="ProtocolMaster" IsEnabled="False" />
                     <Separator/>
                     <MenuItem Header="Website"/>
                     <MenuItem Header="Github" />
                     <MenuItem Header="Release Notes" />
+                    <MenuItem Header="Debug Options" x:Name="DebugToggle" IsCheckable="True"/>
                 </MenuItem>
                 <MenuItem Header="File">
                     <MenuItem Header="Log Folder" />
@@ -36,12 +37,28 @@
                     <MenuItem Header="User Guide" />
                     <MenuItem Header="Technical Documentation" />
                 </MenuItem>
-                <MenuItem Header="Debug">
-                    <MenuItem Header="Log Test" Click="MenuItem_Click"/>
-                    <MenuItem Header="User Guide" />
-                    <MenuItem Header="Technical Documentation" />
+                <MenuItem Header="Debug" Visibility="{Binding ElementName=DebugToggle, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <MenuItem Header="Log Test" Click="LogTest_Click"/>
                 </MenuItem>
+    
             </Menu>
+
+            <StackPanel Grid.Column="2" HorizontalAlignment="Right"  Margin="2,2,16,2" Orientation="Horizontal">
+                <Button x:Name="GoogleAuthButton" Style="{StaticResource MaterialDesignForegroundFlatButton}"
+                        Width="Auto" Margin="0" Padding="4,0" Click="GoogleAuthButton_Click" Visibility="{Binding Auth.IsPreAuth, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Google" VerticalAlignment="Center" Margin="3,0"/>
+                            <TextBlock Text="Sign in with Google" VerticalAlignment="Center" Margin="3,0"/>
+                        </StackPanel>
+                </Button>
+                <TextBlock Text="Signing in, please check your browser" Margin="0" d:Visibility="Collapsed" VerticalAlignment="Center" IsEnabled="False" Visibility="{Binding Auth.IsDoAuth, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <Button x:Name="GoogleDeauthButton" Width="Auto" Margin="0" Padding="4,0" Style="{StaticResource MaterialDesignForegroundFlatButton}" d:Visibility="Collapsed" Click="GoogleDeauthButton_Click" Visibility="{Binding Auth.IsPostAuth, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Google" VerticalAlignment="Center" Margin="3,0"/>
+                            <TextBlock Text="Sign out" VerticalAlignment="Center" Margin="3,0"/>
+                        </StackPanel>
+                </Button>
+            </StackPanel>
 
             <StackPanel Grid.Column="3" Orientation="Horizontal">
                 <Button Click="Minimize_Click" Style="{DynamicResource MaterialDesignBackgroundIconButton}" Margin="2">

@@ -13,16 +13,21 @@
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel HorizontalAlignment="Left" Grid.Column="0" Orientation="Horizontal">
+        <Grid HorizontalAlignment="Left" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
             <Button x:Name="SelectButton" 
                     Style="{DynamicResource MaterialDesignBackgroundIconButton}" 
                     Margin="2" Height="50"
+                    Grid.Column="0"
                     Click="SelectButton_Click"
                     IsEnabled="{Binding CanSelect}">
                 <materialDesign:PackIcon Kind="FileFind" VerticalAlignment="Center" Margin="2"/>
             </Button>
-            <TextBlock Style="{DynamicResource MaterialDesignTextBlock}" Name="ProtocolLabel" VerticalAlignment="Center" Margin="4" FontSize="12">No Protocol</TextBlock>
-        </StackPanel>
+            <TextBlock Style="{DynamicResource MaterialDesignTextBlock}" Grid.Column="1" TextWrapping="WrapWithOverflow" Name="ProtocolLabel" VerticalAlignment="Center" Margin="4" FontSize="12" Text="{Binding SelectionObject}"/>
+        </Grid>
         <StackPanel  Grid.Column="1">
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                 <Button x:Name="PreviewButton" Style="{DynamicResource MaterialDesignBackgroundIconButton}" IsEnabled="{Binding CanPreview}" Click="PreviewButton_Click" Margin="2">

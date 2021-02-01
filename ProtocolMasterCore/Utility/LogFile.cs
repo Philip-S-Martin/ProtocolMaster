@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ProtocolMasterCore.Utility
 {
     class LogFile
     {
-        private List<String> buffer;
-        private long writeAfter;
+        ConcurrentQueue<string> inputbuffer;
         private string filePath;
         private string tempPath;
         bool tempFail;
@@ -16,55 +18,58 @@ namespace ProtocolMasterCore.Utility
         public LogFile(string filePath)
         {
             this.filePath = filePath;
-            buffer = new List<string>();
+            inputbuffer = new ConcurrentQueue<string>();
+            Task fileWriter = Task.Factory.StartNew(() =>
+            {
+                while (true)
+                {
+                    if (tempFail || !inputbuffer.IsEmpty) WriteBuffer();
+                    else Thread.Sleep(1000);
+                }
+            }, TaskCreationOptions.LongRunning);
         }
 
-        public void Write(string message, bool deepWrite = false)
+        public void Write(string message)
         {
-            StringBuilder builder = new StringBuilder(DateTime.Now.ToString());
-            builder.Append("\t");
-            builder.Append(message);
-            string output = builder.ToString();
-
-            buffer.Add(output);
-
-            if (deepWrite || DateTime.Now.Ticks > writeAfter)
-            {
-                WriteBuffer();
-            }
+            inputbuffer.Enqueue(message);
         }
 
         public void WriteBuffer()
         {
             try
             {
-                File.AppendAllLines(filePath, buffer);
+                StreamWriter writer = File.AppendText(filePath);
                 if (tempFail)
                 {
+                    using (Stream input = File.OpenRead(tempPath))
+                    {
+                        input.CopyTo(writer.BaseStream); // Using .NET 4
+                    }
                     if (File.Exists(tempPath))
                         File.Delete(tempPath);
                     tempFail = false;
                 }
+                while (inputbuffer.TryDequeue(out string append))
+                    writer.WriteLine(append);
+                writer.Close();
             }
             catch (IOException)
             {
                 tempFail = true;
-                tempPath = filePath + "[temp]";
-                Write("Failed to open log at " + filePath + " attempting " + tempPath + " instead.");
+                tempPath = $"[temp]{filePath}";
+                Log.Out($"Failed to open log at {filePath} attempting {tempPath} instead.");
                 try
                 {
-                    File.AppendAllLines(tempPath, buffer);
+                    StreamWriter writer = File.AppendText(tempPath);
+                    while (inputbuffer.TryDequeue(out string append))
+                        writer.WriteLine(append);
+                    writer.Close();
                 }
                 catch (IOException)
                 {
-                    Write("Failed to open temporary log " + tempPath + " will wait to write buffer");
+                    Log.Out($"Failed to open temporary log {tempPath} will wait to write buffer");
                 }
             }
-
-
-            if (!tempFail) buffer = new List<string>();
-
-            writeAfter = DateTime.Now.Ticks + (5 * 10000000);
         }
     }
 }

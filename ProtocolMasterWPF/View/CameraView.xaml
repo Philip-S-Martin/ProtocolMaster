@@ -7,14 +7,22 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="{DynamicResource MaterialDesignDarkBackground}">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
         <Border BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"
-                        BorderThickness="2" Margin="2">
+                        BorderThickness="1" Margin="3">
             <ContentControl HorizontalContentAlignment="Stretch"
                         VerticalContentAlignment="Stretch"
                         Content="{Binding XamlHostCaptureElement}"
                         
                         />
         </Border>
-        
+        <!--
+        <StackPanel Grid.Row="1">
+            <Button Content="Camera Rec/Stop" Margin="32,0" Click="Button_Click"/>
+        </StackPanel>
+        -->
     </Grid>
 </UserControl>

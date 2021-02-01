@@ -1,9 +1,5 @@
 ﻿using ProtocolMasterCore.Protocol;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Schedulino.Generator
 {
@@ -12,7 +8,7 @@ namespace Schedulino.Generator
         public Sound sound;
         public SoundInterval previous;
         public SoundInterval next;
-        public SoundInterval(Sound sound, SoundInterval previous, uint begin, uint end):base(begin, end)
+        public SoundInterval(Sound sound, SoundInterval previous, uint begin, uint end) : base(begin, end)
         {
             this.sound = sound;
             this.previous = previous;

@@ -1,27 +1,24 @@
-﻿using System;
+﻿using ProtocolMasterCore.Prompt;
+using ProtocolMasterCore.Utility;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using System.Threading;
-using System.Threading.Tasks;
-using ProtocolMasterCore.Prompt;
 
 namespace ProtocolMasterCore.Protocol
 {
-    abstract class ExtensionManager<E, T> where T : IExtensionMeta where E : IExtension
+    public delegate void OptionsLoadedCallback(List<IExtensionMeta> options);
+    public abstract class ExtensionManager<E, T> where T : IExtensionMeta where E : IExtension
     {
         [ImportMany]
-        IEnumerable<ExportFactory<E, T>> AvailableExtensions { get; set; }
+        IEnumerable<ExportFactory<E, T>> Extensions { get; set; }
         ExportFactory<E, T> extensionFactory;
         ExportLifetimeContext<E> extensionContext;
         E extension;
-        public bool IsRunning { get => !isDisposed; }
+        internal bool IsRunning { get => !isDisposed; }
         bool isDisposed = true;
-
-        public event EventHandler OnOptionsLoaded;
-
-        private PromptTargetStore promptTargets = new PromptTargetStore();
-        public PromptTargetStore PromptTargets { get => promptTargets; set => promptTargets = value; }
+        public OptionsLoadedCallback OnOptionsLoaded { get; set; }
+        public PromptTargetStore PromptTargets { get; set; }
 
         public void LoadOptions(CompositionContainer container)
         {
@@ -31,25 +28,27 @@ namespace ProtocolMasterCore.Protocol
             }
             catch (CompositionException compositionException)
             {
-                //Debug.Log.Error(compositionException.ToString());
+                Log.Error(compositionException.ToString());
             }
 
-            foreach (ExportFactory<E, T> i in AvailableExtensions)
+            var extensionMeta = new List<IExtensionMeta>();
+            foreach (ExportFactory<E, T> i in Extensions)
             {
                 if (i.Metadata.Name == "None" && i.Metadata.Version == "")
                 {
                     Selected = i.Metadata;
                 }
-                //Debug.Log.Error(typeof(E).ToString() + " found: '" + i.Metadata.Name + "' version: '" + i.Metadata.Version + "'");
+                extensionMeta.Add(i.Metadata);
+                Log.Error($"{typeof(E)} found: '{i.Metadata.Name}' version: '{i.Metadata.Version}'");
             }
-            OnOptionsLoaded?.Invoke(this, new EventArgs());
+            OnOptionsLoaded?.Invoke(extensionMeta);
         }
         public IExtensionMeta Selected
         {
             get { return extensionFactory.Metadata; }
             set
             {
-                foreach (ExportFactory<E, T> i in AvailableExtensions)
+                foreach (ExportFactory<E, T> i in Extensions)
                 {
                     if (i.Metadata.Name == value.Name && i.Metadata.Version == value.Version)
                     {
@@ -64,7 +63,7 @@ namespace ProtocolMasterCore.Protocol
             get
             {
                 List<IExtensionMeta> optionsList = new List<IExtensionMeta>();
-                foreach (ExportFactory<E, T> i in AvailableExtensions)
+                foreach (ExportFactory<E, T> i in Extensions)
                 {
                     optionsList.Add(i.Metadata);
                 }

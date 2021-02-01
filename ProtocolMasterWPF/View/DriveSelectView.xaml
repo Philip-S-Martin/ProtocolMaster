@@ -7,21 +7,15 @@
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="400">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Width="Auto" Margin="8">
+        <ListBox x:Name ="SelectListBox" ItemsSource="{Binding Drive.AvailableFiles}" Visibility="{Binding Auth.IsPostAuth, Converter={StaticResource BooleanToVisibilityConverter}}"
+                VerticalAlignment="Stretch"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding Auth.IsPreAuth, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Button Width="Auto" Margin="8"  Click="SignIn_Click">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Google" VerticalAlignment="Center" Margin="2,0"/>
-                    <TextBlock Text="Sign In" VerticalAlignment="Center" Margin="2,0"/>
+                    <TextBlock Text="Sign in with Google" VerticalAlignment="Center" Margin="2,0"/>
                 </StackPanel>
             </Button>
         </StackPanel>
-
-        <ListBox
-                x:Name ="SelectList" ItemsSource="{Binding Options}"
-                Grid.Row="1" Height="300"/>
     </Grid>
 </UserControl>

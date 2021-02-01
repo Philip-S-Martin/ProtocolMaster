@@ -7,14 +7,14 @@ namespace ProtocolMasterCore.Protocol
         public string Handler { get; private set; }
         public string CategoryLabel { get; private set; }
         public string ParentLabel { get; private set; }
-        
+
         public Dictionary<string, string> Arguments { get; private set; }
 
         public ProtocolEvent(string handler, params KeyValuePair<string, string>[] args)
         {
             this.Handler = handler;
             Arguments = new Dictionary<string, string>();
-            foreach(KeyValuePair<string, string> arg in args)
+            foreach (KeyValuePair<string, string> arg in args)
             {
                 Arguments.Add(arg.Key, arg.Value);
             }

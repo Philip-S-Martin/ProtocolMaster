@@ -1,9 +1,6 @@
 ﻿using ProtocolMasterCore.Protocol;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Schedulino.Generator
 {
@@ -147,7 +144,7 @@ namespace Schedulino.Generator
                     prevSoundInterval = si;
                 }
                 exp_end = potential_end;
-            }            
+            }
         }
 
         private void GeneratePreSounds(ref UInt32 timeMs, ref SoundInterval prevSoundInterval)
@@ -335,7 +332,7 @@ namespace Schedulino.Generator
                 totalTime += duration[i] + between[i];
             }
             uint timeMs;
-            if (end-begin > totalTime)
+            if (end - begin > totalTime)
                 timeMs = begin + ((end - begin) - totalTime) / 2;
             else timeMs = begin - (totalTime - (end - begin)) / 2;
             for (int i = 0; i < stim.stims_per_sound; i++)

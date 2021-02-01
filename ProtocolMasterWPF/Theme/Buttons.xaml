@@ -35,4 +35,9 @@
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDarkForeground}"/>
         <Setter Property="BorderThickness" Value="2"/>
     </Style>
+
+    <Style x:Key="MaterialDesignForegroundFlatButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignDarkForeground}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
 </ResourceDictionary>

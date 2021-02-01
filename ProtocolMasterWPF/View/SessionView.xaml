@@ -14,7 +14,7 @@
             <RowDefinition Height="*" MinHeight="180"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <local:CameraView/>
         <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch"/>
         <Grid Grid.Row="2">
@@ -22,26 +22,24 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Border Grid.Row="0" BorderBrush="{DynamicResource SecondaryHueDarkBrush}" BorderThickness="0,0,0,1">
-                <StackPanel Orientation="Horizontal">
-                    <RadioButton
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <RadioButton
                         x:Name="TimelineTab"
                         Style="{StaticResource MaterialDesignTabRadioButton}"
                         IsChecked="True"
                         Content="Timeline"/>
-                    <RadioButton
+                <RadioButton
                         x:Name="LogTab"
                         Style="{StaticResource MaterialDesignTabRadioButton}"
                         IsChecked="False"
                         Content="Log"/>
-                </StackPanel>
-            </Border>
-            <local:TimelineView Grid.Row="1" Visibility="{Binding IsChecked, ElementName=TimelineTab, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-            <local:LogView Grid.Row="1" Visibility="{Binding IsChecked, ElementName=LogTab, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Stretch"/>
+            </StackPanel>
+            <Grid Grid.Row="1" Background="{DynamicResource DefaultHueDarkBrush}">
+                <local:TimelineView Visibility="{Binding IsChecked, ElementName=TimelineTab, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <local:LogView  Visibility="{Binding IsChecked, ElementName=LogTab, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Stretch"/>
+            </Grid>
         </Grid>
-        <Border Grid.Row="3" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0 1 0 0">
-            <local:SessionControlBarView/>
-        </Border>
+        <local:SessionControlBarView Grid.Row="3"/>
         <materialDesign:DialogHost Identifier="SessionDialog" Grid.RowSpan="4" DialogTheme="Inherit"/>
     </Grid>
 </UserControl>

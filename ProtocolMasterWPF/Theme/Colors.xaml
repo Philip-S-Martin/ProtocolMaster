@@ -2,6 +2,17 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:ProtocolMasterWPF.Theme">
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/MaterialDesignColor.Grey.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="DefaultHueLightBrush" Color="{StaticResource Primary100}" />
+            <SolidColorBrush x:Key="DefaultHueLightForegroundBrush" Color="{StaticResource Primary100Foreground}" />
+            <SolidColorBrush x:Key="DefaultHueMidBrush" Color="{StaticResource Primary500}" />
+            <SolidColorBrush x:Key="DefaultHueMidForegroundBrush" Color="{StaticResource Primary500Foreground}" />
+            <SolidColorBrush x:Key="DefaultHueDarkBrush" Color="{StaticResource Primary900}" />
+            <SolidColorBrush x:Key="DefaultHueDarkForegroundBrush" Color="{StaticResource Primary600Foreground}" />
+        </ResourceDictionary>
         <!-- primary colors -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

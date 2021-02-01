@@ -26,36 +26,12 @@ namespace ProtocolMasterWPF.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TargetSerialPort {
+        public string SessionConfig {
             get {
-                return ((string)(this["TargetSerialPort"]));
+                return ((string)(this["SessionConfig"]));
             }
             set {
-                this["TargetSerialPort"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string InterpreterExtension {
-            get {
-                return ((string)(this["InterpreterExtension"]));
-            }
-            set {
-                this["InterpreterExtension"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string DriverExtension {
-            get {
-                return ((string)(this["DriverExtension"]));
-            }
-            set {
-                this["DriverExtension"] = value;
+                this["SessionConfig"] = value;
             }
         }
     }
