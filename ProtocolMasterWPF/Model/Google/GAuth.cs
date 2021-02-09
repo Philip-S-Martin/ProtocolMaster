@@ -65,7 +65,7 @@ namespace ProtocolMasterWPF.Model.Google
             CancellationTokenSource cts = new CancellationTokenSource();
             cts.CancelAfter(40000);
 
-            Log.Error("Authenticate(): Launching OAuth");
+            Log.Error("Authenticate():  Launching OAuth");
 
             try
             {
@@ -79,16 +79,24 @@ namespace ProtocolMasterWPF.Model.Google
                      "user", cts.Token, userStore, receiver);
                 CreateServices(services);
             }
-            catch (Exception e)
+           catch (Exception e)
             {
                 State = GAuthState.PreAuth;
                 Log.Error($"Authentication Exception: {e.Message}");
+                return;
             }
-
-            State = GAuthState.PostAuth;
-            Log.Error("Authenticate(): User Fully Authenticated");
-            if (PostAuthentication != null)
-                PostAuthentication.Invoke(this, new EventArgs());
+            if (cts.Token.IsCancellationRequested)
+            {
+                State = GAuthState.PreAuth;
+                Log.Error("Authentication Failed");
+            }
+            else
+            {
+                State = GAuthState.PostAuth;
+                Log.Error("Authenticate(): User Fully Authenticated");
+                if (PostAuthentication != null)
+                    PostAuthentication.Invoke(this, new EventArgs());
+            }
         }
         private void CreateServices(IService[] services)
         {
@@ -108,7 +116,6 @@ namespace ProtocolMasterWPF.Model.Google
                     builder.Add(token);
                 }
             }
-
             return builder.ToArray();
         }
 
@@ -123,7 +130,6 @@ namespace ProtocolMasterWPF.Model.Google
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

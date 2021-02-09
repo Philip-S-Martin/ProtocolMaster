@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ProtocolMasterCore.Protocol.NullExtensions
 {
-    [DriverMeta("None", "")]
+    [DriverMeta("No Driver", "")]
     public class NullDriver : IDriver
     {
         public bool IsCanceled { get; set; }

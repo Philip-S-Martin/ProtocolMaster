@@ -18,8 +18,8 @@ namespace ProtocolMasterCore.Protocol
         internal bool IsRunning { get => !isDisposed; }
         bool isDisposed = true;
         public OptionsLoadedCallback OnOptionsLoaded { get; set; }
-        public PromptTargetStore PromptTargets { get; set; }
-
+        public PromptTargetStore PromptTargets { get => _promptTargets; set => _promptTargets = value; }
+        private PromptTargetStore _promptTargets = new PromptTargetStore();
         public void LoadOptions(CompositionContainer container)
         {
             try
@@ -50,12 +50,13 @@ namespace ProtocolMasterCore.Protocol
             {
                 foreach (ExportFactory<E, T> i in Extensions)
                 {
-                    if (i.Metadata.Name == value.Name && i.Metadata.Version == value.Version)
+                    if ((IExtensionMeta)i.Metadata == value)
                     {
                         extensionFactory = i;
+                        return;
                     }
                 }
-                throw new Exception($"No extension of type {typeof(E)} with name {value.Name} is loaded");
+                throw new Exception($"No extension of type {typeof(E)} of with metadata {value} is loaded");
             }
         }
         public IEnumerable<IExtensionMeta> Options

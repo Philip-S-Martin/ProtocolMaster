@@ -21,8 +21,6 @@ namespace ProtocolMasterCore.Protocol
         bool isRunning;
         bool isReady;
 
-        Task<List<ProtocolEvent>> generator;
-        private Task runTask;
         private CancellationToken cancelToken;
         private CancellationTokenSource tokenSource;
 
@@ -48,7 +46,7 @@ namespace ProtocolMasterCore.Protocol
             DriverManager.LoadOptions(_container);
             InterpreterManager.LoadOptions(_container);
         }
-        public void Interpret(string selectionID, string argument, FileStream fs)
+        public void Interpret(Stream stream, string argument = null)
         {
             if (isRunning)
             {
@@ -60,19 +58,7 @@ namespace ProtocolMasterCore.Protocol
                 //then fall through
             }
             isReady = true;
-            tokenSource = new CancellationTokenSource();
-            cancelToken = tokenSource.Token;
-            generator = Task.Factory.StartNew<List<ProtocolEvent>>(() =>
-            {
-                cancelToken.Register(new Action(() =>
-                {
-                    if (InterpreterManager.IsRunning)
-                    {
-                        InterpreterManager.CancelRunningExtension();
-                    }
-                }));
-                return InterpreterManager.GenerateData(selectionID, argument, fs);
-            }, TaskCreationOptions.LongRunning);
+            Data = InterpreterManager.GenerateData(stream, argument);
         }
         public void Run()
         {
@@ -89,22 +75,10 @@ namespace ProtocolMasterCore.Protocol
                 isReady = false;
                 isRunning = true;
                 Progress<DriverProgress> driverProgress = new Progress<DriverProgress>();
-
-                runTask = Task.Run(new Action(() =>
-                {
-                    cancelToken.Register(new Action(() =>
-                    {
-                        if (DriverManager.IsRunning)
-                        {
-                            DriverManager.CancelRunningExtension();
-                        }
-                    }));
-                    DriverManager.Run(Data);
-                }), tokenSource.Token);
+                DriverManager.Run(Data);
             }
         }
-
-        public void End()
+        public void Cancel()
         {
             if (!isRunning)
             {
@@ -120,8 +94,16 @@ namespace ProtocolMasterCore.Protocol
             }
             Terminate();
         }
-        public void Terminate()
+        private void Terminate()
         {
+            if (InterpreterManager.IsRunning)
+            {
+                InterpreterManager.CancelRunningExtension();
+            }
+            if (DriverManager.IsRunning)
+            {
+                DriverManager.CancelRunningExtension();
+            }
             if (tokenSource != null && !tokenSource.IsCancellationRequested)
                 tokenSource.Cancel();
             isRunning = false;

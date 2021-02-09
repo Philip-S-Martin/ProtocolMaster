@@ -48,7 +48,7 @@ namespace ProtocolMasterWPF.View
             Plot.Model = model;
             ResetPlot();
         }
-        private void ResetPlot()
+        public void ResetPlot()
         {
             PrepAnimator();
             Plot.Model.Series.Clear();
@@ -63,6 +63,8 @@ namespace ProtocolMasterWPF.View
             VerticalCategoryAxis.MinimumRange = VerticalCategoryAxis.AbsoluteMaximum - VerticalCategoryAxis.AbsoluteMinimum;
             Plot.Model.InvalidatePlot(true);
         }
+        public void LoadPlotDataInUIThread(List<ProtocolEvent> eventList)=>App.Current.Dispatcher.Invoke(() => LoadPlotData(eventList));
+        
         public void LoadPlotData(List<ProtocolEvent> eventList)
         {
             List<IntervalBarSeries> allSeries;
@@ -174,15 +176,17 @@ namespace ProtocolMasterWPF.View
                 AnimatorLoop(animationProgress, cancelToken);
             }, cancelToken);
         }
-        public void StartAnimator(object sender, EventArgs e)
+        public void StartAnimatorUIThread() => App.Current.Dispatcher.Invoke(() => StartAnimator());
+        public void StartAnimator()
         {
             Line.Color = OxyColors.Red;
             AnimatorTask.Start();
             start = DateTime.Now;
         }
-        public void EndAnimator(object sender, EventArgs e)
+        public void StopAnimatorUIThread() => App.Current.Dispatcher.Invoke(() => StopAnimator());
+        public void StopAnimator()
         {
-            tokenSource.Cancel();
+            tokenSource?.Cancel();
             Line.Color = OxyColors.Green;
             Plot.InvalidatePlot();
         }

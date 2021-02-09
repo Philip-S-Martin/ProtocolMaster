@@ -20,9 +20,6 @@ namespace ProtocolMasterWPF.ViewModel
         }
         public CaptureElement CapElement { get; set; }
         public WindowsXamlHost XamlHostCaptureElement { get; set; }
-        /// <summary>
-        /// Create / Host UWP CaptureElement
-        /// </summary>
         private void GetUwpCaptureElement()
         {
             XamlHostCaptureElement = new WindowsXamlHost

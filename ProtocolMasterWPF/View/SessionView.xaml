@@ -35,11 +35,11 @@
                         Content="Log"/>
             </StackPanel>
             <Grid Grid.Row="1" Background="{DynamicResource DefaultHueDarkBrush}">
-                <local:TimelineView Visibility="{Binding IsChecked, ElementName=TimelineTab, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                <local:LogView  Visibility="{Binding IsChecked, ElementName=LogTab, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Stretch"/>
+                <local:TimelineView x:Name="Timeline" Visibility="{Binding IsChecked, ElementName=TimelineTab, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <local:LogView x:Name="Log" Visibility="{Binding IsChecked, ElementName=LogTab, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Stretch"/>
             </Grid>
         </Grid>
-        <local:SessionControlBarView Grid.Row="3"/>
+        <local:SessionControlBarView x:Name="ControlBar" Grid.Row="3"/>
         <materialDesign:DialogHost Identifier="SessionDialog" Grid.RowSpan="4" DialogTheme="Inherit"/>
     </Grid>
 </UserControl>

@@ -9,12 +9,13 @@ namespace ProtocolMasterCore.Protocol.Interpreter
     {
         IInterpreter interpreter;
         public ProtocolEventsLoader OnEventsLoaded;
-        internal List<ProtocolEvent> GenerateData(string selectionID, string argument, Stream stream)
+        internal List<ProtocolEvent> GenerateData(Stream stream, string argument = null)
         {
             interpreter = CreateSelectedExtension();
 
             if (typeof(ExcelDataInterpreter).IsAssignableFrom(interpreter.GetType()))
             {
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
                 ExcelDataInterpreter spreadSheetInterpreter = interpreter as ExcelDataInterpreter;
                 if (stream != null)
                     spreadSheetInterpreter.SetReader(ExcelReaderFactory.CreateReader(stream));

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 
 namespace ProtocolMasterCore.Protocol.Driver
 {
+    public delegate void DriverTimeEvent();
     public class DriverManager : ExtensionManager<IDriver, DriverMeta>
     {
         IDriver driver;
-        public event EventHandler OnProtocolStart;
-        public event EventHandler OnProtocolEnd;
+        public DriverTimeEvent OnProtocolStart;
+        public DriverTimeEvent OnProtocolEnd;
         internal bool Run(List<ProtocolEvent> data)
         {
             bool didStart = false;
@@ -15,9 +16,9 @@ namespace ProtocolMasterCore.Protocol.Driver
             if (driver.Setup(data))
             {
                 didStart = true;
-                OnProtocolStart?.Invoke(this, new EventArgs());
+                OnProtocolStart?.Invoke();
                 driver.Start();
-                OnProtocolEnd?.Invoke(this, new EventArgs());
+                OnProtocolEnd?.Invoke();
             }
             DisposeSelectedExtension();
             return didStart;

@@ -9,10 +9,5 @@ namespace ProtocolMasterWPF.ViewModel
     {
         public GAuth Auth { get => GAuth.Instance; }
         public GDrive Drive { get => GDrive.Instance; }
-
-        public DriveSelectViewModel()
-        {
-            
-        }
     }
 }

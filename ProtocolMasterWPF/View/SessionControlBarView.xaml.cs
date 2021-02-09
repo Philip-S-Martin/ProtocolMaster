@@ -1,4 +1,6 @@
 ﻿using MaterialDesignThemes.Wpf;
+using ProtocolMasterCore.Protocol;
+using ProtocolMasterWPF.Model;
 using ProtocolMasterWPF.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,12 +12,11 @@ namespace ProtocolMasterWPF.View
     /// </summary>
     public partial class SessionControlBarView : UserControl
     {
-        private SessionControlViewModel _sessionControl;
-        internal SessionControlViewModel SessionControl { get => _sessionControl; set { _sessionControl = value; DataContext = _sessionControl; } }
+        internal Session SessionControl { get => _sessionControl; set { _sessionControl = value; DataContext = _sessionControl; } }
+        private Session _sessionControl;
         public SessionControlBarView()
         {
             InitializeComponent();
-            SessionControl = new SessionControlViewModel();
         }
         private void PreviewButton_Click(object sender, RoutedEventArgs e) => SessionControl.Preview();
         private void StartButton_Click(object sender, RoutedEventArgs e) => SessionControl.Start();
@@ -27,5 +28,14 @@ namespace ProtocolMasterWPF.View
             else SessionControl.MakeSelection(eventArgs.Parameter);
         }
         private void SelectButton_Click(object sender, RoutedEventArgs e) => DialogHost.Show(new ProtocolSelectView(), SelectDialog_OnDialogClosing);
+
+        private void Interpreter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SessionControl.Protocol.InterpreterManager.Selected = (IExtensionMeta)((ComboBox)sender).SelectedItem;
+        }
+        private void Driver_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SessionControl.Protocol.DriverManager.Selected = (IExtensionMeta)((ComboBox)sender).SelectedItem;
+        }
     }
 }
