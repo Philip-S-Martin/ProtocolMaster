@@ -7,11 +7,6 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:helpers="clr-namespace:ProtocolMasterWPF.Helpers"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <helpers:NotNullToBoolConverter x:Key="NotNullToBoolConverter"/>
-        </ResourceDictionary>
-    </UserControl.Resources>
     <StackPanel Margin="1">
         <TextBlock Text="Select a Protocol" 
                    HorizontalAlignment="Center" 

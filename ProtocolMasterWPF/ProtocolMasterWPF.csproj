@@ -4,7 +4,7 @@
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<UseWPF>true</UseWPF>
-		<ApplicationIcon>C:\Source\Philip-S-Martin\ProtocolMaster\ProtocolMasterWPF\Assets\Logo\LogoSquareIcon.ico</ApplicationIcon>
+		<ApplicationIcon>Assets\Logo\LogoSquareIcon.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 	</PropertyGroup>
 

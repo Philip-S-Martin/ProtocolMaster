@@ -27,7 +27,7 @@ namespace ProtocolMasterWPF.View
             if (eventArgs.Parameter == null) SessionControl.CancelSelection();
             else SessionControl.MakeSelection(eventArgs.Parameter);
         }
-        private void SelectButton_Click(object sender, RoutedEventArgs e) => DialogHost.Show(new ProtocolSelectView(), SelectDialog_OnDialogClosing);
+        private void SelectButton_Click(object sender, RoutedEventArgs e) => DialogHost.Show(new ProtocolSelectView(), "SessionDialog", SelectDialog_OnDialogClosing);
 
         private void Interpreter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

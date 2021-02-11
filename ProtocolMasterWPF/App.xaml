@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:ProtocolMasterWPF"
              StartupUri="MainWindow.xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:materialExtension="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml"
+             xmlns:materialExtension="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml" xmlns:helpers="clr-namespace:ProtocolMasterWPF.Helpers"
              Startup="Application_Startup">
     <Application.Resources>
         <ResourceDictionary>
@@ -15,6 +15,10 @@
 
                 <ResourceDictionary Source="Theme/Colors.xaml"/>
                 <ResourceDictionary Source="Theme/Buttons.xaml"/>
+
+                <ResourceDictionary>
+                    <helpers:NotNullToBoolConverter x:Key="NotNullToBoolConverter"/>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -1,5 +1,7 @@
-﻿using ProtocolMasterWPF.Model;
+﻿using ProtocolMasterCore.Prompt;
+using ProtocolMasterWPF.Model;
 using System.Windows.Controls;
+using ProtocolMasterWPF;
 
 namespace ProtocolMasterWPF.View
 {
@@ -19,6 +21,11 @@ namespace ProtocolMasterWPF.View
             SessionControl.Protocol.DriverManager.OnProtocolStart += Timeline.StartAnimatorUIThread;
             SessionControl.OnStop += Timeline.StopAnimatorUIThread;
             SessionControl.OnReset += Timeline.ResetPlot;
+            PromptTargetStore promptTargets = new PromptTargetStore();
+            promptTargets.UserSelect = DropdownDialog.DropdownUserSelect;
+            
+            SessionControl.Protocol.DriverManager.PromptTargets = promptTargets;
+            SessionControl.Protocol.InterpreterManager.PromptTargets = promptTargets;
         }
     }
 }

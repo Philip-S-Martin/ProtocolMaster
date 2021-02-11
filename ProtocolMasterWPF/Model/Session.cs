@@ -96,7 +96,7 @@ namespace ProtocolMasterWPF.Model
                 }, CancelSource.Token);
                 SessionTask.Start();
             }
-            else throw new Exception("Cannot start in state " + State.ToString());
+            else throw new Exception($"Cannot start in state {State.ToString()}");
         }
         public void Stop(bool overrideCheck = false)
         {
@@ -106,7 +106,7 @@ namespace ProtocolMasterWPF.Model
                 CancelSource.Cancel();
                 State = SessionState.Viewing;
             }
-            else throw new Exception("Cannot stop in state " + State.ToString());
+            else throw new Exception($"Cannot stop in state {State.ToString()}");
         }
         public void Reset(bool overrideCheck = false)
         {
@@ -119,7 +119,7 @@ namespace ProtocolMasterWPF.Model
                 else
                     State = SessionState.NotReady;
             }
-            else throw new Exception("Cannot reset in state " + State.ToString());
+            else throw new Exception($"Cannot reset in state {State.ToString()}");
         }
         public void Preview(bool overrideCheck = false)
         {
@@ -139,7 +139,7 @@ namespace ProtocolMasterWPF.Model
                 OnPreview?.Invoke();
                 State = SessionState.Viewing;
             }
-            else throw new Exception("Cannot preview in state " + State.ToString());
+            else throw new Exception($"Cannot preview in state {State.ToString()}");
         }
         public void OpenSelection(bool overrideCheck = false)
         {
@@ -147,7 +147,7 @@ namespace ProtocolMasterWPF.Model
             {
                 State = SessionState.Selecting;
             }
-            else throw new Exception("Cannot open selection in state " + State.ToString());
+            else throw new Exception($"Cannot open selection in state {State.ToString()}");
         }
         public void MakeSelection(object select)
         {

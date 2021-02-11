@@ -41,5 +41,6 @@
         </Grid>
         <local:SessionControlBarView x:Name="ControlBar" Grid.Row="3"/>
         <materialDesign:DialogHost Identifier="SessionDialog" Grid.RowSpan="4" DialogTheme="Inherit"/>
+        <materialDesign:DialogHost Identifier="PromptDialog" Grid.RowSpan="4" DialogTheme="Inherit"/>
     </Grid>
 </UserControl>
