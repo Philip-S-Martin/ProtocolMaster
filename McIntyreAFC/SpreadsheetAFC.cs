@@ -93,17 +93,17 @@ namespace McIntyreAFC
                 baseData.owner = DataReader.GetValue(headerMap["Owner"]).ToString();
                 baseData.sound_order = DataReader.GetValue(headerMap["Sound Order"]).ToString();
 
-                string extra_time_str = DataReader.GetValue(headerMap["Extra Time (seconds)"]).ToString();
-                string interval_min_str = DataReader.GetValue(headerMap["Inter-sound Interval Minimum (seconds)"]).ToString();
-                string interval_max_str = DataReader.GetValue(headerMap["Inter-sound Interval Maximum (seconds)"]).ToString();
+                string extra_time_str = DataReader.GetValue(headerMap["Extra Time (ms)"]).ToString();
+                string interval_min_str = DataReader.GetValue(headerMap["Inter-sound Interval Minimum (ms)"]).ToString();
+                string interval_max_str = DataReader.GetValue(headerMap["Inter-sound Interval Maximum (ms)"]).ToString();
 
                 baseData.Sounds.Add(new Sound(DataReader.GetValue(headerMap["Sound A"]).ToString()));
                 if (!DataReader.IsDBNull(headerMap["Sound B"]))
                     baseData.Sounds.Add(new Sound(DataReader.GetValue(headerMap["Sound B"]).ToString()));
 
-                baseData.extra_time = Convert.ToUInt32(extra_time_str) * 1000;
-                baseData.interval_min = Convert.ToUInt32(interval_min_str) * 1000;
-                baseData.interval_max = Convert.ToUInt32(interval_max_str) * 1000;
+                baseData.extra_time = Convert.ToUInt32(extra_time_str);
+                baseData.interval_min = Convert.ToUInt32(interval_min_str);
+                baseData.interval_max = Convert.ToUInt32(interval_max_str);
 
                 return true;
             }
@@ -198,9 +198,9 @@ namespace McIntyreAFC
                         sound.duration_pin = DataReader.GetValue(headerMap["Duration_Pin"]).ToString();
                         sound.sound_id = DataReader.GetValue(headerMap["Sound_ID"]).ToString();
 
-                        string duration_str = DataReader.GetValue(headerMap["Duration (seconds)"]).ToString();
+                        string duration_str = DataReader.GetValue(headerMap["Duration (ms)"]).ToString();
 
-                        sound.duration = Convert.ToUInt32(duration_str) * 1000;
+                        sound.duration = Convert.ToUInt32(duration_str);
                     }
                 }
                 return true;

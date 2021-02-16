@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ProtocolMasterCore.Protocol.NullExtensions
 {
-    [InterpreterMeta("No Interpreter", "")]
+    [InterpreterMeta("None Selected", "")]
     public class NullInterpreter : IInterpreter
     {
         public bool IsCanceled { get; set; }

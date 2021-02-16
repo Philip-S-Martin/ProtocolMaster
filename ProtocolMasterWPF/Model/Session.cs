@@ -1,10 +1,13 @@
 ﻿using ProtocolMasterCore.Protocol;
 using ProtocolMasterCore.Utility;
+using ProtocolMasterWPF.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Devices.Enumeration;
 
 namespace ProtocolMasterWPF.Model
 {
@@ -26,8 +29,12 @@ namespace ProtocolMasterWPF.Model
         CancellationToken CancelToken { get; set; }
         public List<IExtensionMeta> InterpreterOptions { get => _interpreterOptions; private set { _interpreterOptions = value; NotifyProperty(); } }
         private List<IExtensionMeta> _interpreterOptions;
+        public IExtensionMeta SelectedInterpreter { get => Protocol.InterpreterManager.Selected; set { Protocol.InterpreterManager.Selected = value; NotifyProperty(); } }
         public List<IExtensionMeta> DriverOptions { get => _driverOptions; private set { _driverOptions = value; NotifyProperty(); } }
         private List<IExtensionMeta> _driverOptions;
+        public IExtensionMeta SelectedDriver { get => Protocol.DriverManager.Selected; set { Protocol.DriverManager.Selected = value; NotifyProperty(); } }
+        public ClockAnimator Animator { get; private set; }
+        public CameraContainer Cam { get; private set; }
         SessionState State { get => _state; set { _state = value; NotifyStateProperties(); } }
         SessionState _state = SessionState.NotReady;
         public IStreamStarter Selection
@@ -44,7 +51,7 @@ namespace ProtocolMasterWPF.Model
             }
         }
         public IStreamStarter _selection;
-        public object SelectionObject => (object)Selection;
+        public object SelectionObject { get { if (Selection != null) return (object)Selection; else return "No Protocol Selected"; } }
         public bool CanStart { get => State == SessionState.Ready; }
         public bool CanStop { get => State == SessionState.Running; }
         public bool CanPreview { get => State == SessionState.Ready; }
@@ -58,7 +65,14 @@ namespace ProtocolMasterWPF.Model
             Protocol = new InterpretAndDriveProtocol(extensionDir);
             Protocol.InterpreterManager.OnOptionsLoaded += LoadInterpreterOptions;
             Protocol.DriverManager.OnOptionsLoaded += LoadDriverOptions;
+            Animator = new ClockAnimator();
+            Protocol.InterpreterManager.OnEventsLoaded += Animator.FindMaxTime;
+            Protocol.DriverManager.OnProtocolStart += Animator.StartAnimatorNow;
+            Protocol.DriverManager.OnProtocolEnd += Animator.StopAnimator;
             Protocol.LoadExtensions();
+            Cam = new CameraContainer();
+            OnStart += Cam.StartRecord;
+            OnStop += Cam.StopRecord;
         }
         private void LoadInterpreterOptions(List<IExtensionMeta> options) => InterpreterOptions = options;
         private void LoadDriverOptions(List<IExtensionMeta> options) => DriverOptions = options;
@@ -102,8 +116,8 @@ namespace ProtocolMasterWPF.Model
         {
             if (CanStop || overrideCheck)
             {
-                OnStop?.Invoke();
                 CancelSource.Cancel();
+                OnStop?.Invoke();
                 State = SessionState.Viewing;
             }
             else throw new Exception($"Cannot stop in state {State.ToString()}");

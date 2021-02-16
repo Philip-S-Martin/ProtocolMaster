@@ -1,17 +1,8 @@
 ﻿using MaterialDesignThemes.Wpf;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ProtocolMasterWPF.View
 {
@@ -20,7 +11,6 @@ namespace ProtocolMasterWPF.View
     /// </summary>
     public partial class DropdownDialog : UserControl, ISelectView
     {
-        public string Selected { get; private set; }
         public DropdownDialog(string[] options)
         {
             InitializeComponent();
@@ -41,7 +31,6 @@ namespace ProtocolMasterWPF.View
         public ListBox SelectList => SelectListBox;
         private void SelectButton_Click(object sender, RoutedEventArgs e)
         {
-            Selected = SelectList.SelectedItem as string;
             DialogHost.Close("PromptDialog", SelectList.SelectedItem);
         }
     }

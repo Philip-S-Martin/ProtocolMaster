@@ -6,6 +6,7 @@ using ProtocolMasterCore.Protocol;
 using ProtocolMasterWPF.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -26,11 +27,7 @@ namespace ProtocolMasterWPF.View
         LineAnnotation Line { get; set; }
         CategoryAxis VerticalCategoryAxis { get; set; }
         DateTimeAxis HorizontalTimeAxis { get; set; }
-        // Animator Properties
-        Task AnimatorTask { get; set; }
-        DateTime start;
-        Progress<int> animationProgress;
-        CancellationTokenSource tokenSource;
+
         private void SetUpPlot()
         {
             // Generate Model
@@ -50,7 +47,7 @@ namespace ProtocolMasterWPF.View
         }
         public void ResetPlot()
         {
-            PrepAnimator();
+            Line.X = 0;
             Plot.Model.Series.Clear();
             VerticalCategoryAxis.Labels.Clear();
             HorizontalTimeAxis.AbsoluteMinimum = -0.00001;
@@ -67,22 +64,27 @@ namespace ProtocolMasterWPF.View
         
         public void LoadPlotData(List<ProtocolEvent> eventList)
         {
-            List<IntervalBarSeries> allSeries;
-            List<string> labels;
-            List<double> gridLines;
-            CategoryNode.GeneratePlotData(CategoryNode.BuildTrees(eventList), out allSeries, out labels, out gridLines);
-
-            // GENERATE LABELS, GRIDLINES, ETC. FROM TREE!
-            VerticalCategoryAxis.Labels.Clear();
-            VerticalCategoryAxis.Labels.AddRange(labels);
-            gridLines.CopyTo(VerticalCategoryAxis.ExtraGridlines, 0);
-
             Plot.Model.Series.Clear();
-            foreach (IntervalBarSeries series in allSeries)
-                Plot.Model.Series.Add(series);
+
+            List<CategoryNode> nodes = CategoryNode.BuildTrees(eventList);
+            if (nodes != null)
+            {
+                List<IntervalBarSeries> allSeries;
+                List<string> labels;
+                List<double> gridLines;
+                CategoryNode.GeneratePlotData(nodes, out allSeries, out labels, out gridLines);
+
+                // GENERATE LABELS, GRIDLINES, ETC. FROM TREE!
+                VerticalCategoryAxis.Labels.Clear();
+                VerticalCategoryAxis.Labels.AddRange(labels);
+                VerticalCategoryAxis.ExtraGridlines = gridLines.ToArray();
+
+                foreach (IntervalBarSeries series in allSeries)
+                    Plot.Model.Series.Add(series);
+            }
             Plot.ResetAllAxes();
-            HorizontalTimeAxis.Minimum = 0;
-            VerticalCategoryAxis.AbsoluteMaximum = gridLines[gridLines.Count - 1] + 0.6;
+            HorizontalTimeAxis.Minimum = HorizontalTimeAxis.AbsoluteMinimum;
+            VerticalCategoryAxis.AbsoluteMaximum = VerticalCategoryAxis.ExtraGridlines.Max() + 0.6f;
             VerticalCategoryAxis.MaximumRange = VerticalCategoryAxis.AbsoluteMaximum - VerticalCategoryAxis.AbsoluteMinimum;
             VerticalCategoryAxis.MinimumRange = VerticalCategoryAxis.AbsoluteMaximum - VerticalCategoryAxis.AbsoluteMinimum;
             Plot.Model.InvalidatePlot(true);
@@ -164,48 +166,22 @@ namespace ProtocolMasterWPF.View
                 Y = 0
             };
         }
-        public void PrepAnimator()
-        {
-            Line.X = 0;
-            animationProgress = new Progress<int>();
-            tokenSource = new CancellationTokenSource();
-            CancellationToken cancelToken = tokenSource.Token;
-            animationProgress.ProgressChanged += AnimatorProgress;
-            AnimatorTask = new Task(() =>
-            {
-                AnimatorLoop(animationProgress, cancelToken);
-            }, cancelToken);
-        }
-        public void StartAnimatorUIThread() => App.Current.Dispatcher.Invoke(() => StartAnimator());
-        public void StartAnimator()
+        public void StartTime() => App.Current.Dispatcher.Invoke(() => StartTimeLocal());
+        private void StartTimeLocal()
         {
             Line.Color = OxyColors.Red;
-            AnimatorTask.Start();
-            start = DateTime.Now;
         }
-        public void StopAnimatorUIThread() => App.Current.Dispatcher.Invoke(() => StopAnimator());
-        public void StopAnimator()
+        public void StopTime() => App.Current.Dispatcher.Invoke(() => StopTimeLocal());
+        private void StopTimeLocal()
         {
-            tokenSource?.Cancel();
             Line.Color = OxyColors.Green;
             Plot.InvalidatePlot();
         }
-        void AnimatorProgress(object sender, int e)
+        public void UpdateTime(double elapsed, double duration) => App.Current.Dispatcher.Invoke(() => UpdateTimeLocal(elapsed, duration));
+        private void UpdateTimeLocal(double elapsed, double duration)
         {
-            if (!tokenSource.IsCancellationRequested)
-            {
-                Line.X = (DateTime.Now.ToOADate() - start.ToOADate());
-                Plot.InvalidatePlot();
-            }
-        }
-        void AnimatorLoop(IProgress<int> progress, CancellationToken cancelToken)
-        {
-            while (!cancelToken.IsCancellationRequested)
-            {
-                Thread.Sleep(192);
-                progress.Report(1);
-            }
-            progress.Report(0);
+            Line.X = elapsed;
+            Plot.InvalidatePlot();
         }
     }
 }

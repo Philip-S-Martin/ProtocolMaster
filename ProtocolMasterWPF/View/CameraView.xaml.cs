@@ -8,12 +8,9 @@ namespace ProtocolMasterWPF.View
     /// </summary>
     public partial class CameraView : UserControl
     {
-        CameraViewModel ViewModel { get; set; }
         public CameraView()
         {
             InitializeComponent();
-            ViewModel = new CameraViewModel();
-            DataContext = ViewModel;
         }
     }
 }

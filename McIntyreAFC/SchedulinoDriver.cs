@@ -5,6 +5,7 @@ using ProtocolMasterCore.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
+using System.Threading;
 
 namespace McIntyreAFC
 {
@@ -22,6 +23,7 @@ namespace McIntyreAFC
         SerialPort serial;
         public SerialPort Serial { get => serial; set => serial = value; }
         public UserSelectHandler UserSelectPrompt { private get; set; }
+        Thread driverThread;
 
         // Data processing handlers
         delegate void Handler(ProtocolEvent item);
@@ -69,21 +71,16 @@ namespace McIntyreAFC
             set
             {
                 isCanceled = true;
-                Log.Error("Cancelling McIntyreAFC");
-                //scheduleIndex = schedule.Count;
+                Log.Error("McInyreAFC CANCELLED");
                 Serial.Write("X");
-                while (serial.BytesToRead >= 1)
-                {
-                    int read = Serial.ReadByte();
-                    if (read != -1)
-                        Receive((char)read);
-                }
-                //Serial.Close();} }
+                ReadSerialBuffer(Serial);
             }
         }
 
         public bool Setup(List<ProtocolEvent> dataList)
         {
+            Log.Error("McIntyreAFC SETUP");
+            driverThread = Thread.CurrentThread;
             foreach (ProtocolEvent data in dataList)
             {
                 Handle(data);
@@ -110,57 +107,69 @@ namespace McIntyreAFC
                 BaudRate = 9600,
                 NewLine = "\n"
             };
+            Serial.DataReceived += DataReceiver;
             Serial.Open();
 
             // Handshake
             // Read serial buffer until arduino tells us how much capacity it has
             while (_state != ScheduleState.DONE && _capacity == 0)
             {
-                ReadSerialBuffer();
+                Thread.Sleep(8);
             }
-            // Pre-Load as many events as possible
-            while (_state != ScheduleState.DONE && _capacity > 0 && scheduleIndex < schedule.Count)
-            {
-                SendNextEvent();
-                ReadSerialBuffer();
-            }
+            // Send as many events as possible
+            while (_capacity > 0 && scheduleIndex < schedule.Count) 
+                while(SendNextEvent(Serial));
             return true;
         }
 
         public void Start()
         {
+            Log.Error("McIntyreAFC START");
             // Send start signal
             if (_state != ScheduleState.DONE)
             {
-                while (serial.IsOpen && !TrySendStartSignal())
+                while (!TrySendStartSignal())
                 {
-                    ReadSerialBuffer();
+                    Thread.Sleep(2);
                 }
             }
+            Log.Error($"McIntyreAFC STARTING:[state:{_state}]");
             // Send events and send serial data until Done event is recieved
             while (_state == ScheduleState.RUNNING)
             {
-                SendNextEvent();
-                ReadSerialBuffer();
+                Thread.Sleep(64);
             }
+            // Read remaining buffer
+            ReadSerialBuffer(Serial);
             if (serial.IsOpen) Serial.Close();
         }
-        private void SendNextEvent()
+        void DataReceiver(object sender, SerialDataReceivedEventArgs args)
         {
-            if (serial.IsOpen && _capacity > 0 && _serial_available >= 7 && scheduleIndex < schedule.Count)
+            if (_state != ScheduleState.DONE)
             {
+                ReadSerialBuffer(sender as SerialPort);
+                while (_state == ScheduleState.RUNNING && SendNextEvent(sender as SerialPort));
+            }
+        }
+        private bool SendNextEvent(SerialPort port)
+        {
+            if (port.IsOpen && _capacity > 0 && _serial_available >= 7 && scheduleIndex < schedule.Count)
+            {
+                Log.Error($"McIntyreAFC SENDEVENT:[scheduleIndex:{scheduleIndex}],[pinState:{schedule[scheduleIndex]}]");
                 byte[] bytes = schedule[scheduleIndex].ToBytes();
-                Serial.Write("E");
-                Serial.Write(bytes, 0, bytes.Length);
+                port.Write("E");
+                port.Write(bytes, 0, bytes.Length);
                 _serial_available -= 7;
                 _capacity--;
                 scheduleIndex++;
+                return true;
             }
+            else return false;
         }
 
         private bool TrySendStartSignal()
         {
-            if (serial.IsOpen && _serial_available > 0)
+            if (Serial.IsOpen && _serial_available > 0)
             {
                 Serial.Write("S");
                 _state = ScheduleState.RUNNING;
@@ -169,11 +178,11 @@ namespace McIntyreAFC
             return false;
         }
 
-        private void ReadSerialBuffer()
+        private void ReadSerialBuffer(SerialPort port)
         {
-            while (serial.IsOpen && serial.BytesToRead >= 1)
+            while (port.IsOpen && port.BytesToRead > 0)
             {
-                int read = Serial.ReadByte();
+                int read = port.ReadByte();
                 if (read != -1)
                     Receive((char)read);
             }
@@ -346,7 +355,7 @@ namespace McIntyreAFC
         {
             _capacity = Convert.ToUInt16(Serial.ReadLine());
             _serial_available = Convert.ToByte(Serial.ReadLine());
-            //Log.Error("McIntyreAFC CAPACITY\ncapacity:" + _capacity + "\nserial_available:" + _serial_available);
+            Log.Error($"McIntyreAFC CAPACITY:[capacity:{_capacity}],[serial_available:{_serial_available}]");
         }
         private void ErrorReceiver()
         {
@@ -354,14 +363,13 @@ namespace McIntyreAFC
             file = Convert.ToByte(Serial.ReadLine());
             error = Convert.ToByte(Serial.ReadLine());
             ext = Convert.ToByte(Serial.ReadLine());
-            //Log.Error("McIntyreAFC ERROR\nfile:" + file + "\nerror:" + error + "\next:" + ext); ;
-
+            Log.Error($"McIntyreAFC ERROR:[file:{file}],[error:{error}],[ext:{ext}]");
         }
         private void DoneReceiver()
         {
             _run_time = Convert.ToUInt32(Serial.ReadLine());
             _state = ScheduleState.DONE;
-            //Log.Error("McIntyreAFC DONE\nrun_time:" + _run_time + "\nstate:" + _state);
+            Log.Error($"McIntyreAFC DONE:[run_time:{_run_time}],[state:{_state}]");
         }
         private void ReportReceiver()
         {
@@ -370,12 +378,12 @@ namespace McIntyreAFC
             byte pin = Convert.ToByte(Serial.ReadLine());
             byte pinstate = Convert.ToByte(Serial.ReadLine());
             _capacity++;
-            //Log.Error("McIntyreAFC REPORT\nindex:" + index + "\ntime/otime:" + time + "/" + schedule[index].Time + "\npin:" + pin + "\npinstate:" + pinstate);
+            Log.Error($"McIntyreAFC REPORT:[index:{index}],[time:{time}],[otime:{schedule[index].Time}],[pin:{pin}],[pinstate:{pinstate}]");
         }
         private void ReplyReceiver()
         {
             _serial_available += 7;
-            //Log.Error("McIntyreAFC REPLY\nserial_available:" + _serial_available);
+            Log.Error($"McIntyreAFC REPLY:[serial_available:{_serial_available}]");
         }
         private void InvalidKeyReceiver()
         {

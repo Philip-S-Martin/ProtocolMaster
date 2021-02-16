@@ -2,6 +2,7 @@
 using ProtocolMasterCore.Utility;
 using ProtocolMasterWPF.Model;
 using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
@@ -12,10 +13,11 @@ namespace ProtocolMasterWPF.ViewModel
 {
     internal class CameraViewModel : ViewModelBase
     {
-        Camera Cam { get; set; }
-        internal CameraViewModel()
+        CameraContainer CamContainer { get; set; }
+        internal CameraViewModel(CameraContainer cam)
         {
-            Cam = new Camera();
+            CamContainer = cam;
+            CamContainer.PropertyChanged += CameraChangedEvent;
             GetUwpCaptureElement();
         }
         public CaptureElement CapElement { get; set; }
@@ -37,8 +39,21 @@ namespace ProtocolMasterWPF.ViewModel
             {
                 CapElement = captureElement;
                 CapElement.Stretch = Windows.UI.Xaml.Media.Stretch.Uniform;
-                CapElement.Source = Cam.MediaCap;
-                Cam.StartPreview();
+                CapElement.Source = CamContainer.Cam.MediaCap;
+                CamContainer.Cam.StartPreview();
+            }
+        }
+        private async void CameraChangedEvent(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Cam")
+            {
+                var cameraContainer = (CameraContainer)sender;
+                if (CapElement != null && cameraContainer != null)
+                {
+                    if (CapElement.Source != null) await CapElement.Source.StopPreviewAsync();
+                    CapElement.Source = CamContainer.Cam.MediaCap;
+                    CamContainer.Cam.StartPreview();
+                }
             }
         }
     }

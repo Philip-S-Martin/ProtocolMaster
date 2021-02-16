@@ -2,6 +2,7 @@
 using ProtocolMasterWPF.Model;
 using System.Windows.Controls;
 using ProtocolMasterWPF;
+using ProtocolMasterWPF.ViewModel;
 
 namespace ProtocolMasterWPF.View
 {
@@ -14,18 +15,23 @@ namespace ProtocolMasterWPF.View
         private Session _sessionControl;
         public SessionView()
         {
-            InitializeComponent();
             SessionControl = new Session();
-            ControlBar.SessionControl = SessionControl;
-            SessionControl.Protocol.InterpreterManager.OnEventsLoaded += Timeline.LoadPlotDataInUIThread;
-            SessionControl.Protocol.DriverManager.OnProtocolStart += Timeline.StartAnimatorUIThread;
-            SessionControl.OnStop += Timeline.StopAnimatorUIThread;
-            SessionControl.OnReset += Timeline.ResetPlot;
+
             PromptTargetStore promptTargets = new PromptTargetStore();
             promptTargets.UserSelect = DropdownDialog.DropdownUserSelect;
-            
             SessionControl.Protocol.DriverManager.PromptTargets = promptTargets;
             SessionControl.Protocol.InterpreterManager.PromptTargets = promptTargets;
+
+            InitializeComponent();
+            ControlBar.SessionControl = SessionControl;
+            CamView.DataContext = new CameraViewModel(SessionControl.Cam);
+            SessionControl.Protocol.InterpreterManager.OnEventsLoaded += Timeline.LoadPlotDataInUIThread;
+            SessionControl.OnStart += Timeline.StartTime;
+            SessionControl.OnStop += Timeline.StopTime;
+            SessionControl.OnReset += Timeline.ResetPlot;
+            SessionControl.Animator.OnUpdate += Timeline.UpdateTime;
+            SessionControl.Animator.OnUpdate += ControlBar.UpdateTime;
+
         }
     }
 }

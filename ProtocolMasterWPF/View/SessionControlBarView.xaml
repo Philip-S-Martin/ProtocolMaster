@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ProtocolMasterWPF.View" 
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:model="clr-namespace:ProtocolMasterWPF.Model"
              mc:Ignorable="d" 
              d:DesignHeight="80" d:DesignWidth="800">
     <Grid >
@@ -49,9 +49,9 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Style="{DynamicResource MaterialDesignTextBlock}" FontSize="12" Margin="0,4,8,4">1:33</TextBlock>
-                <ProgressBar Grid.Column="1" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignLinearProgressBar}" Value="15.5"/>
-                <TextBlock  Grid.Column="2" Style="{DynamicResource MaterialDesignTextBlock}" FontSize="12" Margin="8,4,0,4">10:00</TextBlock>
+                <TextBlock x:Name="ElapsedLabel" Style="{DynamicResource MaterialDesignTextBlock}" FontSize="12" Margin="0,4,8,4" Text="0:00"/>
+                <ProgressBar x:Name="TimeProgressBar" Grid.Column="1" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignLinearProgressBar}" Value="0"/>
+                <TextBlock x:Name="DurationLabel" Grid.Column="2" Style="{DynamicResource MaterialDesignTextBlock}" FontSize="12" Margin="8,4,0,4" Text="0:00"/>
             </Grid>
         </StackPanel>
 
@@ -69,14 +69,22 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource MaterialDesignHeadline6TextBlock}" HorizontalAlignment="Center" Margin="0,0,0,16 " Text="Session Options" />
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Interpreter: " VerticalAlignment="Center"/>
-                    <ComboBox Grid.Row="1" Grid.Column="1" SelectionChanged="Interpreter_SelectionChanged" Margin="8" Padding="8"
-                              ItemsSource="{Binding InterpreterOptions}" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Driver: " VerticalAlignment="Center"/>
-                    <ComboBox Grid.Row="2" Grid.Column="1" SelectionChanged="Driver_SelectionChanged" Margin="8" Padding="8"
-                              ItemsSource="{Binding DriverOptions}"  BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Interpreter:" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="InterpeterSelect" Grid.Row="1" Grid.Column="1" Margin="8" Padding="8"
+                              ItemsSource="{Binding InterpreterOptions}" SelectedValue="{Binding SelectedInterpreter, Mode=TwoWay}" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Driver:" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="DriverSelect" Grid.Row="2" Grid.Column="1" Margin="8" Padding="8"
+                              ItemsSource="{Binding DriverOptions}" SelectedValue="{Binding SelectedDriver, Mode=TwoWay}" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Camera:" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="CameraSelect" Grid.Row="3" Grid.Column="1" Margin="8" Padding="8"
+                              ItemsSource="{Binding Cam.VideoDevices}" SelectedValue="{Binding Cam.VideoDevice, Mode=TwoWay}" DisplayMemberPath="Name" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Microphone:" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="MicrophoneSelect" Grid.Row="4" Grid.Column="1" Margin="8" Padding="8"
+                              ItemsSource="{Binding Cam.AudioDevices}" SelectedValue="{Binding Cam.AudioDevice, Mode=TwoWay}" DisplayMemberPath="Name" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
                 </Grid>
             </materialDesign:PopupBox>
         </StackPanel>

@@ -18,14 +18,15 @@ namespace ProtocolMasterWPF.Helpers
         {
             this.Name = name;
             this.Children = new List<CategoryNode>();
-            Series = new IntervalBarSeries() 
-            { 
-                Title = name, 
-                StrokeThickness = 1.5, 
-                StrokeColor = OxyColors.Gray, 
-                FillColor = OxyColor.FromArgb(255, 16, 16, 16), 
-                BarWidth = 1.0, 
-                ToolTip = name };
+            Series = new IntervalBarSeries()
+            {
+                Title = name,
+                StrokeThickness = 1.5,
+                StrokeColor = OxyColors.Gray,
+                FillColor = OxyColor.FromArgb(255, 16, 16, 16),
+                BarWidth = 1.0,
+                ToolTip = name
+            };
         }
         public CategoryNode(string name, CategoryNode parent) : this(name)
         {
@@ -50,36 +51,38 @@ namespace ProtocolMasterWPF.Helpers
             allSeries = new List<IntervalBarSeries>();
             labels = new List<string>();
             gridLines = new List<double>();
-            for (int i = 0; i < rootNodes.Count; i++)
-            {
-                CategoryNode root = rootNodes[i];
-                root.SetSeriesData(fullIndex++, pallete[palleteIndex]);
-                allSeries.Add(root.Series);
-                labels.Add(root.Name);
-                gridLines.Add(linePos++);
-                Stack<CategoryNode> subtree = new Stack<CategoryNode>(root.Children);
-                while (subtree.Count != 0)
+            if (rootNodes != null)
+                for (int i = 0; i < rootNodes.Count; i++)
                 {
-                    CategoryNode subNode = subtree.Pop();
-                    subNode.SetSeriesData(fullIndex++, pallete[palleteIndex]);
-                    allSeries.Add(subNode.Series);
-                    labels.Add(subNode.Name);
+                    CategoryNode root = rootNodes[i];
+                    root.SetSeriesData(fullIndex++, pallete[palleteIndex]);
+                    allSeries.Add(root.Series);
+                    labels.Add(root.Name);
                     gridLines.Add(linePos++);
-                    foreach (CategoryNode child in subNode.Children)
-                        subtree.Push(child);
+                    Stack<CategoryNode> subtree = new Stack<CategoryNode>(root.Children);
+                    while (subtree.Count != 0)
+                    {
+                        CategoryNode subNode = subtree.Pop();
+                        subNode.SetSeriesData(fullIndex++, pallete[palleteIndex]);
+                        allSeries.Add(subNode.Series);
+                        labels.Add(subNode.Name);
+                        gridLines.Add(linePos++);
+                        foreach (CategoryNode child in subNode.Children)
+                            subtree.Push(child);
+                    }
+                    if (i < rootNodes.Count - 1)
+                    {
+                        palleteIndex = (palleteIndex + 1) % pallete.Length;
+                        linePos++;
+                        fullIndex++;
+                        labels.Add("");
+                    }
                 }
-                if (i < rootNodes.Count - 1)
-                {
-                    palleteIndex = (palleteIndex + 1) % pallete.Length;
-                    linePos++;
-                    fullIndex++;
-                    labels.Add("");
-                }
-            }
         }
         // The biggest ugliest mess in the universe!
         public static List<CategoryNode> BuildTrees(List<ProtocolEvent> eventList)
         {
+            if (eventList == null) return null;
             Dictionary<string, CategoryNode> nodeDictionary = new Dictionary<string, CategoryNode>();
             List<CategoryNode> rootNodes = new List<CategoryNode>();
             Queue<ProtocolEvent> eventQueue = new Queue<ProtocolEvent>(eventList);

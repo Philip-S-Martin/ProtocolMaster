@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Enumeration;
 using Windows.Media;
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
@@ -17,22 +18,26 @@ namespace ProtocolMasterWPF.Model
         private StorageFolder videoStore;
         private string storagePath;
         public MediaCapture MediaCap { get; private set; }
-        public Camera()
+        
+        public Camera(DeviceInformation videoDevice, DeviceInformation audioDevice)
         {
             AppEnvironment.TryAddLocationAppData("Video", "Video", out storagePath);
             InitVideoStore();
             MediaCap = new MediaCapture();
-            InitializeCap();
+            InitializeCap(videoDevice, audioDevice);
         }
         private async void InitVideoStore()
         {
             videoStore = await StorageFolder.GetFolderFromPathAsync(storagePath);
         }
-        public async void InitializeCap()
+        public async void InitializeCap(DeviceInformation videoDevice, DeviceInformation audioDevice)
         {
             try
             {
-                await MediaCap.InitializeAsync(new MediaCaptureInitializationSettings());
+                await MediaCap.InitializeAsync(new MediaCaptureInitializationSettings() { 
+                    VideoDeviceId = videoDevice.Id, 
+                    AudioDeviceId = audioDevice.Id 
+                });
             }
             catch (UnauthorizedAccessException ex)
             {

@@ -2,8 +2,10 @@
 using ProtocolMasterCore.Protocol;
 using ProtocolMasterWPF.Model;
 using ProtocolMasterWPF.ViewModel;
+using System;
 using System.Windows;
 using System.Windows.Controls;
+using Windows.Devices.Enumeration;
 
 namespace ProtocolMasterWPF.View
 {
@@ -12,11 +14,14 @@ namespace ProtocolMasterWPF.View
     /// </summary>
     public partial class SessionControlBarView : UserControl
     {
-        internal Session SessionControl { get => _sessionControl; set { _sessionControl = value; DataContext = _sessionControl; } }
+        internal Session SessionControl { get => _sessionControl; set { _sessionControl = value; DataContext = _sessionControl; InitDefaults(); } }
         private Session _sessionControl;
         public SessionControlBarView()
         {
             InitializeComponent();
+        }
+        private void InitDefaults()
+        {
         }
         private void PreviewButton_Click(object sender, RoutedEventArgs e) => SessionControl.Preview();
         private void StartButton_Click(object sender, RoutedEventArgs e) => SessionControl.Start();
@@ -28,14 +33,13 @@ namespace ProtocolMasterWPF.View
             else SessionControl.MakeSelection(eventArgs.Parameter);
         }
         private void SelectButton_Click(object sender, RoutedEventArgs e) => DialogHost.Show(new ProtocolSelectView(), "SessionDialog", SelectDialog_OnDialogClosing);
+        public void UpdateTime(double elapsed, double duration) => App.Current.Dispatcher.Invoke(() => UpdateTimeLocal(elapsed, duration));
+        private void UpdateTimeLocal(double elapsed, double duration)
+        {
+            ElapsedLabel.Text = DateTime.FromOADate(elapsed).ToString("HH:mm:ss");
+            DurationLabel.Text = DateTime.FromOADate(duration).ToString("HH:mm:ss");
+            TimeProgressBar.Value = 100f * elapsed / duration;
+        }
 
-        private void Interpreter_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            SessionControl.Protocol.InterpreterManager.Selected = (IExtensionMeta)((ComboBox)sender).SelectedItem;
-        }
-        private void Driver_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            SessionControl.Protocol.DriverManager.Selected = (IExtensionMeta)((ComboBox)sender).SelectedItem;
-        }
     }
 }

@@ -34,7 +34,7 @@ namespace ProtocolMasterCore.Protocol
             var extensionMeta = new List<IExtensionMeta>();
             foreach (ExportFactory<E, T> i in Extensions)
             {
-                if (i.Metadata.Name == "None" && i.Metadata.Version == "")
+                if (i.Metadata.Name == "None Selected" && i.Metadata.Version == "")
                 {
                     Selected = i.Metadata;
                 }

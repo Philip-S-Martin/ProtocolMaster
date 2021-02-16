@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ProtocolMasterCore.Protocol.Driver
 {
@@ -29,6 +30,11 @@ namespace ProtocolMasterCore.Protocol.Driver
         public override string ToString()
         {
             return Name + " " + Version;
+        }
+
+        public bool Equals([AllowNull] IExtensionMeta other)
+        {
+            return this.Name == other.Name && this.Version == other.Version;
         }
     }
 }
