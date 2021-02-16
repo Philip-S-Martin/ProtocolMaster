@@ -56,7 +56,7 @@ namespace ProtocolMasterWPF.Model.Google
                 result = listRequest.Execute();
 
                 foreach (File file in result.Files)
-                    AvailableFiles.Add(new GFileData(file));
+                    AvailableFiles.Add(new GFileStreamer(file));
             } while (result.IncompleteSearch.HasValue && result.IncompleteSearch.Equals(true));
         }
         public void RefreshAvailable()

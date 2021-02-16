@@ -32,9 +32,9 @@ namespace ProtocolMasterCore.Utility
 
         private Log()
         {
-            if (AppEnvironment.TryAddLocationAppData("Log", "Log", out logdata))
+            if (AppEnvironment.TryAddLocationDocuments("Log", "Log", out logdata))
             { }
-            if (AppEnvironment.TryAddLocationAppData("LogArchive", "Log/Archive", out archive))
+            if (AppEnvironment.TryAddLocationDocuments("LogArchive", "Log/Archive", out archive))
             { }
 
             string timePrefix = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");

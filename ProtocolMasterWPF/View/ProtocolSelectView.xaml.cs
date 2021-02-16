@@ -22,10 +22,14 @@ namespace ProtocolMasterWPF.View
         private void PublishedTab_Checked(object sender, RoutedEventArgs e)
         {
             //SelectList.ItemsSource = viewModel.PublishedOptions;
+            DataContext = PublishedSelect;
+            CurrentSelector = PublishedSelect;
         }
         private void LocalTab_Checked(object sender, RoutedEventArgs e)
         {
             //SelectList.ItemsSource = viewModel.LocalOptions;
+            DataContext = LocalSelect;
+            CurrentSelector = LocalSelect;
         }
         private void SelectButton_Click(object sender, RoutedEventArgs e)
         {

@@ -2,6 +2,7 @@
 using ProtocolMasterWPF.Model.Google;
 using ProtocolMasterWPF.ViewModel;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -43,6 +44,25 @@ namespace ProtocolMasterWPF
         public async void GoogleDeauthenticate()
         {
             await GAuth.Instance.DeAuthenticate();
+        }
+
+        public static void TryOpenURI(object sender, params string[] uris)
+        {
+            for (int i = 0; i < uris.Length; i++)
+            {
+                try
+                {
+                    ProcessStartInfo psi = new ProcessStartInfo
+                    {
+                        FileName = uris[i],
+                        UseShellExecute = true
+                    };
+                    Process.Start(psi);
+                    return;
+                }
+                catch (Exception e) { Log.Error($"Failed to open {(sender as DependencyObject).GetValue(FrameworkElement.NameProperty)} URI. Exception:{e}"); }
+            }
+            Log.Error($"Failed to open any URIs for {(sender as DependencyObject).GetValue(FrameworkElement.NameProperty)}, please contact the developer.");
         }
     }
 }

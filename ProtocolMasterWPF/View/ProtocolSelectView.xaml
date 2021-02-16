@@ -20,6 +20,8 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="1" Background="{DynamicResource DefaultHueDarkBrush}">
                 <local:DriveSelectView x:Name="DriveSelect" Visibility="{Binding Path=IsChecked, ElementName=DriveTab, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <local:PublishedSelectView x:Name="PublishedSelect" Visibility="{Binding Path=IsChecked, ElementName=PublishedTab, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <local:LocalSelectView x:Name="LocalSelect" Visibility="{Binding Path=IsChecked, ElementName=LocalTab, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </Grid>
             <Grid Grid.Row="0" Width="500">
                 <Grid.ColumnDefinitions>

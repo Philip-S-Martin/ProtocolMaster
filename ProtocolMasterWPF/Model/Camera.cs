@@ -21,7 +21,7 @@ namespace ProtocolMasterWPF.Model
         
         public Camera(DeviceInformation videoDevice, DeviceInformation audioDevice)
         {
-            AppEnvironment.TryAddLocationAppData("Video", "Video", out storagePath);
+            AppEnvironment.TryAddLocationDocuments("Video", "Video", out storagePath);
             InitVideoStore();
             MediaCap = new MediaCapture();
             InitializeCap(videoDevice, audioDevice);
