@@ -7,23 +7,23 @@ using System.Text;
 
 namespace ProtocolMasterWPF.Model
 {
-    internal class LocalProtocolStore : Observable
+    internal class LocalFileStore : Observable
     {
-        private static LocalProtocolStore instance = new LocalProtocolStore();
-        public static LocalProtocolStore Instance
+        private static LocalFileStore instance = new LocalFileStore();
+        public static LocalFileStore Instance
         {
             get
             {
                 return instance;
             }
         }
-        static LocalProtocolStore()
+        static LocalFileStore()
         {
         }
         private string _directory;
         public string Directory { get =>_directory; private set { _directory = value; NotifyProperty(); } }
         public ObservableCollection<LocalFileStreamer> LocalFiles { get; private set;}
-        private LocalProtocolStore()
+        private LocalFileStore()
         {
             AppEnvironment.TryAddLocationDocuments("Protocols", "Protocols", out string dirResult);
             Directory = dirResult;

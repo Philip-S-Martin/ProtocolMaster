@@ -7,10 +7,10 @@ using System.Text;
 
 namespace ProtocolMasterWPF.Model
 {
-    internal class WebFileStreamer : IStreamStarter
+    internal class PublishedFileStreamer : IStreamStarter
     {
         public string Name { get => WebFile.Name; }
-        public PublishedWebFile WebFile { get; private set; }
+        public PublishedFile WebFile { get; private set; }
         public Stream StartStream()
         {
             WebClient webClient = new WebClient();

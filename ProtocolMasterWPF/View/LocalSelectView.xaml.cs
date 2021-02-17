@@ -26,7 +26,7 @@ namespace ProtocolMasterWPF.View
         {
             InitializeComponent();
         }
-        private void RefreshButton_Click(object sender, RoutedEventArgs e) => LocalProtocolStore.Instance.RefreshFiles();
+        private void RefreshButton_Click(object sender, RoutedEventArgs e) => LocalFileStore.Instance.RefreshFiles();
         private void OpenFolderButton_Click(object sender, RoutedEventArgs e) => App.TryOpenURI(sender, AppEnvironment.GetLocation("Protocols"));
     }
 }

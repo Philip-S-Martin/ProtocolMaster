@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ProtocolMasterWPF.Model
 {
-    internal class PublishedWebFile
+    internal class PublishedFile
     {
         public string Name { get; private set; }
         public string URL { get; private set; }
