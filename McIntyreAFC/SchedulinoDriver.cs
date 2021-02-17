@@ -3,8 +3,8 @@ using ProtocolMasterCore.Protocol;
 using ProtocolMasterCore.Protocol.Driver;
 using ProtocolMasterCore.Utility;
 using System;
+using RJCP.IO.Ports;
 using System.Collections.Generic;
-using System.IO.Ports;
 using System.Threading;
 
 namespace McIntyreAFC
@@ -19,11 +19,10 @@ namespace McIntyreAFC
         uint _run_time;
         byte _serial_available;
         private uint _capacity;
-
-        SerialPort serial;
-        public SerialPort Serial { get => serial; set => serial = value; }
+        
+        SerialPortStream serial;
+        public SerialPortStream Serial { get => serial; set => serial = value; }
         public UserSelectHandler UserSelectPrompt { private get; set; }
-        Thread driverThread;
 
         // Data processing handlers
         delegate void Handler(ProtocolEvent item);
@@ -80,26 +79,24 @@ namespace McIntyreAFC
         public bool Setup(List<ProtocolEvent> dataList)
         {
             Log.Error("McIntyreAFC SETUP");
-            driverThread = Thread.CurrentThread;
-            foreach (ProtocolEvent data in dataList)
-            {
-                Handle(data);
-            }
+            // CONVERT EVENTS TO SCHEDULE
+            // Generate Schedule
+            foreach (ProtocolEvent data in dataList) Handle(data);
+            // Sort schedule
             schedule.Sort();
 
-            string[] portOptions = SerialPort.GetPortNames();
+            // PORT SELECTION
+            string[] portOptions = SerialPortStream.GetPortNames();
             string port;
-            if (portOptions.Length == 0)
-            {
-                return false;
-            }
-            else if (portOptions.Length == 1)
-                port = portOptions[0];
-            else
-                port = UserSelectPrompt(portOptions);
+            // If there are no available ports, exit
+            if (portOptions.Length == 0) return false;
+            // If there is one available port, use it
+            else if (portOptions.Length == 1) port = portOptions[0];
+            // If there are many available ports, allow the user to select
+            else port = UserSelectPrompt(portOptions);
 
-            // SerialPort setup
-            Serial = new SerialPort
+            // SERIALPORT SETUP
+            Serial = new SerialPortStream
             {
                 RtsEnable = true,
                 DtrEnable = true,
@@ -107,6 +104,7 @@ namespace McIntyreAFC
                 BaudRate = 9600,
                 NewLine = "\n"
             };
+
             Serial.DataReceived += DataReceiver;
             Serial.Open();
 
@@ -117,8 +115,8 @@ namespace McIntyreAFC
                 Thread.Sleep(8);
             }
             // Send as many events as possible
-            while (_capacity > 0 && scheduleIndex < schedule.Count) 
-                while(SendNextEvent(Serial));
+            while (_capacity > 0 && scheduleIndex < schedule.Count)
+                while (SendNextEvent(Serial)) ;
             return true;
         }
 
@@ -147,11 +145,11 @@ namespace McIntyreAFC
         {
             if (_state != ScheduleState.DONE)
             {
-                ReadSerialBuffer(sender as SerialPort);
-                while (_state == ScheduleState.RUNNING && SendNextEvent(sender as SerialPort));
+                ReadSerialBuffer(sender as SerialPortStream);
+                while (_state == ScheduleState.RUNNING && SendNextEvent(sender as SerialPortStream)) ;
             }
         }
-        private bool SendNextEvent(SerialPort port)
+        private bool SendNextEvent(SerialPortStream port)
         {
             if (port.IsOpen && _capacity > 0 && _serial_available >= 7 && scheduleIndex < schedule.Count)
             {
@@ -178,7 +176,7 @@ namespace McIntyreAFC
             return false;
         }
 
-        private void ReadSerialBuffer(SerialPort port)
+        private void ReadSerialBuffer(SerialPortStream port)
         {
             while (port.IsOpen && port.BytesToRead > 0)
             {

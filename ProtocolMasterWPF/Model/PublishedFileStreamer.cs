@@ -9,15 +9,18 @@ namespace ProtocolMasterWPF.Model
 {
     internal class PublishedFileStreamer : IStreamStarter
     {
-        public string Name { get => WebFile.Name; }
-        public PublishedFile WebFile { get; private set; }
+        public string Name { get; set; }
+        public string URL { get; set; }
         public Stream StartStream()
         {
             WebClient webClient = new WebClient();
             Stream result;
             try
             {
-                result = webClient.OpenRead(WebFile.URL);
+                string filepath = Path.Combine(PublishedFileStore.Instance.Directory, "PubCache.file");
+                webClient.DownloadFile(URL, filepath);
+                FileInfo file = new FileInfo(filepath);
+                result = file.Open(FileMode.Open);
             }
             catch(Exception e)
             {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProtocolMasterWPF.Model;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -23,6 +24,9 @@ namespace ProtocolMasterWPF.View
             InitializeComponent();
         }
 
-        public ListBox SelectList => throw new NotImplementedException();
+        public ListBox SelectList => SelectListBox;
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e) => PublishedFileStore.Instance.Remove(SelectListBox.SelectedValue as PublishedFileStreamer);
+        private void AddButton_Click(object sender, RoutedEventArgs e) => PublishedFileStore.Instance.Add(NewNameText.Text, NewURLText.Text);
     }
 }

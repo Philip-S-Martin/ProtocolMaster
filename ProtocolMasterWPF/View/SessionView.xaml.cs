@@ -29,6 +29,7 @@ namespace ProtocolMasterWPF.View
             SessionControl.OnStart += Timeline.StartTime;
             SessionControl.OnStop += Timeline.StopTime;
             SessionControl.OnReset += Timeline.ResetPlot;
+            SessionControl.OnReset += ControlBar.ResetTime;
             SessionControl.Animator.OnUpdate += Timeline.UpdateTime;
             SessionControl.Animator.OnUpdate += ControlBar.UpdateTime;
 

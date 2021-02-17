@@ -14,14 +14,12 @@ namespace ProtocolMasterWPF.View
     /// </summary>
     public partial class SessionControlBarView : UserControl
     {
-        internal Session SessionControl { get => _sessionControl; set { _sessionControl = value; DataContext = _sessionControl; InitDefaults(); } }
+        internal Session SessionControl { get => _sessionControl; set { _sessionControl = value; DataContext = _sessionControl;} }
         private Session _sessionControl;
         public SessionControlBarView()
         {
             InitializeComponent();
-        }
-        private void InitDefaults()
-        {
+            ResetTimeLocal();
         }
         private void PreviewButton_Click(object sender, RoutedEventArgs e) => SessionControl.Preview();
         private void StartButton_Click(object sender, RoutedEventArgs e) => SessionControl.Start();
@@ -40,6 +38,12 @@ namespace ProtocolMasterWPF.View
             DurationLabel.Text = DateTime.FromOADate(duration).ToString("HH:mm:ss");
             TimeProgressBar.Value = 100f * elapsed / duration;
         }
-
+        public void ResetTime() => App.Current.Dispatcher.Invoke(() => ResetTimeLocal());
+        private void ResetTimeLocal()
+        {
+            ElapsedLabel.Text = DateTime.FromOADate(0f).ToString("HH:mm:ss");
+            DurationLabel.Text = DateTime.FromOADate(0f).ToString("HH:mm:ss");
+            TimeProgressBar.Value = 0f;
+        }
     }
 }

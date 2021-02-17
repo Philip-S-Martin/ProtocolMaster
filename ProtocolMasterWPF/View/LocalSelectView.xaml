@@ -25,7 +25,7 @@
                     x:Name="OpenFolderButton" Click="OpenFolderButton_Click">
                 <materialDesign:PackIcon Kind="Folder" VerticalAlignment="Center"/>
             </Button>
-            <TextBlock d:Text="C:/Users/phili/Documents/" Grid.Column="1" FontSize="10" Text="{Binding Source={x:Static model:LocalProtocolStore.Instance}, Path=Directory}" Margin="8,4" VerticalAlignment="Center" TextWrapping="Wrap"/>
+            <TextBlock d:Text="C:/Users/phili/Documents/" Grid.Column="1" FontSize="10" Text="{Binding Source={x:Static model:LocalFileStore.Instance}, Path=Directory}" Margin="8,4" VerticalAlignment="Center" TextWrapping="Wrap"/>
 
             <Button Style="{DynamicResource MaterialDesignBackgroundIconButton}" Grid.Column="2" 
                     x:Name="RefreshButton" Click="RefreshButton_Click">

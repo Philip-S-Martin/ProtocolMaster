@@ -40,7 +40,7 @@
                     <materialDesign:PackIcon Kind="Stop"/>
                 </Button>
                 <Button x:Name="ResetButton" Style="{DynamicResource MaterialDesignBackgroundIconButton}" IsEnabled="{Binding CanReset}" Click="ResetButton_Click" Margin="2">
-                    <materialDesign:PackIcon Kind="Clear"/>
+                    <materialDesign:PackIcon Kind="Cancel"/>
                 </Button>
             </StackPanel>
             <Grid>

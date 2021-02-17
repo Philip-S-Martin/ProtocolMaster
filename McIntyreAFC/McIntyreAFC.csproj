@@ -11,7 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="System.IO.Ports" Version="5.0.0" />
+	  <PackageReference Include="SerialPortStream" Version="2.2.2" />
 	</ItemGroup>
 
 	<ItemGroup>
