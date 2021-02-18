@@ -18,7 +18,7 @@
 
                 <ResourceDictionary>
                     <helpers:NotNullToBoolConverter x:Key="NotNullToBoolConverter"/>
-                    <helpers:NotNullToBoolConverter x:Key="NullOrEmptyStringToBoolConverter"/>
+                    <helpers:IsEnabledConverter x:Key="IsEnabledConverter"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
