@@ -1,0 +1,73 @@
+﻿<UserControl x:Class="ProtocolMasterWPF.View.PublishedSelectView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ProtocolMasterWPF.View"
+                          xmlns:helpers="clr-namespace:ProtocolMasterWPF.Helpers"
+
+             xmlns:model="clr-namespace:ProtocolMasterWPF.Model" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ListBox x:Name ="SelectListBox" Grid.Row="0" ItemsSource="{Binding Source={x:Static model:PublishedFileStore.Instance}, Path=PublishedFiles}"
+                VerticalAlignment="Stretch"/>
+        <Grid Grid.Row="1" Background="{DynamicResource MaterialDesignDarkBackground}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <materialDesign:PopupBox x:Name="AddPopup" StaysOpen="True" Grid.Column="0" PlacementMode="RightAndAlignBottomEdges" Margin="0,0,12,0">
+                <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignDarkForeground}" Kind="Add" Margin="10" Height="24" Width="24"/>
+                </materialDesign:PopupBox.ToggleContent>
+                <Grid Width="300" Margin="8,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Style="{DynamicResource MaterialDesignBody2TextBlock}" Text="New Published File" HorizontalAlignment="Center"/>
+                    <TextBox x:Name="NewNameText" materialDesign:HintAssist.Hint="Protocol Name" materialDesign:ValidationAssist.OnlyShowOnFocus="True"
+                             Grid.Row="1" VerticalAlignment="Center" Margin="8" Validation.Error="HandleValidationError">
+                        <TextBox.Text>
+                            <Binding Path="NewName" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
+                                <Binding.ValidationRules>
+                                    <helpers:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <TextBox x:Name="NewURLText" materialDesign:HintAssist.Hint="https://protocol.url/download.file" materialDesign:ValidationAssist.OnlyShowOnFocus="True"
+                             Grid.Row="2" VerticalAlignment="Center" Margin="8" Validation.Error="HandleValidationError">
+                        <TextBox.Text>
+                            <Binding Path="NewURL" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
+                                <Binding.ValidationRules>
+                                    <helpers:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="8">
+                        <Button Style="{DynamicResource MaterialDesignFlatMidBgButton}" x:Name="AddButton" Click="AddButton_Click" Content="Save"/>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:PopupBox>
+            <Button Style="{DynamicResource MaterialDesignBackgroundIconButton}" Grid.Column="3" x:Name="DeleteButton"
+                    IsEnabled="{Binding ElementName=SelectListBox,Path=SelectedItem,Converter={StaticResource NotNullToBoolConverter}}"
+                    Click="DeleteButton_Click">
+                <materialDesign:PackIcon Kind="Delete" VerticalAlignment="Center"/>
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>

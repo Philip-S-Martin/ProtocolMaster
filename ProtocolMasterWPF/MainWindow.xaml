@@ -1,0 +1,53 @@
+﻿<Window x:Class="ProtocolMasterWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ProtocolMasterWPF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="Auto" Width="Auto" MinWidth="450" MinHeight="500"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:view="clr-namespace:ProtocolMasterWPF.View"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextBlock.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        BorderThickness="0">
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+        CaptionHeight="48"
+        CornerRadius ="0"
+        ResizeBorderThickness="8"    
+        GlassFrameThickness="0">
+        </WindowChrome>
+    </WindowChrome.WindowChrome>
+    <Border BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignDivider}">
+        <Border.Style>
+            <Style TargetType="{x:Type Border}">
+                <Style.Triggers>
+                    <!-- Add to avoid border disappearing when window is maximised -->
+                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                 Value="Maximized">
+                        <Setter Property="Margin" Value="10"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                 Value="Normal">
+                        <Setter Property="Margin" Value="0"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <view:TitleBarView Grid.Row="0" x:Name="TitleBar"/>
+            <view:SessionView Grid.Row="1" x:Name="SessionPane"/>
+        </Grid>
+    </Border>
+</Window>

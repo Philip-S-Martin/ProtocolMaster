@@ -1,0 +1,82 @@
+﻿<UserControl x:Class="ProtocolMasterWPF.View.ProtocolSelectView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ProtocolMasterWPF.View"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:helpers="clr-namespace:ProtocolMasterWPF.Helpers"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel Margin="1">
+        <TextBlock Text="Select an Experiment" 
+                   HorizontalAlignment="Center" 
+                   Margin="8"
+                   FontSize="16" />
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="300"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="1" Background="{DynamicResource DefaultHueDarkBrush}">
+                <local:DriveSelectView x:Name="DriveSelect" Visibility="{Binding Path=IsChecked, ElementName=DriveTab, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <local:PublishedSelectView x:Name="PublishedSelect" Visibility="{Binding Path=IsChecked, ElementName=PublishedTab, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <local:LocalSelectView x:Name="LocalSelect" Visibility="{Binding Path=IsChecked, ElementName=LocalTab, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </Grid>
+            <Grid Grid.Row="0" Width="500">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <RadioButton
+                        Grid.Column="0"
+                        x:Name="DriveTab"
+                        Style="{StaticResource MaterialDesignTabRadioButton}"
+                        IsChecked="True"
+                        Checked="DriveTab_Checked"
+                        Content="Google Drive"/>
+                <RadioButton
+                        Grid.Column="1"
+                        x:Name="PublishedTab"
+                        Style="{StaticResource MaterialDesignTabRadioButton}"
+                        IsChecked="False"
+                        Checked="PublishedTab_Checked"
+                        Content="Published"/>
+                <RadioButton
+                        Grid.Column="2"
+                        x:Name="LocalTab"
+                        Style="{StaticResource MaterialDesignTabRadioButton}"
+                        IsChecked="False"
+                        Checked="LocalTab_Checked"
+                        Content="Local Folder"/>
+            </Grid>
+        </Grid>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal" Margin="8">
+                <Button x:Name="CancelButton" Click="CancelButton_Click"
+                    IsCancel="True"
+                    Content="Cancel"
+                    Style="{StaticResource MaterialDesignForegroundFlatButton}">
+                    <Button.CommandParameter>
+                        <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">False</system:Boolean>
+                    </Button.CommandParameter>
+                </Button>
+
+                <Button x:Name="SelectButton" Click="SelectButton_Click"
+                    IsEnabled="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ProtocolSelectView}}, Path=CurrentSelector.SelectList.SelectedItem, Converter={StaticResource NotNullToBoolConverter}}"
+                    IsDefault="True"
+                    Content="Select"
+                    Margin="8, 0, 0, 0"
+                    Style="{StaticResource MaterialDesignRaisedButton}">
+                </Button>
+            </StackPanel>
+        </Grid>
+    </StackPanel>
+</UserControl>
