@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel Margin="1">
-        <TextBlock Text="Select a Protocol" 
+        <TextBlock Text="Select an Experiment" 
                    HorizontalAlignment="Center" 
                    Margin="8"
                    FontSize="16" />
@@ -70,7 +70,7 @@
                 </Button>
 
                 <Button x:Name="SelectButton" Click="SelectButton_Click"
-                    IsEnabled="{Binding SelectList.SelectedItem, Converter={StaticResource NotNullToBoolConverter}}"
+                    IsEnabled="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ProtocolSelectView}}, Path=CurrentSelector.SelectList.SelectedItem, Converter={StaticResource NotNullToBoolConverter}}"
                     IsDefault="True"
                     Content="Select"
                     Margin="8, 0, 0, 0"

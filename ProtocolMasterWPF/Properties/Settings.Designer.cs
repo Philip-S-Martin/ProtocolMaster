@@ -26,12 +26,58 @@ namespace ProtocolMasterWPF.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string SessionConfig {
+        public string CameraID {
             get {
-                return ((string)(this["SessionConfig"]));
+                return ((string)(this["CameraID"]));
             }
             set {
-                this["SessionConfig"] = value;
+                this["CameraID"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MicrophoneID {
+            get {
+                return ((string)(this["MicrophoneID"]));
+            }
+            set {
+                this["MicrophoneID"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::ProtocolMasterWPF.Model.ExtensionMetaSetting DriverMeta {
+            get {
+                return ((global::ProtocolMasterWPF.Model.ExtensionMetaSetting)(this["DriverMeta"]));
+            }
+            set {
+                this["DriverMeta"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::ProtocolMasterWPF.Model.ExtensionMetaSetting InterpreterMeta {
+            get {
+                return ((global::ProtocolMasterWPF.Model.ExtensionMetaSetting)(this["InterpreterMeta"]));
+            }
+            set {
+                this["InterpreterMeta"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ExperimentDefaultTab {
+            get {
+                return ((string)(this["ExperimentDefaultTab"]));
+            }
+            set {
+                this["ExperimentDefaultTab"] = value;
             }
         }
     }

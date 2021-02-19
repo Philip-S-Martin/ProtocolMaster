@@ -1,23 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
-	</PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<OutputPath>..\ProtocolMasterWPF\bin\Debug\netcoreapp3.1\Extensions\</OutputPath>
-		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<WarningLevel>5</WarningLevel>
-	</PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <OutputPath>..\ProtocolMasterWPF\bin\Debug\netcoreapp3.1\Extensions\</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <WarningLevel>5</WarningLevel>
+    </PropertyGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="SerialPortStream" Version="2.2.2" />
-	</ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <OutputPath>..\ProtocolMasterWPF\bin\Release\netcoreapp3.1\Extensions\</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\ProtocolMasterCore\ProtocolMasterCore.csproj">
-		  <Private>false</Private>
-		</ProjectReference>
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="SerialPortStream" Version="2.2.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ProtocolMasterCore\ProtocolMasterCore.csproj">
+            <Private>false</Private>
+        </ProjectReference>
+    </ItemGroup>
 
 </Project>

@@ -50,13 +50,13 @@ namespace ProtocolMasterCore.Protocol
             {
                 foreach (ExportFactory<E, T> i in Extensions)
                 {
-                    if ((IExtensionMeta)i.Metadata == value)
+                    if (i.Metadata.Equals(value))
                     {
                         extensionFactory = i;
                         return;
                     }
                 }
-                throw new Exception($"No extension of type {typeof(E)} of with metadata {value} is loaded");
+                throw new ArgumentException($"No extension of type {typeof(E)} of with metadata {value} is loaded");
             }
         }
         public IEnumerable<IExtensionMeta> Options

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Xml.Serialization;
 
 namespace ProtocolMasterCore.Protocol
 {
@@ -7,4 +10,5 @@ namespace ProtocolMasterCore.Protocol
         string Name { get; }
         string Version { get; }
     }
+    
 }

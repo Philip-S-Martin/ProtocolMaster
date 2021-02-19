@@ -2,7 +2,19 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ProtocolMasterWPF.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="SessionConfig" Type="System.String" Scope="User">
+    <Setting Name="CameraID" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="MicrophoneID" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DriverMeta" Type="ProtocolMasterWPF.Model.ExtensionMetaSetting" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="InterpreterMeta" Type="ProtocolMasterWPF.Model.ExtensionMetaSetting" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ExperimentDefaultTab" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

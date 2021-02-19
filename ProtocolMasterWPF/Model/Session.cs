@@ -1,6 +1,7 @@
 ﻿using ProtocolMasterCore.Protocol;
 using ProtocolMasterCore.Utility;
 using ProtocolMasterWPF.Helpers;
+using ProtocolMasterWPF.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,10 +30,38 @@ namespace ProtocolMasterWPF.Model
         CancellationToken CancelToken { get; set; }
         public List<IExtensionMeta> InterpreterOptions { get => _interpreterOptions; private set { _interpreterOptions = value; NotifyProperty(); } }
         private List<IExtensionMeta> _interpreterOptions;
-        public IExtensionMeta SelectedInterpreter { get => Protocol.InterpreterManager.Selected; set { Protocol.InterpreterManager.Selected = value; NotifyProperty(); } }
+        public IExtensionMeta SelectedInterpreter
+        {
+            get => Protocol.InterpreterManager.Selected;
+            set
+            {
+                if (value == null) return;
+                Protocol.InterpreterManager.Selected = value;
+                NotifyProperty();
+                if (Settings.Default.InterpreterMeta != value)
+                {
+                    Settings.Default.InterpreterMeta = new ExtensionMetaSetting(value);
+                    Settings.Default.Save();
+                }
+            }
+        }
         public List<IExtensionMeta> DriverOptions { get => _driverOptions; private set { _driverOptions = value; NotifyProperty(); } }
         private List<IExtensionMeta> _driverOptions;
-        public IExtensionMeta SelectedDriver { get => Protocol.DriverManager.Selected; set { Protocol.DriverManager.Selected = value; NotifyProperty(); } }
+        public IExtensionMeta SelectedDriver
+        {
+            get => Protocol.DriverManager.Selected;
+            set
+            {
+                if (value == null) return;
+                Protocol.DriverManager.Selected = value;
+                NotifyProperty();
+                if (Settings.Default.DriverMeta != value)
+                {
+                    Settings.Default.DriverMeta = new ExtensionMetaSetting(value);
+                    Settings.Default.Save();
+                }
+            }
+        }
         public ClockAnimator Animator { get; private set; }
         public CameraContainer Cam { get; private set; }
         SessionState State { get => _state; set { _state = value; NotifyStateProperties(); } }
@@ -69,10 +98,43 @@ namespace ProtocolMasterWPF.Model
             Protocol.InterpreterManager.OnEventsLoaded += Animator.FindMaxTime;
             Protocol.DriverManager.OnProtocolStart += Animator.StartAnimatorNow;
             Protocol.DriverManager.OnProtocolEnd += Animator.StopAnimator;
-            Protocol.LoadExtensions();
+
+            InitDefaultExtensions();
+
+
             Cam = new CameraContainer();
             OnStart += Cam.StartRecord;
             OnStop += Cam.StopRecord;
+        }
+        public void InitDefaultExtensions()
+        {
+            Protocol.LoadExtensions();
+            try
+            {
+                SelectedDriver = Settings.Default.DriverMeta;
+            }
+            catch (ArgumentException e)
+            {
+                Log.Error($"Default Driver could not be seleted, exception: {e}");
+                SelectedDriver = Protocol.DriverManager.Selected;
+            }
+            catch (NullReferenceException)
+            {
+                SelectedDriver = Protocol.DriverManager.Selected;
+            }
+            try
+            {
+                SelectedInterpreter = Settings.Default.InterpreterMeta;
+            }
+            catch (ArgumentException e)
+            {
+                Log.Error($"Default Interpreter could not be seleted, exception: {e}");
+                SelectedInterpreter = Protocol.InterpreterManager.Selected;
+            }
+            catch (NullReferenceException)
+            {
+                SelectedDriver = Protocol.DriverManager.Selected;
+            }
         }
         private void LoadInterpreterOptions(List<IExtensionMeta> options) => InterpreterOptions = options;
         private void LoadDriverOptions(List<IExtensionMeta> options) => DriverOptions = options;
@@ -105,7 +167,7 @@ namespace ProtocolMasterWPF.Model
                         OnRun?.Invoke();
                         Protocol.Run();
                     }
-                    if(!CancelToken.IsCancellationRequested)
+                    if (!CancelToken.IsCancellationRequested)
                         Stop();
                 }, CancelSource.Token);
                 SessionTask.Start();

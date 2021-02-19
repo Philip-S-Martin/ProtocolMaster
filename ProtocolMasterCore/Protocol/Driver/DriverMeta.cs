@@ -19,6 +19,9 @@ namespace ProtocolMasterCore.Protocol.Driver
             this.Version = version;
             this.HandlerLabels = eventNames;
         }
+        public DriverMeta()
+        { 
+        }
 
         public DriverMeta(IDictionary<string, object> inputs)
         {
@@ -34,7 +37,7 @@ namespace ProtocolMasterCore.Protocol.Driver
 
         public bool Equals([AllowNull] IExtensionMeta other)
         {
-            return this.Name == other.Name && this.Version == other.Version;
+            return  this.Name == other.Name && this.Version == other.Version;
         }
     }
 }

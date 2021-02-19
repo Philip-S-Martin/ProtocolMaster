@@ -56,7 +56,7 @@
         </StackPanel>
 
         <StackPanel HorizontalAlignment="Right" Grid.Column="2" Orientation="Horizontal">
-            <materialDesign:PopupBox StaysOpen="True" PlacementMode="LeftAndAlignBottomEdges" Margin="0,0,12,0">
+            <materialDesign:PopupBox StaysOpen="True" PlacementMode="LeftAndAlignBottomEdges" Margin="0,0,12,0" IsEnabled="{Binding CanSelect}">
                 <materialDesign:PopupBox.ToggleContent>
                     <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignDarkForeground}" Kind="EllipsisHorizontal" Margin="10" Height="24" Width="24"/>
                 </materialDesign:PopupBox.ToggleContent>
@@ -81,10 +81,10 @@
                               ItemsSource="{Binding DriverOptions}" SelectedValue="{Binding SelectedDriver, Mode=TwoWay}" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Camera:" VerticalAlignment="Center"/>
                     <ComboBox x:Name="CameraSelect" Grid.Row="3" Grid.Column="1" Margin="8" Padding="8"
-                              ItemsSource="{Binding Cam.VideoDevices}" SelectedValue="{Binding Cam.VideoDevice, Mode=TwoWay}" DisplayMemberPath="Name" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
+                              ItemsSource="{Binding Source={x:Static model:MediaDevices.Instance}, Path=VideoDevices}" SelectedValue="{Binding Cam.VideoDevice, Mode=TwoWay}" DisplayMemberPath="Name" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Microphone:" VerticalAlignment="Center"/>
                     <ComboBox x:Name="MicrophoneSelect" Grid.Row="4" Grid.Column="1" Margin="8" Padding="8"
-                              ItemsSource="{Binding Cam.AudioDevices}" SelectedValue="{Binding Cam.AudioDevice, Mode=TwoWay}" DisplayMemberPath="Name" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
+                              ItemsSource="{Binding Source={x:Static model:MediaDevices.Instance}, Path=AudioDevices}" SelectedValue="{Binding Cam.AudioDevice, Mode=TwoWay}" DisplayMemberPath="Name" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
                 </Grid>
             </materialDesign:PopupBox>
         </StackPanel>
