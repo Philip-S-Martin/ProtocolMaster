@@ -32,35 +32,38 @@ namespace ProtocolMasterWPF.Model
         }
         public void InitializeCap(DeviceInformation videoDevice, DeviceInformation audioDevice)
         {
-            if(videoDevice == null)
+            if (videoDevice == null)
                 Log.Error($"Video Device null");
-            if (audioDevice == null)
-            {
-                try
-                {
-                    MediaCap.InitializeAsync(new MediaCaptureInitializationSettings()
-                    {
-                        VideoDeviceId = videoDevice.Id
-                    }).AsTask().Wait();
-                }
-                catch (UnauthorizedAccessException ex)
-                {
-                    Log.Error($"The app was denied access to the camera: {ex}");
-                }
-            }
             else
             {
-                try
+                if (audioDevice == null)
                 {
-                    MediaCap.InitializeAsync(new MediaCaptureInitializationSettings()
+                    try
                     {
-                        VideoDeviceId = videoDevice.Id,
-                        AudioDeviceId = audioDevice.Id
-                    }).AsTask().Wait();
+                        MediaCap.InitializeAsync(new MediaCaptureInitializationSettings()
+                        {
+                            VideoDeviceId = videoDevice.Id
+                        }).AsTask().Wait();
+                    }
+                    catch (UnauthorizedAccessException ex)
+                    {
+                        Log.Error($"The app was denied access to the camera: {ex}");
+                    }
                 }
-                catch (UnauthorizedAccessException ex)
+                else
                 {
-                    Log.Error($"The app was denied access to the camera: {ex}");
+                    try
+                    {
+                        MediaCap.InitializeAsync(new MediaCaptureInitializationSettings()
+                        {
+                            VideoDeviceId = videoDevice.Id,
+                            AudioDeviceId = audioDevice.Id
+                        }).AsTask().Wait();
+                    }
+                    catch (UnauthorizedAccessException ex)
+                    {
+                        Log.Error($"The app was denied access to the camera: {ex}");
+                    }
                 }
             }
         }
@@ -76,11 +79,11 @@ namespace ProtocolMasterWPF.Model
             }
         }
         public bool IsRecording { get; private set; }
-        public async void StartRecord()
+        public async void StartRecord(string label)
         {
             try
             {
-                StorageFile file = await videoStore.CreateFileAsync("Recording (1).wmv", CreationCollisionOption.GenerateUniqueName);
+                StorageFile file = await videoStore.CreateFileAsync($"{label}.wmv", CreationCollisionOption.GenerateUniqueName);
                 await MediaCap.StartRecordToStorageFileAsync(MediaEncodingProfile.CreateWmv(VideoEncodingQuality.Auto), file);
                 IsRecording = true;
                 Log.Error("Began Recording");

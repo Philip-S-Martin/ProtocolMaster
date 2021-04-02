@@ -4,7 +4,7 @@ using System.IO;
 
 namespace ProtocolMasterCore.Protocol.Interpreter
 {
-    public delegate void ProtocolEventsLoader(List<ProtocolEvent> events);
+    public delegate void ProtocolEventsLoader(List<ProtocolEvent> events, string label);
     public class InterpreterManager : ExtensionManager<IInterpreter, InterpreterMeta>
     {
         IInterpreter interpreter;
@@ -18,14 +18,16 @@ namespace ProtocolMasterCore.Protocol.Interpreter
                 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
                 ExcelDataInterpreter spreadSheetInterpreter = interpreter as ExcelDataInterpreter;
                 if (stream != null)
+                {
                     spreadSheetInterpreter.SetReader(ExcelReaderFactory.CreateReader(stream));
+                }
                 else return null;
             }
             // pre-fill event data
             List<ProtocolEvent> result = interpreter.Generate(argument);
             if (interpreter.IsCanceled) return null;
             DisposeSelectedExtension();
-            OnEventsLoaded?.Invoke(result);
+            OnEventsLoaded?.Invoke(result, interpreter.ProtocolLabel);
             return result;
         }
     }

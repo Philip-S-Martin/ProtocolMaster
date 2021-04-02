@@ -5,18 +5,20 @@ using Schedulino.Generator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace McIntyreAFC
 {
     [InterpreterMeta("SpreadsheetAFC", "1.1")]
 
-    public class SpreadsheetAFC : ExcelDataInterpreter, IInterpreter, IPromptUserSelect
+    public class SpreadsheetAFC : ExcelDataInterpreter, IInterpreter, IPromptUserSelect, IPromptUserNumber
     {
         private delegate bool RowReader(Dictionary<string, int> map);
         Dictionary<string, RowReader> mappedRowReaders;
         Dictionary<string, Protocol> protocols;
         Protocol baseData;
         public UserSelectHandler UserSelectPrompt { get; set; }
+        public UserNumberHandler UserNumberPrompt { get; set; }
         public SpreadsheetAFC()
         {
             mappedRowReaders = new Dictionary<string, RowReader>(){
@@ -29,6 +31,12 @@ namespace McIntyreAFC
             protocols = new Dictionary<string, Protocol>();
         }
         public bool IsCanceled { get; set; }
+
+        string protocolName = null;
+        string experimentName = null;
+        int subjectNumber = 0;
+        public string ProtocolLabel => $"{(experimentName != null ? experimentName : "NoExperiment")}_{(protocolName != null ? protocolName : "NoProtocol")}_{subjectNumber:D2}";
+
         private Protocol GetOrCreateProtocol(string protocolName)
         {
             Protocol result;
@@ -42,8 +50,9 @@ namespace McIntyreAFC
                 return result;
             }
         }
-        public List<ProtocolEvent> Generate(string protocolName = null)
+        public List<ProtocolEvent> Generate(string argument)
         {
+            experimentName = new Regex("\\(\\d+\\)|_| ").Replace( argument, "");
             if (DataReader == null) return null;
             do
             {
@@ -73,14 +82,19 @@ namespace McIntyreAFC
             {
                 if (protocolName == null)
                 {
-                    string dropdownResponse = UserSelectPrompt(protocols.Keys.ToArray());
-                    if (dropdownResponse != null)
-                        return protocols[dropdownResponse].Generate();
+                    protocolName = UserSelectPrompt(protocols.Keys.ToArray(), "Select a Protocol:");
+                    if (protocolName != null)
+                    {
+                        subjectNumber = UserNumberPrompt(1, 99, "Select a Subject:");
+                        return protocols[protocolName].Generate();
+                    }
                     else return null;
                 }
                 else
                 {
-                    return protocols[protocolName].Generate();
+                    {
+                        return protocols[protocolName].Generate();
+                    }
                 }
             }
             else return null;

@@ -82,6 +82,10 @@ namespace ProtocolMasterCore.Protocol
                 {
                     (extension as IPromptUserSelect).UserSelectPrompt = PromptTargets.UserSelect;
                 }
+                if (typeof(IPromptUserNumber).IsAssignableFrom(extension.GetType()))
+                {
+                    (extension as IPromptUserNumber).UserNumberPrompt = PromptTargets.UserNumber;
+                }
                 return extension;
             }
             else

@@ -8,7 +8,7 @@ namespace ProtocolMasterWPF.Model
 {
     internal class LocalFileStreamer : IStreamStarter
     {
-        public string Name { get => LocalFile.Name; }
+        public string Name { get => Path.GetFileNameWithoutExtension(LocalFile.FullName); }
         public FileInfo LocalFile { get; private set; }
         public LocalFileStreamer(FileInfo source)
         {
@@ -21,7 +21,7 @@ namespace ProtocolMasterWPF.Model
             {
                 result = LocalFile.Open(FileMode.Open);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Log.Error($"Could not open Local File {Name}, Exception: {e}");
                 result = null;

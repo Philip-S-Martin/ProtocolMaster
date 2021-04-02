@@ -60,7 +60,7 @@ namespace ProtocolMasterWPF.View
             VerticalCategoryAxis.MinimumRange = VerticalCategoryAxis.AbsoluteMaximum - VerticalCategoryAxis.AbsoluteMinimum;
             Plot.Model.InvalidatePlot(true);
         }
-        public void LoadPlotDataInUIThread(List<ProtocolEvent> eventList)=>App.Current.Dispatcher.Invoke(() => LoadPlotData(eventList));
+        public void LoadPlotDataInUIThread(List<ProtocolEvent> eventList, string label)=>App.Current.Dispatcher.Invoke(() => LoadPlotData(eventList));
         
         public void LoadPlotData(List<ProtocolEvent> eventList)
         {

@@ -23,7 +23,7 @@ namespace ProtocolMasterWPF.Helpers
         {
             PrepAnimator();
         }
-        public void FindMaxTime(List<ProtocolEvent> events)
+        public void FindMaxTime(List<ProtocolEvent> events, string label)
         {
             if (events == null) return;
             double milliseconds = events.Where(i => i.Arguments.ContainsKey("TimeEndMs")).Max(i => Convert.ToDouble( i.Arguments["TimeEndMs"]));

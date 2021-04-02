@@ -39,8 +39,11 @@ namespace ProtocolMasterWPF.ViewModel
             {
                 CapElement = captureElement;
                 CapElement.Stretch = Windows.UI.Xaml.Media.Stretch.Uniform;
-                CapElement.Source = CamContainer.Cam.MediaCap;
-                CamContainer.Cam.StartPreview();
+                if (CamContainer.VideoDevice != null)
+                {
+                    CapElement.Source = CamContainer.Cam.MediaCap;
+                    CamContainer.Cam.StartPreview();
+                }
             }
         }
         private async void CameraChangedEvent(object sender, PropertyChangedEventArgs e)
@@ -51,8 +54,11 @@ namespace ProtocolMasterWPF.ViewModel
                 if (CapElement != null && cameraContainer != null)
                 {
                     if (CapElement.Source != null) await CapElement.Source.StopPreviewAsync();
-                    CapElement.Source = CamContainer.Cam.MediaCap;
-                    CamContainer.Cam.StartPreview();
+                    if (CamContainer.VideoDevice != null)
+                    {
+                        CapElement.Source = CamContainer.Cam.MediaCap;
+                        CamContainer.Cam.StartPreview();
+                    }
                 }
             }
         }

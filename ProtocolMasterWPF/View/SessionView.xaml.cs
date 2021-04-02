@@ -19,6 +19,8 @@ namespace ProtocolMasterWPF.View
 
             PromptTargetStore promptTargets = new PromptTargetStore();
             promptTargets.UserSelect = DropdownDialog.DropdownUserSelect;
+            promptTargets.UserNumber = DropdownDialog.DropdownUserNumber;
+
             SessionControl.Protocol.DriverManager.PromptTargets = promptTargets;
             SessionControl.Protocol.InterpreterManager.PromptTargets = promptTargets;
 

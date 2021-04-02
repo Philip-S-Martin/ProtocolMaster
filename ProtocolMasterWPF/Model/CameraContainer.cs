@@ -1,4 +1,5 @@
-﻿using ProtocolMasterCore.Utility;
+﻿using ProtocolMasterCore.Protocol;
+using ProtocolMasterCore.Utility;
 using ProtocolMasterWPF.Properties;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace ProtocolMasterWPF.Model
                 _videoDevice = value;
                 NotifyProperty();
                 ResetCam();
-                if (value.Id != Settings.Default.CameraID)
+                if (value != null && value.Id != Settings.Default.CameraID)
                 {
                     Settings.Default.CameraID = value.Id;
                     Settings.Default.Save();
@@ -50,7 +51,7 @@ namespace ProtocolMasterWPF.Model
                 _audioDevice = value;
                 NotifyProperty();
                 ResetCam();
-                if(value.Id != Settings.Default.MicrophoneID)
+                if (value != null && value.Id != Settings.Default.MicrophoneID)
                 {
                     Settings.Default.MicrophoneID = value.Id;
                     Settings.Default.Save();
@@ -58,7 +59,19 @@ namespace ProtocolMasterWPF.Model
             }
         }
         private DeviceInformation _audioDevice;
-        public void StartRecord() => Cam.StartRecord();
+
+        string label = "Recording";
+        public void SetLabel(List<ProtocolEvent> events, string label)
+        {
+            if (label != null)
+                this.label = label;
+            else this.label = "Recording";
+        }
+        public void StartRecord()
+        {
+            if(VideoDevice != null)
+                Cam.StartRecord(label);
+        }
         public void StopRecord() => Cam.StopRecord();
 
         private void ResetCam()
@@ -75,7 +88,9 @@ namespace ProtocolMasterWPF.Model
             catch (Exception e)
             {
                 Log.Error($"Default Camera could not be seleted, exception: {e}");
-                VideoDevice = MediaDevices.Instance.VideoDevices.First();
+                if (MediaDevices.Instance.VideoDevices.Count != 0)
+                    VideoDevice = MediaDevices.Instance.VideoDevices.First();
+                else VideoDevice = null;
             }
             try
             {
@@ -84,7 +99,9 @@ namespace ProtocolMasterWPF.Model
             catch (Exception e)
             {
                 Log.Error($"Default Microphone could not be seleted, exception: {e}");
-                AudioDevice = MediaDevices.Instance.AudioDevices.First();
+                if (MediaDevices.Instance.AudioDevices.Count != 0)
+                    AudioDevice = MediaDevices.Instance.AudioDevices.First();
+                else AudioDevice = null;
             }
         }
     }

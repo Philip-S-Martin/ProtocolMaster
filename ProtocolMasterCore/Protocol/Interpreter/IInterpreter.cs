@@ -4,6 +4,7 @@ namespace ProtocolMasterCore.Protocol.Interpreter
 {
     public interface IInterpreter : IExtension
     {
-        List<ProtocolEvent> Generate(string protocolName);
+        string ProtocolLabel { get; }
+        List<ProtocolEvent> Generate(string argument);
     }
 }

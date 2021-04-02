@@ -103,7 +103,8 @@ namespace ProtocolMasterWPF.Model
 
 
             Cam = new CameraContainer();
-            OnStart += Cam.StartRecord;
+            Protocol.InterpreterManager.OnEventsLoaded += Cam.SetLabel;
+            Protocol.DriverManager.OnProtocolStart += Cam.StartRecord;
             OnStop += Cam.StopRecord;
         }
         public void InitDefaultExtensions()
@@ -161,7 +162,7 @@ namespace ProtocolMasterWPF.Model
                     {
                         Protocol.Cancel();
                     });
-                    Protocol.Interpret(Selection.StartStream());
+                    Protocol.Interpret(Selection.StartStream(), Selection.ToString());
                     if (!CancelToken.IsCancellationRequested)
                     {
                         OnRun?.Invoke();
@@ -172,7 +173,7 @@ namespace ProtocolMasterWPF.Model
                 }, CancelSource.Token);
                 SessionTask.Start();
             }
-            else throw new Exception($"Cannot start in state {State.ToString()}");
+            else throw new Exception($"Cannot start in state {State}");
         }
         public void Stop(bool overrideCheck = false)
         {
@@ -182,7 +183,7 @@ namespace ProtocolMasterWPF.Model
                 OnStop?.Invoke();
                 State = SessionState.Viewing;
             }
-            else throw new Exception($"Cannot stop in state {State.ToString()}");
+            else throw new Exception($"Cannot stop in state {State}");
         }
         public void Reset(bool overrideCheck = false)
         {
@@ -195,7 +196,7 @@ namespace ProtocolMasterWPF.Model
                 else
                     State = SessionState.NotReady;
             }
-            else throw new Exception($"Cannot reset in state {State.ToString()}");
+            else throw new Exception($"Cannot reset in state {State}");
         }
         public void Preview(bool overrideCheck = false)
         {
@@ -209,13 +210,13 @@ namespace ProtocolMasterWPF.Model
                     {
                         Protocol.Cancel();
                     });
-                    Protocol.Interpret(Selection.StartStream());
+                    Protocol.Interpret(Selection.StartStream(), Selection.ToString());
                 }, CancelSource.Token);
                 SessionTask.Start();
                 OnPreview?.Invoke();
                 State = SessionState.Viewing;
             }
-            else throw new Exception($"Cannot preview in state {State.ToString()}");
+            else throw new Exception($"Cannot preview in state {State}");
         }
         public void OpenSelection(bool overrideCheck = false)
         {
@@ -223,7 +224,7 @@ namespace ProtocolMasterWPF.Model
             {
                 State = SessionState.Selecting;
             }
-            else throw new Exception($"Cannot open selection in state {State.ToString()}");
+            else throw new Exception($"Cannot open selection in state {State}");
         }
         public void MakeSelection(object select)
         {

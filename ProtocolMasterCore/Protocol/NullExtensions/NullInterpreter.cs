@@ -7,6 +7,9 @@ namespace ProtocolMasterCore.Protocol.NullExtensions
     public class NullInterpreter : IInterpreter
     {
         public bool IsCanceled { get; set; }
+
+        public string ProtocolLabel => "No Protocol";
+
         public List<ProtocolEvent> Generate(string protocolName)
         {
             return null;
