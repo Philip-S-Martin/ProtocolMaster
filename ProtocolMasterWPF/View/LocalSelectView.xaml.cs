@@ -28,15 +28,5 @@ namespace ProtocolMasterWPF.View
         }
         private void RefreshButton_Click(object sender, RoutedEventArgs e) => LocalFileStore.Instance.RefreshFiles();
         private void OpenFolderButton_Click(object sender, RoutedEventArgs e) => App.TryOpenURI(sender, AppEnvironment.GetLocation("Protocols"));
-
-        private void DeleteButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (SelectList.SelectedItem != null) ((LocalFileStreamer)SelectList.SelectedItem).Delete();
-        }
-
-        private void OpenButton_Click(object sender, RoutedEventArgs e)
-        {
-            ((LocalFileStreamer)SelectList.SelectedItem).Open();
-        }
     }
 }

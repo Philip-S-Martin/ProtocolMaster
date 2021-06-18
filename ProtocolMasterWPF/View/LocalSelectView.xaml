@@ -17,36 +17,20 @@
         <Grid Grid.Row="1" Background="{DynamicResource MaterialDesignDarkBackground}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             
             <Button Style="{DynamicResource MaterialDesignBackgroundIconButton}" Grid.Column="0"
-                    x:Name="OpenFolderButton" Click="OpenFolderButton_Click"
-                    ToolTip="Open local experiments folder">
-                <materialDesign:PackIcon Kind="FolderOpen" VerticalAlignment="Center"/>
+                    x:Name="OpenFolderButton" Click="OpenFolderButton_Click">
+                <materialDesign:PackIcon Kind="Folder" VerticalAlignment="Center"/>
             </Button>
-            <Button Style="{DynamicResource MaterialDesignBackgroundIconButton}" Grid.Column="1" 
-                    x:Name="RefreshButton" Click="RefreshButton_Click"
-                    ToolTip="Refresh local experiments list">
+            <TextBlock d:Text="C:/Users/phili/Documents/" Grid.Column="1" FontSize="10" Text="{Binding Source={x:Static model:LocalFileStore.Instance}, Path=Directory}" Margin="8,4" VerticalAlignment="Center" TextWrapping="Wrap"/>
+
+            <Button Style="{DynamicResource MaterialDesignBackgroundIconButton}" Grid.Column="2" 
+                    x:Name="RefreshButton" Click="RefreshButton_Click">
                 <materialDesign:PackIcon Kind="Refresh" VerticalAlignment="Center"/>
             </Button>
-            <TextBlock d:Text="C:/Users/phili/Documents/" Grid.Column="2" FontSize="10" Text="{Binding Source={x:Static model:LocalFileStore.Instance}, Path=Directory}" Margin="8,4" VerticalAlignment="Center" TextWrapping="Wrap"/>
-            <Button Style="{DynamicResource MaterialDesignBackgroundIconButton}" Grid.Column="3" x:Name="OpenButton"
-                    IsEnabled="{Binding ElementName=SelectListBox,Path=SelectedItem,Converter={StaticResource NotNullToBoolConverter}}"
-                    Click="OpenButton_Click"
-                    ToolTip="Open selected experiment with another application">
-                <materialDesign:PackIcon Kind="OpenInApp" VerticalAlignment="Center"/>
-            </Button>
-            <Button Style="{DynamicResource MaterialDesignBackgroundIconButton}" Grid.Column="4" x:Name="DeleteButton"
-                    IsEnabled="{Binding ElementName=SelectListBox,Path=SelectedItem,Converter={StaticResource NotNullToBoolConverter}}"
-                    Click="DeleteButton_Click"
-                    ToolTip="Delete selected experiment">
-                <materialDesign:PackIcon Kind="Delete" VerticalAlignment="Center"/>
-            </Button>
-
         </Grid>
     </Grid>
 </UserControl>

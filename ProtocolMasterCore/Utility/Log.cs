@@ -7,23 +7,30 @@ using System.Linq;
 namespace ProtocolMasterCore.Utility
 {
     public delegate void LogPrinter(string message);
-    public static class Log
+    public sealed class Log
     {
-        static TextWriter cout;
-        static TextWriter cerr;
-
-        private static readonly string logdata;
-        private static readonly string archive;
-
-        private static readonly int maxUnarchived = 20;
-        private static readonly int minUnarchived = 16;
-
-        public static LogPrinter ErrorPrinter;
-        public static LogPrinter OutputPrinter;
-
-        public static bool PrintErrors { get; set; }
-        public static bool PrintOutput { get; set; }
+        private static readonly Log instance = new Log();
+        // Explicit static constructor to tell C# compiler
+        // not to mark type as beforefieldinit
         static Log()
+        {
+        }
+
+        public static LogPrinter OutputPrinter;
+        public static LogPrinter ErrorPrinter;
+
+        private readonly string logdata;
+        private readonly string archive;
+
+        private readonly int maxUnarchived = 20;
+        private readonly int minUnarchived = 16;
+
+        private readonly LogFile lfOut;
+        private readonly LogFile lfErr;
+        public bool PrintErrors { get; set; }
+        public bool PrintOutput { get; set; }
+
+        private Log()
         {
             if (AppEnvironment.TryAddLocationDocuments("Log", "Log", out logdata))
             { }
@@ -31,49 +38,50 @@ namespace ProtocolMasterCore.Utility
             { }
 
             string timePrefix = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-
-            FileStream outStream = new FileStream(Path.Combine(logdata, $"{timePrefix}_Out.log"), FileMode.Create);
-            FileStream errStream = new FileStream(Path.Combine(logdata, $"{timePrefix}_Err.log"), FileMode.Create);
-
-            cout = TextWriter.Synchronized(new StreamWriter(outStream));
-            cerr = TextWriter.Synchronized(new StreamWriter(errStream));
+            lfOut = new LogFile(Path.Combine(logdata, $"{timePrefix}_Out.log"));
+            lfErr = new LogFile(Path.Combine(logdata, $"{timePrefix}_Err.log"));
 
             PrintErrors = true;
             ArchiveOldest();
         }
-        public static void Error(object message, bool writeThrough = false)
+        public static Log Instance
         {
-            string toWrite;
-            if (message == null)
-                toWrite = $"{DateTime.Now}:\tNULL";
-            else toWrite = $"{DateTime.Now}:\t{message}";
-
-            cerr.WriteLine(toWrite);
-            if(writeThrough)
-                cerr.Flush();
-
-            ErrorPrinter.Invoke(toWrite);
+            get
+            {
+                return instance;
+            }
         }
-        public static void Out(object message, bool writeThrough = false)
-        {
-            string toWrite;
-            if (message == null)
-                toWrite = $"{DateTime.Now}:\tNULL";
-            else toWrite = $"{DateTime.Now}:\t{message}";
 
-            cout.WriteLine(toWrite);
-            if (writeThrough)
-                cout.Flush();
+        public static void Error(object message) => Instance.I_Error(message == null ? "NULL" : message.ToString());
+        public void I_Error(string message)
+        {
+            string toWrite = $"E:{DateTime.Now}:\t{message}";
+            lfErr.Write(toWrite);
+            if (PrintErrors)
+            {
+                ErrorPrinter(toWrite);
+            }
+        }
+        public static void Out(object message) => Log.Instance.I_Out(message == null ? "NULL" : message.ToString());
+        public void I_Out(string message)
+        {
+            string toWrite = $"O:{DateTime.Now}:\t{message}";
+            lfOut.Write(toWrite);
+            if (PrintErrors)
+            {
+                OutputPrinter(toWrite);
+            }
+        }
 
-            OutputPrinter.Invoke(toWrite);
-        }
-        public static void Flush()
+        public void WriteFiles()
         {
-            cout.Flush();
-            cerr.Flush();
+            lfErr.WriteBuffer();
+            lfOut.WriteBuffer();
         }
-        public static void OpenFolder()
+
+        public void OpenFolder()
         {
+            WriteFiles();
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
             {
                 FileName = logdata,
@@ -81,6 +89,8 @@ namespace ProtocolMasterCore.Utility
                 Verb = "open"
             });
         }
-        private static void ArchiveOldest() => Archiver.ArchiveOldestInDirectory(logdata, archive, ".log", maxUnarchived, minUnarchived);
+
+        private void ArchiveOldest() => Archiver.ArchiveOldestInDirectory(logdata, archive, ".log", maxUnarchived, minUnarchived);
+
     }
 }

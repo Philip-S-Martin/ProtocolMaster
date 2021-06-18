@@ -99,15 +99,14 @@ namespace McIntyreAFC
             Serial = new SerialPortStream
             {
                 RtsEnable = true,
+                DtrEnable = true,
                 PortName = port,
                 BaudRate = 9600,
                 NewLine = "\n"
             };
 
-            //Serial.Handshake = Handshake.
             Serial.DataReceived += DataReceiver;
             Serial.Open();
-            
 
             // Handshake
             // Read serial buffer until arduino tells us how much capacity it has

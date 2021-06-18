@@ -27,6 +27,7 @@ namespace ProtocolMasterWPF.Model
         {
             AppEnvironment.TryAddLocationDocuments("Protocols", "Protocols", out string dirResult);
             Directory = dirResult;
+            
             LocalFiles = new ObservableCollection<LocalFileStreamer>();
             RefreshFiles();
         }

@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ProtocolMasterWPF.Model
 {
-    internal class LocalFileStreamer : Streamer
+    internal class LocalFileStreamer : IStreamStarter
     {
         public string Name { get => Path.GetFileNameWithoutExtension(LocalFile.FullName); }
         public FileInfo LocalFile { get; private set; }
@@ -15,7 +14,7 @@ namespace ProtocolMasterWPF.Model
         {
             LocalFile = source;
         }
-        public override Stream StartStream()
+        public Stream StartStream()
         {
             Stream result;
             try
@@ -32,19 +31,6 @@ namespace ProtocolMasterWPF.Model
         public override string ToString()
         {
             return Name;
-        }
-        public Task Delete()
-        {
-            var task = Task.Run(() => LocalFile.Delete());
-            task.ContinueWith(
-                (task) => LocalFileStore.Instance.RefreshFiles(),
-                TaskScheduler.FromCurrentSynchronizationContext());
-            return task;
-        }
-        public Task Open()
-        {
-            var task = Task.Run(() => App.TryOpenURI(this, LocalFile.FullName));
-            return task;
         }
     }
 }
