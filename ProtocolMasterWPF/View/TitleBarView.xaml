@@ -15,29 +15,26 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-
+            <Image Grid.Column="0"  Margin="8,0" 
+                   RenderOptions.BitmapScalingMode="HighQuality" 
+                   Height="32" Width="32" 
+                   Source="/Protocol Master;component/Assets/Logo/LogoSquare480.png"/>
             <Menu Grid.Column="1" Margin="2">
-                <MenuItem Padding="10">
-                    <MenuItem.Header>
-                        <Image RenderOptions.BitmapScalingMode="HighQuality" Height="28" Width="28" Source="/ProtocolMasterWPF;component/Assets/Logo/LogoSquare480.png"></Image>
-                    </MenuItem.Header>
-                    <MenuItem Header="ProtocolMaster" IsEnabled="False" />
-                    <Separator/>
-                    <MenuItem Header="Website" x:Name="OpenWebsiteHome" Click="OpenWebsiteHome_Click"/>
-                    <MenuItem Header="Github" x:Name="OpenGithub" Click="OpenGithub_Click"/>
-                    <MenuItem Header="Release Notes" x:Name="OpenReleaseNotes" Click="OpenReleaseNotes_Click"/>
-                    <MenuItem Header="Debug Options" x:Name="DebugToggle" IsCheckable="True"/>
-                </MenuItem>
                 <MenuItem Header="File">
                     <MenuItem Header="Protocols Folder" x:Name="OpenProtocolsFolder" Click="OpenProtocolsFolder_Click"/>
-                    <MenuItem Header="Video Folder" x:Name="OpenVideoFolder" Click="OpenVideoFolder_Click"/>
-                    <MenuItem Header="Log Folder" x:Name="OpenLogFolder" Click="OpenLogFolder_Click"/>
-                    <MenuItem Header="Extension Folder" x:Name="OpenExtensionFolder" Click="OpenExtensionFolder_Click"/>
+                    <MenuItem Header="Recordings Folder" x:Name="OpenRecordingsFolder" Click="OpenRecordingsFolder_Click"/>
+                    <MenuItem Header="Logs Folder" x:Name="OpenLogFolder" Click="OpenLogFolder_Click"/>
+                    <MenuItem Header="Extensions Folder" x:Name="OpenExtensionFolder" Click="OpenExtensionFolder_Click"/>
                 </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="Getting Started" x:Name="OpenWebsiteGettingStarted" Click="OpenWebsiteGettingStarted_Click"/>
                     <MenuItem Header="User Guide" x:Name="OpenWebsiteUserGuide" Click="OpenWebsiteUserGuide_Click"/>
                     <MenuItem Header="Technical Documentation" x:Name="OpenWiki" Click="OpenWiki_Click"/>
+                    <Separator/>
+                    <MenuItem Header="Website" x:Name="OpenWebsiteHome" Click="OpenWebsiteHome_Click"/>
+                    <MenuItem Header="Github" x:Name="OpenGithub" Click="OpenGithub_Click"/>
+                    <MenuItem Header="Release Notes" x:Name="OpenReleaseNotes" Click="OpenReleaseNotes_Click"/>
+                    <MenuItem Header="Debug Options" x:Name="DebugToggle" IsCheckable="True"/>
                 </MenuItem>
                 <MenuItem Header="Debug" Visibility="{Binding ElementName=DebugToggle, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <MenuItem Header="Log Test" Click="LogTest_Click"/>
@@ -48,7 +45,8 @@
             <StackPanel Grid.Column="2" HorizontalAlignment="Right"  Margin="2,2,16,2" Orientation="Horizontal">
                 <Button x:Name="GoogleAuthButton" Style="{StaticResource MaterialDesignForegroundFlatButton}"
                         Width="Auto" Margin="0" Padding="4,0" Click="GoogleAuthButton_Click" 
-                        Visibility="{Binding Source={x:Static google:GAuth.Instance}, Path=IsPreAuth, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        Visibility="{Binding Source={x:Static google:GAuth.Instance}, Path=IsPreAuth, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        ToolTip="Sign into Protocol Master with your Google account">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Google" VerticalAlignment="Center" Margin="3,0"/>
                             <TextBlock Text="Sign in with Google" VerticalAlignment="Center" Margin="3,0"/>
@@ -57,7 +55,8 @@
                 <TextBlock Text="Signing in, please check your browser" Margin="0" d:Visibility="Collapsed" VerticalAlignment="Center" IsEnabled="False" 
                            Visibility="{Binding Source={x:Static google:GAuth.Instance}, Path=IsDoAuth, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 <Button x:Name="GoogleDeauthButton" Width="Auto" Margin="0" Padding="4,0" Style="{StaticResource MaterialDesignForegroundFlatButton}" d:Visibility="Collapsed" Click="GoogleDeauthButton_Click" 
-                        Visibility="{Binding Source={x:Static google:GAuth.Instance}, Path=IsPostAuth, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        Visibility="{Binding Source={x:Static google:GAuth.Instance}, Path=IsPostAuth, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        ToolTip="Sign out of Protocol Master with Google">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Google" VerticalAlignment="Center" Margin="3,0"/>
                             <TextBlock Text="Sign out" VerticalAlignment="Center" Margin="3,0"/>

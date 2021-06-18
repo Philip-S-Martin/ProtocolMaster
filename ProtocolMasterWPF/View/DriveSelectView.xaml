@@ -8,18 +8,67 @@
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="400">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <ListBox x:Name ="SelectListBox" 
+                 Grid.Row="0"
                 ItemsSource="{Binding Source={x:Static google:GDrive.Instance}, Path=AvailableFiles}" 
                 Visibility="{Binding Source={x:Static google:GAuth.Instance}, Path=IsPostAuth, Converter={StaticResource BooleanToVisibilityConverter}}"
                 VerticalAlignment="Stretch"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                 Grid.Row="0"
                     Visibility="{Binding Source={x:Static google:GAuth.Instance}, Path=IsPreAuth, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Button Width="Auto" Margin="8"  Click="SignIn_Click">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Google" VerticalAlignment="Center" Margin="2,0"/>
-                    <TextBlock Text="Sign in with Google" VerticalAlignment="Center" Margin="2,0"/>
+                    <TextBlock Text="Sign in with Google" 
+                               VerticalAlignment="Center" 
+                               Margin="2,0"
+                               ToolTip="Sign into Protocol Master with your Google account"/>
                 </StackPanel>
             </Button>
         </StackPanel>
+        <Grid Grid.Row="1" Background="{DynamicResource MaterialDesignDarkBackground}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Style="{DynamicResource MaterialDesignBackgroundIconButton}" Grid.Column="0" x:Name="OpenDriveButton"
+                    IsEnabled="{Binding Source={x:Static google:GAuth.Instance}, Path=IsPostAuth}"
+                    Click="OpenDriveButton_Click"
+                    ToolTip="Open Google Drive in your browser">
+                <materialDesign:PackIcon Kind="GoogleDrive" VerticalAlignment="Center"/>
+            </Button>
+            <Button Style="{DynamicResource MaterialDesignBackgroundIconButton}" Grid.Column="1" x:Name="RefreshButton"
+                    IsEnabled="{Binding Source={x:Static google:GAuth.Instance}, Path=IsPostAuth}"
+                    Click="RefreshButton_Click"
+                    ToolTip="Refresh Google Drive experiments list">
+                <materialDesign:PackIcon Kind="Refresh" VerticalAlignment="Center"/>
+            </Button>
+            <Button Style="{DynamicResource MaterialDesignBackgroundIconButton}" Grid.Column="3" x:Name="OpenInDriveButton"
+                    IsEnabled="{Binding ElementName=SelectListBox,Path=SelectedItem,Converter={StaticResource NotNullToBoolConverter}}"
+                    Click="OpenInDriveButton_Click"
+                    ToolTip="Open selected experiment with Google Sheets">
+                <materialDesign:PackIcon Kind="GoogleSpreadsheet" VerticalAlignment="Center"/>
+            </Button>
+            <Button Style="{DynamicResource MaterialDesignBackgroundIconButton}" Grid.Column="4" x:Name="PublishButton"
+                    IsEnabled="{Binding ElementName=SelectListBox,Path=SelectedItem,Converter={StaticResource NotNullToBoolConverter}}"
+                    Click="PublishButton_Click"
+                    ToolTip="Publish selected experiment">
+                <materialDesign:PackIcon Kind="Publish" VerticalAlignment="Center"/>
+            </Button>
+            <Button Style="{DynamicResource MaterialDesignBackgroundIconButton}" Grid.Column="5" x:Name="DownloadLocalButton"
+                    IsEnabled="{Binding ElementName=SelectListBox,Path=SelectedItem,Converter={StaticResource NotNullToBoolConverter}}"
+                    Click="DownloadLocalButton_Click"
+                    ToolTip="Download selected experiment locally">
+                <materialDesign:PackIcon Kind="Download" VerticalAlignment="Center"/>
+            </Button>
+        </Grid>
     </Grid>
 </UserControl>

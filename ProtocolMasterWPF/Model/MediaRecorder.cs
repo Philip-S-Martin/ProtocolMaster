@@ -13,13 +13,20 @@ using Windows.Storage;
 
 namespace ProtocolMasterWPF.Model
 {
-    internal class Camera : INotifyPropertyChanged
+    internal class MediaRecorder : INotifyPropertyChanged
     {
         private StorageFolder videoStore;
         private string storagePath;
         public MediaCapture MediaCap { get; private set; }
-        
-        public Camera(DeviceInformation videoDevice, DeviceInformation audioDevice)
+        private RecordMode mode;
+        private enum RecordMode
+        {
+            NONE,
+            VIDEO,
+            VIDEOAUDIO,
+            AUDIO
+        }
+        public MediaRecorder(DeviceInformation videoDevice, DeviceInformation audioDevice)
         {
             AppEnvironment.TryAddLocationDocuments("Video", "Video", out storagePath);
             InitVideoStore();
@@ -33,7 +40,18 @@ namespace ProtocolMasterWPF.Model
         public void InitializeCap(DeviceInformation videoDevice, DeviceInformation audioDevice)
         {
             if (videoDevice == null)
+            {
                 Log.Error($"Video Device null");
+                if (audioDevice != null)
+                {
+                    MediaCap.InitializeAsync(new MediaCaptureInitializationSettings()
+                    {
+                        AudioDeviceId = audioDevice.Id
+                    }).AsTask().Wait();
+                    mode = RecordMode.AUDIO;
+                }
+                else mode = RecordMode.NONE;
+            }
             else
             {
                 if (audioDevice == null)
@@ -44,10 +62,13 @@ namespace ProtocolMasterWPF.Model
                         {
                             VideoDeviceId = videoDevice.Id
                         }).AsTask().Wait();
+                        mode = RecordMode.VIDEO;
                     }
                     catch (UnauthorizedAccessException ex)
                     {
+                        // THIS CATCH NEEDS TESTING, NOT SURE IF MODE SET NONE IS GOOD
                         Log.Error($"The app was denied access to the camera: {ex}");
+                        mode = RecordMode.NONE;
                     }
                 }
                 else
@@ -59,10 +80,13 @@ namespace ProtocolMasterWPF.Model
                             VideoDeviceId = videoDevice.Id,
                             AudioDeviceId = audioDevice.Id
                         }).AsTask().Wait();
+                        mode = RecordMode.VIDEOAUDIO;
                     }
                     catch (UnauthorizedAccessException ex)
                     {
+                        // THIS CATCH NEEDS TESTING, NOT SURE IF MODE SET NONE IS GOOD
                         Log.Error($"The app was denied access to the camera: {ex}");
+                        mode = RecordMode.NONE;
                     }
                 }
             }
@@ -83,8 +107,17 @@ namespace ProtocolMasterWPF.Model
         {
             try
             {
-                StorageFile file = await videoStore.CreateFileAsync($"{label}.wmv", CreationCollisionOption.GenerateUniqueName);
-                await MediaCap.StartRecordToStorageFileAsync(MediaEncodingProfile.CreateWmv(VideoEncodingQuality.Auto), file);
+                if (mode == RecordMode.AUDIO)
+                {
+                    StorageFile file = await videoStore.CreateFileAsync($"{label}.mp3", CreationCollisionOption.GenerateUniqueName);
+                    await MediaCap.StartRecordToStorageFileAsync(MediaEncodingProfile.CreateMp3(AudioEncodingQuality.Auto), file);
+                }
+                else if (mode == RecordMode.VIDEO || mode == RecordMode.VIDEOAUDIO)
+                {
+                    StorageFile file = await videoStore.CreateFileAsync($"{label}.wmv", CreationCollisionOption.GenerateUniqueName);
+                    await MediaCap.StartRecordToStorageFileAsync(MediaEncodingProfile.CreateWmv(VideoEncodingQuality.Auto), file);
+                }
+                else IsRecording = false;
                 IsRecording = true;
                 Log.Error("Began Recording");
             }
