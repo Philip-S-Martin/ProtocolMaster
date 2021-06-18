@@ -18,8 +18,8 @@ namespace ProtocolMasterWPF.View
             SessionControl = new Session();
 
             PromptTargetStore promptTargets = new PromptTargetStore();
-            promptTargets.UserSelect = DropdownDialog.ShowDialogString;
-            promptTargets.UserNumber = DropdownDialog.ShowDialogIntRange;
+            promptTargets.UserSelect = DropdownDialog.DropdownUserSelect;
+            promptTargets.UserNumber = DropdownDialog.DropdownUserNumber;
 
             SessionControl.Protocol.DriverManager.PromptTargets = promptTargets;
             SessionControl.Protocol.InterpreterManager.PromptTargets = promptTargets;
@@ -34,6 +34,7 @@ namespace ProtocolMasterWPF.View
             SessionControl.OnReset += ControlBar.ResetTime;
             SessionControl.Animator.OnUpdate += Timeline.UpdateTime;
             SessionControl.Animator.OnUpdate += ControlBar.UpdateTime;
+
         }
     }
 }

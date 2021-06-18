@@ -10,42 +10,34 @@ using Windows.Devices.Enumeration;
 
 namespace ProtocolMasterWPF.Model
 {
-    internal class MediaProperties : Observable
+    internal class CameraContainer : Observable
     {
-        public MediaProperties()
+        public CameraContainer()
         {
             InitDefaultDevices();
             ResetCam();
         }
-        public MediaRecorder Recorder
+        public Camera Cam
         {
-            get => _recorder;
+            get => _cam;
             private set
             {
-                _recorder = value;
+                _cam = value;
                 NotifyProperty();
             }
         }
-        private MediaRecorder _recorder;
+        private Camera _cam;
         public DeviceInformation VideoDevice
         {
             get => _videoDevice;
             set
             {
                 _videoDevice = value;
-                ResetCam();
                 NotifyProperty();
-                if (value != null)
+                ResetCam();
+                if (value != null && value.Id != Settings.Default.CameraID)
                 {
-                    if (value.Id != Settings.Default.CameraID)
-                    {
-                        Settings.Default.CameraID = value.Id;
-                        Settings.Default.Save();
-                    }
-                }
-                else
-                {
-                    Settings.Default.CameraID = null;
+                    Settings.Default.CameraID = value.Id;
                     Settings.Default.Save();
                 }
             }
@@ -57,19 +49,11 @@ namespace ProtocolMasterWPF.Model
             set
             {
                 _audioDevice = value;
-                ResetCam();
                 NotifyProperty();
-                if (value != null)
+                ResetCam();
+                if (value != null && value.Id != Settings.Default.MicrophoneID)
                 {
-                    if (value.Id != Settings.Default.MicrophoneID)
-                    {
-                        Settings.Default.MicrophoneID = value.Id;
-                        Settings.Default.Save();
-                    }
-                }
-                else
-                {
-                    Settings.Default.MicrophoneID = null;
+                    Settings.Default.MicrophoneID = value.Id;
                     Settings.Default.Save();
                 }
             }
@@ -85,22 +69,21 @@ namespace ProtocolMasterWPF.Model
         }
         public void StartRecord()
         {
-            Recorder.StartRecord(label);
+            if(VideoDevice != null)
+                Cam.StartRecord(label);
         }
-        public void StopRecord() => Recorder.StopRecord();
+        public void StopRecord() => Cam.StopRecord();
 
         private void ResetCam()
         {
-            Recorder = new MediaRecorder(VideoDevice, AudioDevice);
+            Cam = new Camera(VideoDevice, AudioDevice);
         }
 
         public void InitDefaultDevices()
         {
             try
             {
-                if (Settings.Default.CameraID == "") _videoDevice = null;
-                else
-                    _videoDevice = MediaDevices.Instance.VideoDeviceByID(Settings.Default.CameraID);
+                _videoDevice = MediaDevices.Instance.VideoDeviceByID(Settings.Default.CameraID);
             }
             catch (Exception e)
             {
@@ -111,8 +94,7 @@ namespace ProtocolMasterWPF.Model
             }
             try
             {
-                if (Settings.Default.MicrophoneID == "") _audioDevice = null;
-                else _audioDevice = MediaDevices.Instance.AudioDeviceByID(Settings.Default.MicrophoneID);
+                _audioDevice = MediaDevices.Instance.AudioDeviceByID(Settings.Default.MicrophoneID);
             }
             catch (Exception e)
             {

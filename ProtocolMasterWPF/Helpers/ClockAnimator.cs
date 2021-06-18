@@ -64,7 +64,7 @@ namespace ProtocolMasterWPF.Helpers
         {
             while (!cancelToken.IsCancellationRequested)
             {
-                Thread.Sleep(256);
+                Thread.Sleep(192);
                 progress.Report(1);
             }
             progress.Report(0);

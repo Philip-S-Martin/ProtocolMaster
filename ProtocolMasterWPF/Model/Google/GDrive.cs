@@ -5,7 +5,6 @@ using Google.Apis.Services;
 using ProtocolMasterCore.Utility;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Threading.Tasks;
 using File = Google.Apis.Drive.v3.Data.File;
 
 namespace ProtocolMasterWPF.Model.Google
@@ -27,21 +26,12 @@ namespace ProtocolMasterWPF.Model.Google
                 return instance;
             }
         }
-        public Stream StreamFile(string fileID)
+
+        public Stream Download(string fileID)
         {
             if (fileID != null)
                 return service.Files.Export(fileID, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").ExecuteAsStream();
             else return null;
-        }
-        public void Publish(string fileID)
-        {
-            service.Revisions.Update(new Revision()
-            {
-                Published = true,
-                PublishAuto = true,
-            },
-            fileID,
-            "1").Execute();
         }
 
         // Core Drive Functionality. 
@@ -79,8 +69,7 @@ namespace ProtocolMasterWPF.Model.Google
         #region
         private static readonly string[] serviceTokens =
         {
-            DriveService.Scope.DriveFile,
-            "https://www.googleapis.com/auth/drive.install"
+            DriveService.Scope.DriveFile
         };
 
 

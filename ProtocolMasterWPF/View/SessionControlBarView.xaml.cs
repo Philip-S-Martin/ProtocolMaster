@@ -25,7 +25,12 @@ namespace ProtocolMasterWPF.View
         private void StartButton_Click(object sender, RoutedEventArgs e) => SessionControl.Start();
         private void StopButton_Click(object sender, RoutedEventArgs e) => SessionControl.Stop();
         private void ResetButton_Click(object sender, RoutedEventArgs e) => SessionControl.Reset();
-        private void SelectButton_Click(object sender, RoutedEventArgs e) => ProtocolSelectDialog.ShowDialog(SessionControl);
+        private void SelectDialog_OnDialogClosing(object sender, DialogClosingEventArgs eventArgs)
+        {
+            if (eventArgs.Parameter == null) SessionControl.CancelSelection();
+            else SessionControl.MakeSelection(eventArgs.Parameter);
+        }
+        private void SelectButton_Click(object sender, RoutedEventArgs e) => DialogHost.Show(new ProtocolSelectView(), "SessionDialog", SelectDialog_OnDialogClosing);
         public void UpdateTime(double elapsed, double duration) => App.Current.Dispatcher.Invoke(() => UpdateTimeLocal(elapsed, duration));
         private void UpdateTimeLocal(double elapsed, double duration)
         {
@@ -40,7 +45,5 @@ namespace ProtocolMasterWPF.View
             DurationLabel.Text = DateTime.FromOADate(0f).ToString("HH:mm:ss");
             TimeProgressBar.Value = 0f;
         }
-
-        private void SettingsButton_Click(object sender, RoutedEventArgs e) => SessionSettingsDialog.ShowDialog(SessionControl);
     }
 }

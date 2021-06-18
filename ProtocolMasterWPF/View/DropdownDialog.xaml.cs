@@ -18,7 +18,7 @@ namespace ProtocolMasterWPF.View
             SelectList.ItemsSource = options;
             PromptText.Text = prompt;
         }
-        public static string ShowDialogString(string[] options, string prompt)
+        public static string DropdownUserSelect(string[] options, string prompt)
         {
             Task<object> dialogTask = Application.Current.Dispatcher.Invoke<Task<object>>(new Func<Task<object>>(() => DropdownDialog.DropdownHandler(options, prompt)));
             dialogTask.Wait();
@@ -27,7 +27,7 @@ namespace ProtocolMasterWPF.View
         private static Task<object> DropdownHandler(string[] options, string prompt)
         {
             DropdownDialog dialog = new DropdownDialog(options, prompt);
-            return DialogHost.Show(dialog, "PromptHost");
+            return DialogHost.Show(dialog, "PromptDialog");
         }
         public DropdownDialog(int min, int max, string prompt)
         {
@@ -35,7 +35,7 @@ namespace ProtocolMasterWPF.View
             SelectList.ItemsSource = Enumerable.Range(min, max-min+1);
             PromptText.Text = prompt;
         }
-        public static int ShowDialogIntRange(int min, int max, string prompt)
+        public static int DropdownUserNumber(int min, int max, string prompt)
         {
             Task<object> dialogTask = Application.Current.Dispatcher.Invoke<Task<object>>(new Func<Task<object>>(() => DropdownDialog.DropdownHandler(min, max, prompt)));
             dialogTask.Wait();
@@ -44,12 +44,12 @@ namespace ProtocolMasterWPF.View
         private static Task<object> DropdownHandler(int min, int max, string prompt)
         {
             DropdownDialog dialog = new DropdownDialog(min, max, prompt);
-            return DialogHost.Show(dialog, "PromptHost");
+            return DialogHost.Show(dialog, "PromptDialog");
         }
         public ListBox SelectList => SelectListBox;
         private void SelectButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogHost.Close("PromptHost", SelectList.SelectedItem);
+            DialogHost.Close("PromptDialog", SelectList.SelectedItem);
         }
     }
 }

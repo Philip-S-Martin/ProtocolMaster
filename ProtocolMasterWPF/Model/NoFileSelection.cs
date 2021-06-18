@@ -5,9 +5,9 @@ using System.Text;
 
 namespace ProtocolMasterWPF.Model
 {
-    public class NoFileSelection : Streamer
+    public class NoFileSelection : IStreamStarter
     {
-        public override Stream StartStream()
+        public Stream StartStream()
         {
             return null;
         }

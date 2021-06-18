@@ -25,6 +25,7 @@ namespace ProtocolMasterWPF.Model
     {
         public InterpretAndDriveProtocol Protocol { get; private set; }
         private string extensionDir;
+        Task SessionTask { get; set; }
         CancellationTokenSource CancelSource { get; set; }
         CancellationToken CancelToken { get; set; }
         public List<IExtensionMeta> InterpreterOptions { get => _interpreterOptions; private set { _interpreterOptions = value; NotifyProperty(); } }
@@ -62,10 +63,10 @@ namespace ProtocolMasterWPF.Model
             }
         }
         public ClockAnimator Animator { get; private set; }
-        public MediaProperties Cam { get; private set; }
+        public CameraContainer Cam { get; private set; }
         SessionState State { get => _state; set { _state = value; NotifyStateProperties(); } }
         SessionState _state = SessionState.NotReady;
-        public Streamer Selection
+        public IStreamStarter Selection
         {
             get => _selection;
             private set
@@ -78,7 +79,7 @@ namespace ProtocolMasterWPF.Model
                 NotifyProperty("SelectionObject");
             }
         }
-        public Streamer _selection;
+        public IStreamStarter _selection;
         public object SelectionObject { get { if (Selection != null) return (object)Selection; else return "No Protocol Selected"; } }
         public bool CanStart { get => State == SessionState.Ready; }
         public bool CanStop { get => State == SessionState.Running; }
@@ -101,7 +102,7 @@ namespace ProtocolMasterWPF.Model
             InitDefaultExtensions();
 
 
-            Cam = new MediaProperties();
+            Cam = new CameraContainer();
             Protocol.InterpreterManager.OnEventsLoaded += Cam.SetLabel;
             Protocol.DriverManager.OnProtocolStart += Cam.StartRecord;
             OnStop += Cam.StopRecord;
@@ -155,7 +156,7 @@ namespace ProtocolMasterWPF.Model
                 State = SessionState.Running;
                 CancelSource = new CancellationTokenSource();
                 CancelToken = CancelSource.Token;
-                Task SessionTask = new Task(() =>
+                SessionTask = new Task(() =>
                 {
                     CancelToken.Register(() =>
                     {
@@ -203,7 +204,7 @@ namespace ProtocolMasterWPF.Model
             {
                 CancelSource = new CancellationTokenSource();
                 CancelToken = CancelSource.Token;
-                Task SessionTask = new Task(() =>
+                SessionTask = new Task(() =>
                 {
                     CancelToken.Register(() =>
                     {
@@ -227,15 +228,15 @@ namespace ProtocolMasterWPF.Model
         }
         public void MakeSelection(object select)
         {
-            if (typeof(Streamer).IsAssignableFrom(select.GetType()))
+            if (typeof(IStreamStarter).IsAssignableFrom(select.GetType()))
             {
-                Selection = (Streamer)select;
+                Selection = (IStreamStarter)select;
                 Log.Error($"Making selection: {Selection}");
                 Reset(true);
             }
             else
             {
-                Log.Error($"Object {Selection} not of type {typeof(Streamer)}");
+                Log.Error($"Object {Selection} not of type {typeof(IStreamStarter)}");
                 CancelSelection();
             }
         }

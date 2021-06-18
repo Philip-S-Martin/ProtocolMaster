@@ -106,7 +106,7 @@ namespace McIntyreAFC
                 baseData = new Protocol();
                 baseData.owner = DataReader.GetValue(headerMap["Owner"]).ToString();
                 baseData.sound_order = DataReader.GetValue(headerMap["Sound Order"]).ToString();
-                
+
                 string extra_time_str = DataReader.GetValue(headerMap["Extra Time (ms)"]).ToString();
                 string interval_min_str = DataReader.GetValue(headerMap["Inter-sound Interval Minimum (ms)"]).ToString();
                 string interval_max_str = DataReader.GetValue(headerMap["Inter-sound Interval Maximum (ms)"]).ToString();

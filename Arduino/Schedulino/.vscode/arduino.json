@@ -1,6 +1,5 @@
 {
     "sketch": "Schedulino.ino",
     "board": "arduino:avr:uno",
-    "port": "COM4",
-    "programmer": "arduino:avrispmkii"
+    "port": "COM3"
 }
