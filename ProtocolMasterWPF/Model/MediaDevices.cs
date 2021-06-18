@@ -16,12 +16,12 @@ namespace ProtocolMasterWPF.Model
         {
             RefreshDevices();
         }
-        private DeviceInformationCollection _videoDevices;
+        private List<DeviceInformation> _videoDevices;
 
-        public DeviceInformationCollection VideoDevices
+        public List<DeviceInformation> VideoDevices
         {
             get => _videoDevices;
-            set
+            private set
             {
                 _videoDevices = value;
                 NotifyProperty();
@@ -31,18 +31,17 @@ namespace ProtocolMasterWPF.Model
         {
             Task<DeviceInformationCollection> task = DeviceInformation.FindAllAsync(DeviceClass.VideoCapture).AsTask();
             task.Wait();
-            VideoDevices = task.Result;
+            VideoDevices = task.Result.ToList<DeviceInformation>();
             task.Dispose();
-
             task = DeviceInformation.FindAllAsync(DeviceClass.AudioCapture).AsTask();
             task.Wait();
-            AudioDevices = task.Result;
+            AudioDevices = task.Result.ToList<DeviceInformation>();
         }
-        private DeviceInformationCollection _audioDevices;
-        public DeviceInformationCollection AudioDevices
+        private List<DeviceInformation> _audioDevices;
+        public List<DeviceInformation> AudioDevices
         {
             get => _audioDevices;
-            set
+            private set
             {
                 _audioDevices = value;
                 NotifyProperty();

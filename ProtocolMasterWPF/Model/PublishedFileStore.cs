@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 using System.Text;
 using System.IO;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace ProtocolMasterWPF.Model
 {
@@ -48,11 +49,27 @@ namespace ProtocolMasterWPF.Model
         }
         public void Add(string name, string url)
         {
+            string baseName = name;
+            int i = 1;
+            while (PublishedFiles.Any(a => a.Name == name))
+                name = $"{baseName} ({i++})";
             PublishedFiles.Add(new PublishedFileStreamer() { Name=name, URL=url });
             string filepath = Path.Combine(Directory, "PubStore.json");
             FileStream filestream = new FileInfo(filepath).Open(FileMode.Create);
             JsonSerializer.SerializeAsync(filestream, PublishedFiles).Wait();
             filestream.Close();
+        }
+        public void Update(PublishedFileStreamer target, string name, string url)
+        {
+            if (PublishedFiles.Contains(target))
+            {
+                target.Name = name;
+                target.URL = url;
+                string filepath = Path.Combine(Directory, "PubStore.json");
+                FileStream filestream = new FileInfo(filepath).Open(FileMode.Create);
+                JsonSerializer.SerializeAsync(filestream, PublishedFiles).Wait();
+                filestream.Close();
+            }
         }
         public void Remove(PublishedFileStreamer target)
         {

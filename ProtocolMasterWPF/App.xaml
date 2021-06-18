@@ -4,8 +4,10 @@
              xmlns:local="clr-namespace:ProtocolMasterWPF"
              StartupUri="MainWindow.xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:materialExtension="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml" xmlns:helpers="clr-namespace:ProtocolMasterWPF.Helpers"
-             Startup="Application_Startup">
+             xmlns:materialExtension="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml" 
+             xmlns:helpers="clr-namespace:ProtocolMasterWPF.Helpers"
+             Startup="Application_Startup"
+             Exit="Application_Exit">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -18,7 +20,10 @@
 
                 <ResourceDictionary>
                     <helpers:NotNullToBoolConverter x:Key="NotNullToBoolConverter"/>
+                    <helpers:NullToBoolConverter x:Key="NullToBoolConverter"/>
                     <helpers:IsEnabledConverter x:Key="IsEnabledConverter"/>
+                    <helpers:NullReplaceConverter x:Key="NullReplaceConverter"/>
+                    <helpers:EnumerableNullReplaceConverter x:Key="EnumerableNullReplaceConverter"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

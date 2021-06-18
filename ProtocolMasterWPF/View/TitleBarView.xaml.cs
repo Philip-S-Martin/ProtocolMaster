@@ -48,11 +48,12 @@ namespace ProtocolMasterWPF.View
         private void OpenGithub_Click(object sender, RoutedEventArgs e) => App.TryOpenURI(sender, "https://github.com/Philip-S-Martin/ProtocolMaster");
         private void OpenReleaseNotes_Click(object sender, RoutedEventArgs e) => App.TryOpenURI(sender, "https://github.com/Philip-S-Martin/ProtocolMaster/releases");
         private void OpenLogFolder_Click(object sender, RoutedEventArgs e) => App.TryOpenURI(sender, AppEnvironment.GetLocation("Log"));
-        private void OpenVideoFolder_Click(object sender, RoutedEventArgs e) => App.TryOpenURI(sender, AppEnvironment.GetLocation("Video"));
+        private void OpenRecordingsFolder_Click(object sender, RoutedEventArgs e) => App.TryOpenURI(sender, AppEnvironment.GetLocation("Video"));
         private void OpenExtensionFolder_Click(object sender, RoutedEventArgs e) => App.TryOpenURI(sender, AppEnvironment.GetLocation("Extensions"));
         private void OpenWebsiteGettingStarted_Click(object sender, RoutedEventArgs e) => App.TryOpenURI(sender, "https://protocolmaster.philipm.net/docs/getting-started", "https://sites.google.com/view/protocolmaster/docs/getting-started");
         private void OpenWebsiteUserGuide_Click(object sender, RoutedEventArgs e) => App.TryOpenURI(sender, "https://protocolmaster.philipm.net/docs/user-guide", "https://sites.google.com/view/protocolmaster/docs/user-guide");
         private void OpenWiki_Click(object sender, RoutedEventArgs e) => App.TryOpenURI(sender, "https://github.com/Philip-S-Martin/ProtocolMaster/wiki");
         private void OpenProtocolsFolder_Click(object sender, RoutedEventArgs e) => App.TryOpenURI(sender, AppEnvironment.GetLocation("Protocols"));
+
     }
 }

@@ -13,11 +13,11 @@ namespace ProtocolMasterWPF.ViewModel
 {
     internal class CameraViewModel : ViewModelBase
     {
-        CameraContainer CamContainer { get; set; }
-        internal CameraViewModel(CameraContainer cam)
+        MediaProperties MediaProps { get; set; }
+        internal CameraViewModel(MediaProperties cam)
         {
-            CamContainer = cam;
-            CamContainer.PropertyChanged += CameraChangedEvent;
+            MediaProps = cam;
+            MediaProps.PropertyChanged += CameraChangedEvent;
             GetUwpCaptureElement();
         }
         public CaptureElement CapElement { get; set; }
@@ -39,25 +39,29 @@ namespace ProtocolMasterWPF.ViewModel
             {
                 CapElement = captureElement;
                 CapElement.Stretch = Windows.UI.Xaml.Media.Stretch.Uniform;
-                if (CamContainer.VideoDevice != null)
+                if (MediaProps.VideoDevice != null)
                 {
-                    CapElement.Source = CamContainer.Cam.MediaCap;
-                    CamContainer.Cam.StartPreview();
+                    CapElement.Source = MediaProps.Recorder.MediaCap;
+                    MediaProps.Recorder.StartPreview();
                 }
             }
         }
         private async void CameraChangedEvent(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "Cam")
+            if (e.PropertyName == "VideoDevice")
             {
-                var cameraContainer = (CameraContainer)sender;
-                if (CapElement != null && cameraContainer != null)
+                var mediaProperties = (MediaProperties)sender;
+                if (CapElement != null && mediaProperties != null)
                 {
-                    if (CapElement.Source != null) await CapElement.Source.StopPreviewAsync();
-                    if (CamContainer.VideoDevice != null)
+                    if (CapElement.Source != null)
                     {
-                        CapElement.Source = CamContainer.Cam.MediaCap;
-                        CamContainer.Cam.StartPreview();
+                        await CapElement.Source.StopPreviewAsync();
+                        CapElement.Source = null;
+                    }
+                    if (MediaProps.VideoDevice != null)
+                    {
+                        CapElement.Source = MediaProps.Recorder.MediaCap;
+                        MediaProps.Recorder.StartPreview();
                     }
                 }
             }

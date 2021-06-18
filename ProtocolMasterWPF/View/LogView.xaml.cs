@@ -10,7 +10,7 @@ namespace ProtocolMasterWPF.View
         public LogView()
         {
             InitializeComponent();
-            DataContext = ((App)App.Current).LogVM;
+            DataContext = App.LogVM;
         }
     }
 }

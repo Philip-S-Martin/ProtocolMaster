@@ -23,23 +23,42 @@
                     Margin="2" Height="50"
                     Grid.Column="0"
                     Click="SelectButton_Click"
-                    IsEnabled="{Binding CanSelect}">
+                    IsEnabled="{Binding CanSelect}"
+                    ToolTip="Select an experiment for this session">
                 <materialDesign:PackIcon Kind="FileFind" VerticalAlignment="Center" Margin="2"/>
             </Button>
             <TextBlock Style="{DynamicResource MaterialDesignTextBlock}" Grid.Column="1" TextWrapping="WrapWithOverflow" Name="ProtocolLabel" VerticalAlignment="Center" Margin="4" FontSize="12" Text="{Binding SelectionObject}"/>
         </Grid>
         <StackPanel  Grid.Column="1">
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                <Button x:Name="PreviewButton" Style="{DynamicResource MaterialDesignBackgroundIconButton}" IsEnabled="{Binding CanPreview}" Click="PreviewButton_Click" Margin="2">
+                <Button x:Name="PreviewButton" 
+                        Style="{DynamicResource MaterialDesignBackgroundIconButton}" 
+                        IsEnabled="{Binding CanPreview}" 
+                        Click="PreviewButton_Click" Margin="2"
+                        ToolTip="Preview a protocol">
                     <materialDesign:PackIcon Kind="Magnify"/>
                 </Button>
-                <Button x:Name="StartButton" Style="{DynamicResource MaterialDesignBackgroundFocusIconButton}" IsEnabled="{Binding CanStart}" Visibility="{Binding CanStop, Converter={StaticResource InverseBoolToVisConverter}}" Click="StartButton_Click" Margin="2">
+                <Button x:Name="StartButton" 
+                        Style="{DynamicResource MaterialDesignBackgroundFocusIconButton}" 
+                        IsEnabled="{Binding CanStart}" 
+                        Visibility="{Binding CanStop, Converter={StaticResource InverseBoolToVisConverter}}" 
+                        Click="StartButton_Click" Margin="2"
+                        ToolTip="Run a protocol">
                     <materialDesign:PackIcon Kind="Play"/>
                 </Button>
-                <Button x:Name="StopButton" Style="{DynamicResource MaterialDesignNegativeFocusIconButton}" IsEnabled="{Binding CanStop}" Visibility="{Binding CanStop, Converter={StaticResource BooleanToVisibilityConverter}}" Click="StopButton_Click" Margin="2">
+                <Button x:Name="StopButton" 
+                        Style="{DynamicResource MaterialDesignNegativeFocusIconButton}" 
+                        IsEnabled="{Binding CanStop}" 
+                        Visibility="{Binding CanStop, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                        Click="StopButton_Click" Margin="2"
+                        ToolTip="Stop the running protocol">
                     <materialDesign:PackIcon Kind="Stop"/>
                 </Button>
-                <Button x:Name="ResetButton" Style="{DynamicResource MaterialDesignBackgroundIconButton}" IsEnabled="{Binding CanReset}" Click="ResetButton_Click" Margin="2">
+                <Button x:Name="ResetButton" 
+                        Style="{DynamicResource MaterialDesignBackgroundIconButton}" 
+                        IsEnabled="{Binding CanReset}" 
+                        Click="ResetButton_Click" Margin="2"
+                        ToolTip="Clear the protocol">
                     <materialDesign:PackIcon Kind="Cancel"/>
                 </Button>
             </StackPanel>
@@ -56,37 +75,13 @@
         </StackPanel>
 
         <StackPanel HorizontalAlignment="Right" Grid.Column="2" Orientation="Horizontal">
-            <materialDesign:PopupBox StaysOpen="True" PlacementMode="LeftAndAlignBottomEdges" Margin="0,0,12,0" IsEnabled="{Binding CanSelect}">
-                <materialDesign:PopupBox.ToggleContent>
-                    <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignDarkForeground}" Kind="EllipsisHorizontal" Margin="10" Height="24" Width="24"/>
-                </materialDesign:PopupBox.ToggleContent>
-                <Grid Width="300" Margin="16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource MaterialDesignHeadline6TextBlock}" HorizontalAlignment="Center" Margin="0,0,0,16 " Text="Session Options" />
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Interpreter:" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="InterpeterSelect" Grid.Row="1" Grid.Column="1" Margin="8" Padding="8"
-                              ItemsSource="{Binding InterpreterOptions}" SelectedValue="{Binding SelectedInterpreter, Mode=TwoWay}" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Driver:" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="DriverSelect" Grid.Row="2" Grid.Column="1" Margin="8" Padding="8"
-                              ItemsSource="{Binding DriverOptions}" SelectedValue="{Binding SelectedDriver, Mode=TwoWay}" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Camera:" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="CameraSelect" Grid.Row="3" Grid.Column="1" Margin="8" Padding="8"
-                              ItemsSource="{Binding Source={x:Static model:MediaDevices.Instance}, Path=VideoDevices}" SelectedValue="{Binding Cam.VideoDevice, Mode=TwoWay}" DisplayMemberPath="Name" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Microphone:" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="MicrophoneSelect" Grid.Row="4" Grid.Column="1" Margin="8" Padding="8"
-                              ItemsSource="{Binding Source={x:Static model:MediaDevices.Instance}, Path=AudioDevices}" SelectedValue="{Binding Cam.AudioDevice, Mode=TwoWay}" DisplayMemberPath="Name" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignLightSeparatorBackground}"/>
-                </Grid>
-            </materialDesign:PopupBox>
+            <Button x:Name="SettingsButton" 
+                        Style="{DynamicResource MaterialDesignBackgroundIconButton}" 
+                        IsEnabled="{Binding CanSelect}" 
+                        Click="SettingsButton_Click" Margin="2"
+                        ToolTip="Edit or siew session settings">
+                <materialDesign:PackIcon Kind="Settings"/>
+            </Button>
         </StackPanel>
     </Grid>
 </UserControl>

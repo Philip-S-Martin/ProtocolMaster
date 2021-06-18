@@ -72,8 +72,8 @@ namespace ProtocolMasterWPF.Model.Google
                 Credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                      new ClientSecrets
                      {
-                         ClientId = "911699926501-6ici7to17is1fet4mr6jn864lrmrsi0g.apps.googleusercontent.com",
-                         ClientSecret = "LbVHZSa-rtPBMl9odwMBkJi_"
+                         ClientId = "911699926501-lan20ek6qqr6ck92h4npfatb35s2n6om.apps.googleusercontent.com",
+                         ClientSecret = "yAxUzkEEmsGJ9lhzNkMpT9xx"
                      },
                      CombineServiceTokens(services),
                      "user", cts.Token, userStore, receiver);

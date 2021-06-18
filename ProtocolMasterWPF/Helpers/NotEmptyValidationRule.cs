@@ -10,7 +10,7 @@ namespace ProtocolMasterWPF.Helpers
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            return string.IsNullOrWhiteSpace((value ?? "").ToString())
+            return string.IsNullOrWhiteSpace((string)value)
                 ? new ValidationResult(false, "Field is required.")
                 : ValidationResult.ValidResult;
         }
