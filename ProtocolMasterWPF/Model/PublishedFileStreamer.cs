@@ -55,10 +55,10 @@ namespace ProtocolMasterWPF.Model
                 try
                 {
                     string dir = LocalFileStore.Instance.Directory;
-                    string filepath = Path.Combine(dir, $"{name} (Pub).{extension}");
+                    string filepath = Path.Combine(dir, $"{name}.{extension}");
                     int i = 1;
                     while (File.Exists(filepath))
-                        filepath = Path.Combine(dir, $"{name} (Pub) ({i++}).{extension}");
+                        filepath = Path.Combine(dir, $"{name} ({i++}).{extension}");
                     webClient.DownloadFile(URL, filepath);
                     FileInfo file = new FileInfo(filepath);
                 }

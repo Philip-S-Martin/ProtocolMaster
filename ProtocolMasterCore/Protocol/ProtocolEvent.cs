@@ -39,7 +39,7 @@ namespace ProtocolMasterCore.Protocol
             {
                 if (HasParent())
                 {
-                    return (CategoryLabel + ParentLabel);
+                    return ($"{CategoryLabel} {ParentLabel}");
                 }
                 else
                 {

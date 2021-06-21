@@ -26,6 +26,9 @@
                     <MenuItem Header="Logs Folder" x:Name="OpenLogFolder" Click="OpenLogFolder_Click"/>
                     <MenuItem Header="Extensions Folder" x:Name="OpenExtensionFolder" Click="OpenExtensionFolder_Click"/>
                 </MenuItem>
+                <MenuItem Header="View">
+                    <MenuItem Header="Debug Menu" x:Name="DebugToggle" IsCheckable="True"/>
+                </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="Getting Started" x:Name="OpenWebsiteGettingStarted" Click="OpenWebsiteGettingStarted_Click"/>
                     <MenuItem Header="User Guide" x:Name="OpenWebsiteUserGuide" Click="OpenWebsiteUserGuide_Click"/>
@@ -34,7 +37,6 @@
                     <MenuItem Header="Website" x:Name="OpenWebsiteHome" Click="OpenWebsiteHome_Click"/>
                     <MenuItem Header="Github" x:Name="OpenGithub" Click="OpenGithub_Click"/>
                     <MenuItem Header="Release Notes" x:Name="OpenReleaseNotes" Click="OpenReleaseNotes_Click"/>
-                    <MenuItem Header="Debug Options" x:Name="DebugToggle" IsCheckable="True"/>
                 </MenuItem>
                 <MenuItem Header="Debug" Visibility="{Binding ElementName=DebugToggle, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <MenuItem Header="Log Test" Click="LogTest_Click"/>

@@ -4,6 +4,7 @@ using ProtocolMasterCore.Protocol.Interpreter;
 using Schedulino.Generator;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -17,6 +18,7 @@ namespace McIntyreAFC
         Dictionary<string, RowReader> mappedRowReaders;
         Dictionary<string, Protocol> protocols;
         Protocol baseData;
+        HashSet<string> subjects;
         public UserSelectHandler UserSelectPrompt { get; set; }
         public UserNumberHandler UserNumberPrompt { get; set; }
         public SpreadsheetAFC()
@@ -25,17 +27,19 @@ namespace McIntyreAFC
                 { "Experiment", ReadExperimentRow },
                 { "Protocols", ReadProtocolRow },
                 { "Stims", ReadStimsRow },
+                { "Subjects", ReadSubjectsRow },
                 { "SoundConfig", ReadSoundConfigRow },
                 { "StimConfig", ReadStimConfigRow }
             };
             protocols = new Dictionary<string, Protocol>();
+            subjects = new HashSet<string>();
         }
         public bool IsCanceled { get; set; }
 
         string protocolName = null;
         string experimentName = null;
-        int subjectNumber = 0;
-        public string ProtocolLabel => $"{(experimentName != null ? experimentName : "NoExperiment")}_{(protocolName != null ? protocolName : "NoProtocol")}_{subjectNumber:D2}";
+        string subjectID = "";
+        public string ProtocolLabel => $"{(experimentName ?? "NoExperiment")}_{(protocolName ?? "NoProtocol")}_{subjectID:D2}";
 
         private Protocol GetOrCreateProtocol(string protocolName)
         {
@@ -52,7 +56,7 @@ namespace McIntyreAFC
         }
         public List<ProtocolEvent> Generate(string argument)
         {
-            experimentName = new Regex("\\(\\d+\\)|_| ").Replace( argument, "");
+            experimentName = new Regex("\\(\\d+\\)|_| ").Replace(argument, "");
             if (DataReader == null) return null;
             do
             {
@@ -85,40 +89,56 @@ namespace McIntyreAFC
                     protocolName = UserSelectPrompt(protocols.Keys.ToArray(), "Select a Protocol:");
                     if (protocolName != null)
                     {
-                        subjectNumber = UserNumberPrompt(1, 99, "Select a Subject:");
+                        if (subjects.Count >= 1) ;
+                        subjectID = UserSelectPrompt(subjects.ToArray(), "Select a Subject:");
                         return protocols[protocolName].Generate();
                     }
                     else return null;
                 }
                 else
                 {
-                    {
-                        return protocols[protocolName].Generate();
-                    }
+                    return protocols[protocolName].Generate();
                 }
             }
             else return null;
+        }
+        private string ReadStringAt(Dictionary<string, int> headerMap, string headerKey, bool acceptNull)
+        {
+            if (headerMap.ContainsKey(headerKey))
+            {
+                int key = headerMap[headerKey];
+                if (DataReader.IsDBNull(key))
+                    if (acceptNull) return null;
+                    else throw new FormatException($"Value at \"{headerKey}\" in sheet \"{DataReader.Name}\" not present. A value must be entered.");
+                else return DataReader.GetValue(key).ToString();
+            }
+            else throw new FormatException($"Column header \"{headerKey}\" not in sheet \"{DataReader.Name}\". Column header and sheet names must match exactly.");
+        }
+        private uint ReadIntAt(Dictionary<string, int> headerMap, string headerKey, bool acceptNull)
+        {
+            string resultString = ReadStringAt(headerMap, headerKey, acceptNull);
+            if (resultString == null)
+                if (acceptNull) return 0;
+                else throw new FormatException($"Value at \"{headerKey}\" in sheet \"{DataReader.Name}\" not present. A value must be entered.");
+            else
+            {
+                if (uint.TryParse(resultString, out uint n))
+                    return n;
+                else throw new FormatException($"Value \"{resultString}\" at \"{headerKey}\" in sheet \"{DataReader.Name}\" could not be converted to an integer. A number must be entered.");
+            }
         }
         private bool ReadExperimentRow(Dictionary<string, int> headerMap)
         {
             if (DataReader.Read())
             {
                 baseData = new Protocol();
-                baseData.owner = DataReader.GetValue(headerMap["Owner"]).ToString();
-                baseData.sound_order = DataReader.GetValue(headerMap["Sound Order"]).ToString();
-                
-                string extra_time_str = DataReader.GetValue(headerMap["Extra Time (ms)"]).ToString();
-                string interval_min_str = DataReader.GetValue(headerMap["Inter-sound Interval Minimum (ms)"]).ToString();
-                string interval_max_str = DataReader.GetValue(headerMap["Inter-sound Interval Maximum (ms)"]).ToString();
-
-                baseData.Sounds.Add(new Sound(DataReader.GetValue(headerMap["Sound A"]).ToString()));
+                baseData.owner = ReadStringAt(headerMap, "Owner", true);
+                baseData.sound_order = ReadStringAt(headerMap, "Sound Order", true);
+                baseData.Sounds.Add(new Sound(ReadStringAt(headerMap, "Sound A", false)));
                 if (!DataReader.IsDBNull(headerMap["Sound B"]))
-                    baseData.Sounds.Add(new Sound(DataReader.GetValue(headerMap["Sound B"]).ToString()));
-
-                baseData.extra_time = Convert.ToUInt32(extra_time_str);
-                baseData.interval_min = Convert.ToUInt32(interval_min_str);
-                baseData.interval_max = Convert.ToUInt32(interval_max_str);
-
+                    baseData.Sounds.Add(new Sound(ReadStringAt(headerMap, "Sound B", false)));
+                baseData.interval_min = ReadIntAt(headerMap, "Inter-sound Interval Minimum (ms)", false);
+                baseData.interval_max = ReadIntAt(headerMap, "Inter-sound Interval Maximum (ms)", false);
                 return true;
             }
             else return false;
@@ -129,15 +149,10 @@ namespace McIntyreAFC
             {
                 if (!DataReader.IsDBNull(headerMap["Protocol"]))
                 {
-                    string name = DataReader.GetValue(headerMap["Protocol"]).ToString();
-                    Protocol protocol = GetOrCreateProtocol(name);
-
-                    string presounds_str = DataReader.GetValue(headerMap["Number of Presounds (each)"]).ToString();
-                    string sounds_str = DataReader.GetValue(headerMap["Number of Sounds (each)"]).ToString();
-
-
-                    protocol.num_presounds = Convert.ToUInt32(presounds_str);
-                    protocol.num_exp_sounds = Convert.ToUInt32(sounds_str);
+                    Protocol protocol = GetOrCreateProtocol(ReadStringAt(headerMap, "Protocol", false));
+                    protocol.num_presounds = ReadIntAt(headerMap, "Number of Presounds (each)", true);
+                    protocol.num_exp_sounds = ReadIntAt(headerMap, "Number of Sounds (each)", false);
+                    protocol.pre_time = ReadIntAt(headerMap, "Pre-Time (ms)", true);
                 }
                 return true;
             }
@@ -149,48 +164,46 @@ namespace McIntyreAFC
             {
                 if (!DataReader.IsDBNull(headerMap["Protocol"]))
                 {
-                    string name = DataReader.GetValue(headerMap["Protocol"]).ToString();
-                    Protocol protocol = GetOrCreateProtocol(name);
-
+                    Protocol protocol = GetOrCreateProtocol(ReadStringAt(headerMap, "Protocol", false));
                     if (DataReader.IsDBNull(0)) return true;
                     Stimulus stim = new Stimulus();
-                    stim.name = DataReader.GetValue(headerMap["Stimulus"]).ToString();
-                    stim.sound_group = DataReader.GetValue(headerMap["Sound Group"]).ToString();
-                    stim.stim_sound_pairing = DataReader.GetValue(headerMap["Stim-Sound Pairing"]).ToString();
-                    stim.stim_sound_window = DataReader.GetValue(headerMap["Stim-Sound Window"]).ToString();
-                    stim.stim_delivery = DataReader.GetValue(headerMap["Intra-Window Stim Delivery"]).ToString();
+                    stim.name = ReadStringAt(headerMap, "Stimulus", false);
+                    stim.sound_group = ReadStringAt(headerMap, "Sound Group", false);
+                    stim.stim_sound_pairing = ReadStringAt(headerMap, "Stim-Sound Pairing", false);
+                    stim.stim_sound_window = ReadStringAt(headerMap, "Stim-Sound Window", false);
+                    stim.stim_delivery = ReadStringAt(headerMap, "Intra-Window Stim Delivery", false);
 
-                    // This is a very hacky way to handle timeline integer underflow, but it works
-                    // It should probably be replaced by allowing intervals to have negative values
-                    // and then increasing all intervals by the most negative value
-                    if (stim.stim_sound_window == "Before")
-                    {
-                        protocol.GrowExtraTimeIfNeeded(stim.dur_max);
-                    }
+                    stim.num_paired_sounds = ReadIntAt(headerMap, "Number of Paired Sounds", false);
+                    stim.stims_per_sound = ReadIntAt(headerMap, "Stim Repetitions Per Window", false);
+                    stim.dur_min = ReadIntAt(headerMap, "Stim Min Duration (ms)", false);
+                    stim.dur_max = ReadIntAt(headerMap, "Stim Max Duration (ms)", false);
+                    stim.interval_min = ReadIntAt(headerMap, "Time Between Stims Min", true);
+                    stim.interval_max = ReadIntAt(headerMap, "Time Between Stims Max", true);
+                    stim.delay_min = ReadIntAt(headerMap, "Stimulus Delay Min (ms)", true);
+                    stim.delay_max = ReadIntAt(headerMap, "Stimulus Delay Max (ms)", true);
 
-                    string paired_sounds_str = DataReader.GetValue(headerMap["Number of Paired Sounds"]).ToString();
-                    string stims_per_sound_str = DataReader.GetValue(headerMap["Stim Repetitions Per Window"]).ToString();
-                    string dur_min_str = DataReader.GetValue(headerMap["Stim Min Duration (ms)"]).ToString();
-                    string dur_max_str = DataReader.GetValue(headerMap["Stim Max Duration (ms)"]).ToString();
-                    string interval_min_str = DataReader.GetValue(headerMap["Time Between Stims Min"]).ToString();
-                    string interval_max_str = DataReader.GetValue(headerMap["Time Between Stims Max"]).ToString();
-                    string delay_min_str = DataReader.GetValue(headerMap["Stimulus Delay Min (ms)"]).ToString();
-                    string delay_max_str = DataReader.GetValue(headerMap["Stimulus Delay Max (ms)"]).ToString();
-
-                    stim.num_paired_sounds = Convert.ToUInt32(paired_sounds_str);
-                    stim.stims_per_sound = Convert.ToUInt32(stims_per_sound_str);
-                    stim.dur_min = Convert.ToUInt32(dur_min_str);
-                    stim.dur_max = Convert.ToUInt32(dur_max_str);
-                    stim.interval_min = Convert.ToUInt32(interval_min_str);
-                    stim.interval_max = Convert.ToUInt32(interval_max_str);
-                    stim.delay_min = Convert.ToUInt32(delay_min_str);
-                    stim.delay_max = Convert.ToUInt32(delay_max_str);
+                    stim.log_mode = ReadStringAt(headerMap, "Log", false);
 
                     stim.sound = protocol.Sounds.Find(a => a.name == stim.sound_group);
-                    if (stim.sound == null) throw new NullReferenceException("Stimulus sound is invalid");
+                    if (stim.sound == null) throw new Exception($"Stimulus \"{stim.name}\" requires sound \"{stim.sound}\", but that sound is not included in the experiment.");
                     stim.sound.stimuli.Add(stim);
 
                     protocol.Stimuli.Add(stim);
+                }
+                return true;
+            }
+            else return false;
+        }
+        private bool ReadSubjectsRow(Dictionary<string, int> headerMap)
+        {
+            if (DataReader.Read())
+            {
+                if (!DataReader.IsDBNull(headerMap["Subject"]))
+                {
+                    string name = ReadStringAt(headerMap, "Subject", false);
+                    if (subjects.Contains(name))
+                        throw new Exception($"Subject name \"{name}\" is not unique in sheet \"{DataReader.Name}\". All subject names must be unique.");
+                    else subjects.Add(name);
                 }
                 return true;
             }
@@ -201,20 +214,17 @@ namespace McIntyreAFC
             if (DataReader.Read())
             {
                 if (DataReader.IsDBNull(0)) return true;
-                string name = DataReader.GetValue(headerMap["Sound"]).ToString();
+                string name = ReadStringAt(headerMap, "Sound", false);
                 foreach (KeyValuePair<string, Protocol> kvp in protocols)
                 {
                     Sound sound = kvp.Value.Sounds.Find(a => a.name == name);
                     if (sound != null)
                     {
-                        sound.handler = DataReader.GetValue(headerMap["Handler"]).ToString();
-                        sound.behavior_pin = DataReader.GetValue(headerMap["Behavior_Pin"]).ToString();
-                        sound.duration_pin = DataReader.GetValue(headerMap["Duration_Pin"]).ToString();
-                        sound.sound_id = DataReader.GetValue(headerMap["Sound_ID"]).ToString();
+                        sound.handler = ReadStringAt(headerMap, "Handler", false);
+                        sound.behavior_pin = ReadStringAt(headerMap, "Behavior_Pin", false);
+                        sound.duration_pin = ReadStringAt(headerMap, "Duration_Pin", false);
 
-                        string duration_str = DataReader.GetValue(headerMap["Duration (ms)"]).ToString();
-
-                        sound.duration = Convert.ToUInt32(duration_str);
+                        sound.duration = ReadIntAt(headerMap, "Duration (ms)", true);
                     }
                 }
                 return true;
@@ -226,15 +236,15 @@ namespace McIntyreAFC
             if (DataReader.Read())
             {
                 if (DataReader.IsDBNull(0)) return true;
-                string name = DataReader.GetValue(headerMap["Stimulator"]).ToString();
+                string name = ReadStringAt(headerMap, "Stimulator", false);
                 foreach (KeyValuePair<string, Protocol> kvp in protocols)
                 {
                     IEnumerable<Stimulus> stims = kvp.Value.Stimuli.Where(a => a.name == name);
                     if (stims != null)
                     {
-                        string handler = DataReader.GetValue(headerMap["Handler"]).ToString();
-                        string behavior_pin = DataReader.GetValue(headerMap["Behavior_Pin"]).ToString();
-                        string duration_pin = DataReader.GetValue(headerMap["Duration_Pin"]).ToString();
+                        string handler = ReadStringAt(headerMap, "Handler", false);
+                        string behavior_pin = ReadStringAt(headerMap, "Behavior_Pin", false);
+                        string duration_pin = ReadStringAt(headerMap, "Duration_Pin", false);
                         foreach (Stimulus stim in stims)
                         {
                             stim.handler = handler;

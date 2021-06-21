@@ -14,12 +14,14 @@ namespace Schedulino.Generator
         {
             if (stim.sound != null)
                 return new ProtocolEvent(stim.handler, (stim.name), (stim.sound.name),
+                   new KeyValuePair<string, string>("LogMode", stim.log_mode),
                    new KeyValuePair<string, string>("SignalPin", stim.behavior_pin),
                    new KeyValuePair<string, string>("DurationPin", stim.duration_pin),
                    new KeyValuePair<string, string>("TimeStartMs", begin.ToString()),
                    new KeyValuePair<string, string>("TimeEndMs", end.ToString()));
             else
                 return new ProtocolEvent(stim.handler, (stim.name + "\n(Stim)"),
+                   new KeyValuePair<string, string>("LogMode", stim.log_mode),
                    new KeyValuePair<string, string>("SignalPin", stim.behavior_pin),
                    new KeyValuePair<string, string>("DurationPin", stim.duration_pin),
                    new KeyValuePair<string, string>("TimeStartMs", begin.ToString()),

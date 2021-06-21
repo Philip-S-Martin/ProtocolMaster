@@ -39,18 +39,29 @@ namespace ProtocolMasterWPF
         }
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
-            Log.Error(e);
-            Log.Error(e.Exception.StackTrace);
-            Log.Flush();
-            MessageBoxResult res = MessageBox.Show(e.Exception.Message, " ", MessageBoxButton.YesNo);
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                Exception ex = e.Exception.InnerException;
+                Log.Error(ex);
+                Log.Error(ex.StackTrace);
+                Log.Flush();
+                MessageBoxResult res = MessageBox.Show(App.Current.MainWindow, $"An exception occurred in a task:\n\n{ex.Message}\n\nWould you like to see additional data?", "Unhandled Exception in Task", MessageBoxButton.YesNo);
+                if (res == MessageBoxResult.Yes)
+                    MessageBox.Show(App.Current.MainWindow, $"Message:\n\n{ex.Message}\n\nStack Trace:\n\n{ex.StackTrace}", "Exception Information", MessageBoxButton.OK);
+                MessageBox.Show(App.Current.MainWindow, $"The application will now continue.\n\nPlease consider restarting the application if you believe that it may prevent this error from occuring again..", "Application will Continue", MessageBoxButton.OK);
+            });
         }
-
         void AppDispatcherUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Log.Error(e);
-            Log.Error(((Exception)e.ExceptionObject).StackTrace);
+            Exception ex = (Exception)e.ExceptionObject;
+            Log.Error(ex.Message);
+            Log.Error(ex.StackTrace);
             Log.Flush();
-            MessageBoxResult res = MessageBox.Show(((Exception)e.ExceptionObject).Message, "Unhandled Exception", MessageBoxButton.YesNo);
+            MessageBoxResult res = MessageBox.Show(App.Current.MainWindow, $"A terminating exception occurred:\n\n{ex.Message}\n\nWould you like to see additional data?", "Unhandled Exception", MessageBoxButton.YesNo);
+            if (res == MessageBoxResult.Yes)
+                MessageBox.Show(App.Current.MainWindow, $"Message:\n\n{ex.Message}\n\nStack Trace:\n\n{ex.StackTrace}", "Exception Information", MessageBoxButton.OK);
+            MessageBox.Show(App.Current.MainWindow, $"The application will now close.", "Application closing", MessageBoxButton.OK);
+            App.Current.MainWindow.Close();
         }
         private void AuthenticationRefocus(object sender, EventArgs e)
         {

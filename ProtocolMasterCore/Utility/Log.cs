@@ -15,8 +15,8 @@ namespace ProtocolMasterCore.Utility
         private static readonly string logdata;
         private static readonly string archive;
 
-        private static readonly int maxUnarchived = 20;
-        private static readonly int minUnarchived = 16;
+        private static readonly int maxUnarchived = 32;
+        private static readonly int minUnarchived = 12;
 
         public static LogPrinter ErrorPrinter;
         public static LogPrinter OutputPrinter;

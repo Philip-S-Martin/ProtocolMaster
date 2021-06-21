@@ -43,10 +43,10 @@ namespace ProtocolMasterWPF.Model.Google
         {
             var task = Task.Run(() =>
             {
-                GDrive.Instance.Publish(ID);
+                GDrive.Instance.Publish(GFile);
             });
             task.ContinueWith(
-                (task) => PublishedFileStore.Instance.Add($"{Name} (Drive)", $"https://docs.google.com/spreadsheets/d/{ID}/pub?output=xlsx"),
+                (task) => PublishedFileStore.Instance.Add($"{Name}", $"https://docs.google.com/spreadsheets/d/{ID}/pub?output=xlsx"),
                 TaskScheduler.FromCurrentSynchronizationContext());
             return task;
         }
@@ -60,10 +60,10 @@ namespace ProtocolMasterWPF.Model.Google
             {
                 Stream input = GDrive.Instance.StreamFile(ID);
                 string dir = LocalFileStore.Instance.Directory;
-                string filepath = Path.Combine(dir, $"{Name} (Pub).{extension}");
+                string filepath = Path.Combine(dir, $"{Name}.{extension}");
                 int i = 1;
                 while (System.IO.File.Exists(filepath))
-                    filepath = Path.Combine(dir, $"{Name} (Pub) ({i++}).{extension}");
+                    filepath = Path.Combine(dir, $"{Name} ({i++}).{extension}");
                 FileInfo file = new FileInfo(filepath);
                 FileStream output = file.OpenWrite();
                 input.CopyTo(output);

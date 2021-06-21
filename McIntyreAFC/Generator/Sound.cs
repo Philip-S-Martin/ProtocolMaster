@@ -5,6 +5,7 @@ namespace Schedulino.Generator
     class Sound
     {
         public string name, handler, behavior_pin, duration_pin, sound_id;
+        public string log_mode;
         public uint duration;
         public List<SoundInterval> presoundIntervals;
         public List<SoundInterval> expSoundIntervals;
@@ -13,6 +14,7 @@ namespace Schedulino.Generator
         public Sound(string name)
         {
             this.name = name;
+            this.log_mode = "Yes";
             presoundIntervals = new List<SoundInterval>();
             expSoundIntervals = new List<SoundInterval>();
             stimuli = new List<Stimulus>();

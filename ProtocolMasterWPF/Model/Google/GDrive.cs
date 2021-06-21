@@ -33,15 +33,16 @@ namespace ProtocolMasterWPF.Model.Google
                 return service.Files.Export(fileID, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").ExecuteAsStream();
             else return null;
         }
-        public void Publish(string fileID)
+        public void Publish(File gFile)
         {
             service.Revisions.Update(new Revision()
             {
                 Published = true,
                 PublishAuto = true,
+                PublishedOutsideDomain = true
             },
-            fileID,
-            "1").Execute();
+            gFile.Id,
+            gFile.HeadRevisionId).Execute();
         }
 
         // Core Drive Functionality. 
@@ -59,7 +60,7 @@ namespace ProtocolMasterWPF.Model.Google
             {
                 FilesResource.ListRequest listRequest = service.Files.List();
                 listRequest.PageSize = 20;
-                listRequest.Fields = "nextPageToken, files(id, name, mimeType, trashed)";
+                listRequest.Fields = "nextPageToken, files(id, name, headRevisionId, mimeType, trashed)";
                 listRequest.Q =
                     "mimeType = 'application/vnd.google-apps.spreadsheet' and " +
                     "trashed = false";

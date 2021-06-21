@@ -19,7 +19,7 @@
                    FontSize="16" />
         <Grid Grid.Row="1" Background="{DynamicResource DefaultHueDarkBrush}">
             <ListBox x:Name ="SelectListBox" ItemsSource="{Binding Drive.AvailableFiles}" Visibility="{Binding Auth.IsPostAuth, Converter={StaticResource BooleanToVisibilityConverter}}"
-                VerticalAlignment="Stretch" MinWidth="200" MaxHeight="400"/>
+                VerticalAlignment="Stretch" MinWidth="200" MaxHeight="250"/>
         </Grid>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="SelectButton" Click="SelectButton_Click"

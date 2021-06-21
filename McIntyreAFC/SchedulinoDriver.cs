@@ -189,7 +189,7 @@ namespace McIntyreAFC
 
         private void Handle(ProtocolEvent data)
         {
-            //Log.Error("Handling: " + data.Handler);
+            if(data.Arguments.TryGetValue("LogMode", out string v) && v == "Yes") Log.Out($"{data.Arguments["TimeStartMs"]}-{data.Arguments["TimeEndMs"]}: {data.FullLabel()}");
             if (handlers.TryGetValue(data.Handler, out Handler thisKeyHandler))
             {
                 thisKeyHandler(data);

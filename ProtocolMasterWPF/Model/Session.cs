@@ -103,9 +103,15 @@ namespace ProtocolMasterWPF.Model
 
             Cam = new MediaProperties();
             Protocol.InterpreterManager.OnEventsLoaded += Cam.SetLabel;
+            Protocol.InterpreterManager.OnEventsLoaded += this.LogLabel;
             Protocol.DriverManager.OnProtocolStart += Cam.StartRecord;
+            Protocol.DriverManager.OnProtocolStart += this.LogStart;
+            Protocol.DriverManager.OnProtocolEnd += this.LogEnd;
             OnStop += Cam.StopRecord;
         }
+        public void LogLabel(List<ProtocolEvent> events, string label) => Log.Out($"Loaded Protocol: {label}");
+        public void LogStart() => Log.Out($"Protocol Begin Execution");
+        public void LogEnd() => Log.Out($"Protocol End Execution");
         public void InitDefaultExtensions()
         {
             Protocol.LoadExtensions();

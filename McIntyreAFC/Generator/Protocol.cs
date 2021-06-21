@@ -12,7 +12,7 @@ namespace Schedulino.Generator
     class Protocol
     {
         public string name, owner, sound_order;
-        public uint extra_time, num_presounds, num_exp_sounds, interval_min, interval_max, exp_begin, exp_end;
+        public uint pre_time, num_presounds, num_exp_sounds, interval_min, interval_max, exp_begin, exp_end;
         public List<Sound> Sounds { get; set; }
         public List<Stimulus> Stimuli { get; set; }
 
@@ -58,7 +58,7 @@ namespace Schedulino.Generator
         }
         public void GrowExtraTimeIfNeeded(uint byAmount)
         {
-            if (byAmount > extra_time) extra_time = byAmount;
+            if (byAmount > pre_time) pre_time = byAmount;
         }
         public List<ProtocolEvent> Generate()
         {
@@ -84,7 +84,7 @@ namespace Schedulino.Generator
         }
         private void GenerateSoundsAlternating()
         {
-            uint timeMs = extra_time;
+            uint timeMs = pre_time;
             SoundInterval prevSoundInterval = null;
             for (int i = 0; i < num_presounds; i++)
             {
@@ -117,7 +117,7 @@ namespace Schedulino.Generator
         }
         private void GenerateSoundsBlock()
         {
-            uint timeMs = extra_time;
+            uint timeMs = pre_time;
             SoundInterval prevSoundInterval = null;
 
             foreach (Sound s in Sounds)
@@ -378,7 +378,7 @@ namespace Schedulino.Generator
             }
             clone.name = this.name;
             clone.owner = this.owner;
-            clone.extra_time = this.extra_time;
+            clone.pre_time = this.pre_time;
             clone.num_presounds = this.num_presounds;
             clone.num_exp_sounds = this.num_exp_sounds;
             clone.interval_min = this.interval_min;
