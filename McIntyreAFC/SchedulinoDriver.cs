@@ -154,7 +154,7 @@ namespace McIntyreAFC
         {
             if (port.IsOpen && _capacity > 0 && _serial_available >= 7 && scheduleIndex < schedule.Count)
             {
-                Log.Error($"McIntyreAFC SENDEVENT:[scheduleIndex:{scheduleIndex}],[pinState:{schedule[scheduleIndex]}]");
+                Log.Error($"McIntyreAFC SENDEVENT:[scheduleIndex:{scheduleIndex}],[time:{schedule[scheduleIndex].Time}],[pin:{schedule[scheduleIndex].Pin}],[pinstate:{schedule[scheduleIndex].State}]");
                 byte[] bytes = schedule[scheduleIndex].ToBytes();
                 port.Write("E");
                 port.Write(bytes, 0, bytes.Length);
