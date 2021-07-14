@@ -42,7 +42,7 @@ namespace ProtocolMasterWPF.Model.Google
                 PublishedOutsideDomain = true
             },
             gFile.Id,
-            gFile.HeadRevisionId).Execute();
+            gFile.HeadRevisionId??"1").Execute();
         }
 
         // Core Drive Functionality. 
