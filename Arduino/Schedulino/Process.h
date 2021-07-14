@@ -39,7 +39,7 @@ void _Process_Init()
   for (byte i = 2; i <= 19; i++)
   {
     pinMode(i, OUTPUT);
-    digitalWrite(i, LOW);
+    //digitalWrite(i, LOW);
   }
 
   state = SETUP;
