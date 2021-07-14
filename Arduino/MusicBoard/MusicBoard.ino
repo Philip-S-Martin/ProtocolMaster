@@ -173,14 +173,14 @@ void loop()
 
     digitalWrite(music_out, HIGH);
 
+    if(!musicPlayer.playingMusic)
+          musicPlayer.startPlayingFile(track);
     while(digitalRead(trigger))
     {
-      if(!musicPlayer.playingMusic)
-          musicPlayer.startPlayingFile(track);
-      else
         delay(5);
     }
-    musicPlayer.stopPlaying(); 
+    if(musicPlayer.playingMusic)
+      musicPlayer.stopPlaying(); 
     
     digitalWrite(music_out, LOW);
   }
