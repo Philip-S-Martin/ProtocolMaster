@@ -223,6 +223,7 @@ namespace McIntyreAFC
                         sound.handler = ReadStringAt(headerMap, "Handler", false);
                         sound.behavior_pin = ReadStringAt(headerMap, "Behavior_Pin", false);
                         sound.duration_pin = ReadStringAt(headerMap, "Duration_Pin", false);
+                        sound.sound_id = ReadStringAt(headerMap, "Sound_ID", true);
 
                         sound.duration = ReadIntAt(headerMap, "Duration (ms)", true);
                     }
