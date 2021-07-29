@@ -84,7 +84,6 @@ namespace McIntyreAFC
             foreach (ProtocolEvent data in dataList) Handle(data);
             // Sort schedule
             schedule.Sort();
-
             // PORT SELECTION
             string[] portOptions = SerialPortStream.GetPortNames();
             string port;
@@ -94,7 +93,6 @@ namespace McIntyreAFC
             else if (portOptions.Length == 1) port = portOptions[0];
             // If there are many available ports, allow the user to select
             else port = UserSelectPrompt(portOptions);
-
             // SERIALPORT SETUP
             Serial = new SerialPortStream
             {
@@ -103,12 +101,9 @@ namespace McIntyreAFC
                 BaudRate = 9600,
                 NewLine = "\n"
             };
-
-            //Serial.Handshake = Handshake.
+            // Serial.Handshake = Handshake.
             Serial.DataReceived += DataReceiver;
             Serial.Open();
-            
-
             // Handshake
             // Read serial buffer until arduino tells us how much capacity it has
             while (_state != ScheduleState.DONE && _capacity == 0)
@@ -265,14 +260,14 @@ namespace McIntyreAFC
             if (pins_signal != null)
                 for (int i = 0; i < pins_signal.Length; i++)
                 {
-                    schedule.Add(new SchedulePinState(pins_signal[i], (byte)1, time_start));
-                    schedule.Add(new SchedulePinState(pins_signal[i], (byte)0, time_end));
+                    schedule.Add(new SchedulePinState(pins_signal[i], (byte)1, time_start, (byte)40));
+                    schedule.Add(new SchedulePinState(pins_signal[i], (byte)0, time_end, (byte)41));
                 }
             if (pins_dur != null)
                 for (int i = 0; i < pins_dur.Length; i++)
                 {
-                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)1, time_start));
-                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)0, time_end));
+                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)1, time_start, (byte)30));
+                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)0, time_end, (byte)31));
                 }
         }
         private void DigitalPulseHandler(ProtocolEvent item)
@@ -289,14 +284,14 @@ namespace McIntyreAFC
             if (pins_signal != null)
                 for (int i = 0; i < pins_signal.Length; i++)
                 {
-                    schedule.Add(new SchedulePinState(pins_signal[i], (byte)1, time_start));
-                    schedule.Add(new SchedulePinState(pins_signal[i], (byte)0, time_start + 5));
+                    schedule.Add(new SchedulePinState(pins_signal[i], (byte)1, time_start, (byte)40));
+                    schedule.Add(new SchedulePinState(pins_signal[i], (byte)0, time_start + 5, (byte)41));
                 }
             if (pins_dur != null)
                 for (int i = 0; i < pins_dur.Length; i++)
                 {
-                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)1, time_start));
-                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)0, time_end));
+                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)1, time_start, (byte)30));
+                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)0, time_end, (byte)31));
                 }
         }
         private void DigitalStringDurationHandler(ProtocolEvent item)
@@ -317,14 +312,14 @@ namespace McIntyreAFC
             if (pins_signal != null)
                 for (int i = pins_signal[0]; i <= pins_signal[1]; i++)
                 {
-                    schedule.Add(new SchedulePinState((byte)i, PinStateStringHelper(value, (byte)(i - pins_signal[0])), time_start));
-                    schedule.Add(new SchedulePinState((byte)i, (byte)0, time_end));
+                    schedule.Add(new SchedulePinState((byte)i, PinStateStringHelper(value, (byte)(i - pins_signal[0])), time_start, (byte)100));
+                    schedule.Add(new SchedulePinState((byte)i, (byte)0, time_end, (byte)101));
                 }
             if (pins_dur != null)
                 for (int i = 0; i < pins_dur.Length; i++)
                 {
-                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)1, time_start));
-                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)0, time_end));
+                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)1, time_start, (byte)50));
+                    schedule.Add(new SchedulePinState(pins_dur[i], (byte)0, time_end, (byte)51));
                 }
 
         }
@@ -423,11 +418,13 @@ namespace McIntyreAFC
             public readonly byte Pin;
             public readonly byte State;
             public readonly uint Time;
-            public SchedulePinState(byte pin, byte state, uint time)
+            public readonly byte Priority;
+            public SchedulePinState(byte pin, byte state, uint time, byte priority)
             {
                 this.Pin = pin;
                 this.State = state;
                 this.Time = time;
+                this.Priority = priority;
             }
             public byte[] ToBytes()
             {
@@ -451,7 +448,9 @@ namespace McIntyreAFC
 
             public int CompareTo(SchedulePinState other)
             {
-                return (int)(this.Time - other.Time + this.State - other.State);
+                if (this.Time == other.Time)
+                    return other.Priority - this.Priority;
+                else return (int)(this.Time - other.Time);
             }
         }
     }

@@ -18,7 +18,7 @@ namespace Schedulino.Generator
         public override ProtocolEvent ToProtocolEvent()
         {
             return new ProtocolEvent(sound.handler, (sound.name),
-                    new KeyValuePair<string, string>("LogMode", sound.log_mode),
+                   new KeyValuePair<string, string>("LogMode", sound.log_mode),
                    new KeyValuePair<string, string>("SignalPin", sound.behavior_pin),
                    new KeyValuePair<string, string>("DurationPin", sound.duration_pin),
                    new KeyValuePair<string, string>("Value", sound.sound_id),
