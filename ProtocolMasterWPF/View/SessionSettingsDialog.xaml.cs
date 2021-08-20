@@ -20,9 +20,11 @@ namespace ProtocolMasterWPF.View
     /// </summary>
     public partial class SessionSettingsDialog : UserControl
     {
+        Session session;
         internal SessionSettingsDialog(Session sessionControl)
         {
             DataContext = sessionControl;
+            session = sessionControl;
             InitializeComponent();
         }
         internal static void ShowDialog(Session SessionControl) => DialogHost.Show(new SessionSettingsDialog(SessionControl), "SessionSettingsHost");
@@ -30,6 +32,16 @@ namespace ProtocolMasterWPF.View
         private void DoneButton_Click(object sender, RoutedEventArgs e)
         {
             MaterialDesignThemes.Wpf.DialogHost.Close("SessionSettingsHost");
+        }
+
+        private void ToggleCamera_Checked(object sender, RoutedEventArgs e)
+        {
+            session.Cam.StartRecord();
+        }
+
+        private void ToggleCamera_Unchecked(object sender, RoutedEventArgs e)
+        {
+            session.Cam.StopRecord();
         }
     }
 }

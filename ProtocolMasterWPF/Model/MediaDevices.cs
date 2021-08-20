@@ -14,6 +14,7 @@ namespace ProtocolMasterWPF.Model
         static MediaDevices() { }
         private MediaDevices()
         {
+            _qualityOptions = new List<int>(_qualityArray);
             RefreshDevices();
         }
         private List<DeviceInformation> _videoDevices;
@@ -54,6 +55,12 @@ namespace ProtocolMasterWPF.Model
         public DeviceInformation VideoDeviceByID(string id)
         {
             return VideoDevices.First(a => a.Id == id);
+        }
+        private int[] _qualityArray = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+        private List<int> _qualityOptions;
+        public List<int> QualityOptions
+        {
+            get => _qualityOptions;
         }
     }
 }

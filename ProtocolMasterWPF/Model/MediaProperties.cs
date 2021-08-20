@@ -75,6 +75,19 @@ namespace ProtocolMasterWPF.Model
             }
         }
         private DeviceInformation _audioDevice;
+        private uint _quality;
+        public uint Quality
+        {
+            get => _quality;
+            set
+            {
+                _quality = value;
+                NotifyProperty();
+                Settings.Default.CameraQuality = value;
+                Settings.Default.Save();
+            }
+        }
+        
 
         string label = "Recording";
         public void SetLabel(List<ProtocolEvent> events, string label)
@@ -91,7 +104,7 @@ namespace ProtocolMasterWPF.Model
 
         private void ResetCam()
         {
-            Recorder = new MediaRecorder(VideoDevice, AudioDevice);
+            Recorder = new MediaRecorder(VideoDevice, AudioDevice, Quality);
         }
 
         public void InitDefaultDevices()
@@ -121,6 +134,7 @@ namespace ProtocolMasterWPF.Model
                     AudioDevice = MediaDevices.Instance.AudioDevices.First();
                 else AudioDevice = null;
             }
+            Quality = Settings.Default.CameraQuality;
         }
     }
 }

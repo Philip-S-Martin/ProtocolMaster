@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
+using Windows.Foundation;
 using Windows.Media;
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
@@ -26,18 +28,18 @@ namespace ProtocolMasterWPF.Model
             VIDEOAUDIO,
             AUDIO
         }
-        public MediaRecorder(DeviceInformation videoDevice, DeviceInformation audioDevice)
+        public MediaRecorder(DeviceInformation videoDevice, DeviceInformation audioDevice, uint quality)
         {
             AppEnvironment.TryAddLocationDocuments("Video", "Video", out storagePath);
             InitVideoStore();
             MediaCap = new MediaCapture();
-            InitializeCap(videoDevice, audioDevice);
+            InitializeCap(videoDevice, audioDevice, quality);
         }
         private async void InitVideoStore()
         {
             videoStore = await StorageFolder.GetFolderFromPathAsync(storagePath);
         }
-        public void InitializeCap(DeviceInformation videoDevice, DeviceInformation audioDevice)
+        public void InitializeCap(DeviceInformation videoDevice, DeviceInformation audioDevice, uint quality)
         {
             if (videoDevice == null)
             {
@@ -62,6 +64,9 @@ namespace ProtocolMasterWPF.Model
                         {
                             VideoDeviceId = videoDevice.Id
                         }).AsTask().Wait();
+
+                        MediaCap.SetEncoderProperty(MediaStreamType.VideoRecord, new Guid(0x1c0608e9, 0x370c, 0x4710, 0x8a, 0x58, 0xcb, 0x61, 0x81, 0xc4, 0x24, 0x23), PropertyValue.CreateUInt32(3));
+                        MediaCap.SetEncoderProperty(MediaStreamType.VideoRecord, new Guid(0xfcbf57a3, 0x7ea5, 0x4b0c, 0x96, 0x44, 0x69, 0xb4, 0x0c, 0x39, 0xc3, 0x91), PropertyValue.CreateUInt32(quality));
                         mode = RecordMode.VIDEO;
                     }
                     catch (UnauthorizedAccessException ex)
@@ -80,6 +85,11 @@ namespace ProtocolMasterWPF.Model
                             VideoDeviceId = videoDevice.Id,
                             AudioDeviceId = audioDevice.Id
                         }).AsTask().Wait();
+                        
+                        MediaCap.SetEncoderProperty(MediaStreamType.VideoRecord, new Guid(0x1c0608e9, 0x370c, 0x4710, 0x8a, 0x58, 0xcb, 0x61, 0x81, 0xc4, 0x24, 0x23), PropertyValue.CreateUInt32(3));
+                        MediaCap.SetEncoderProperty(MediaStreamType.VideoRecord, new Guid(0xfcbf57a3, 0x7ea5, 0x4b0c, 0x96, 0x44, 0x69, 0xb4, 0x0c, 0x39, 0xc3, 0x91), PropertyValue.CreateUInt32(quality));
+                        var res = MediaCap.VideoDeviceController.GetAvailableMediaStreamProperties(MediaStreamType.VideoRecord);
+                        
                         mode = RecordMode.VIDEOAUDIO;
                     }
                     catch (UnauthorizedAccessException ex)
@@ -114,8 +124,8 @@ namespace ProtocolMasterWPF.Model
                 }
                 else if (mode == RecordMode.VIDEO || mode == RecordMode.VIDEOAUDIO)
                 {
-                    StorageFile file = await videoStore.CreateFileAsync($"{label}.wmv", CreationCollisionOption.GenerateUniqueName);
-                    await MediaCap.StartRecordToStorageFileAsync(MediaEncodingProfile.CreateWmv(VideoEncodingQuality.Auto), file);
+                    StorageFile file = await videoStore.CreateFileAsync($"{label}.mp4", CreationCollisionOption.GenerateUniqueName);
+                    await MediaCap.StartRecordToStorageFileAsync(MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Auto), file);
                 }
                 else IsRecording = false;
                 IsRecording = true;
