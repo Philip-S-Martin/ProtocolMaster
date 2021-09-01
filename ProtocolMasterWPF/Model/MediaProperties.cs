@@ -98,13 +98,13 @@ namespace ProtocolMasterWPF.Model
         }
         public void StartRecord()
         {
-            Recorder.StartRecord(label);
+            Recorder.StartRecord(label, Quality);
         }
         public void StopRecord() => Recorder.StopRecord();
 
         private void ResetCam()
         {
-            Recorder = new MediaRecorder(VideoDevice, AudioDevice, Quality);
+            Recorder = new MediaRecorder(VideoDevice, AudioDevice);
         }
 
         public void InitDefaultDevices()
