@@ -114,7 +114,7 @@ namespace McIntyreAFC
             }
             else throw new FormatException($"Column header \"{headerKey}\" not in sheet \"{DataReader.Name}\". Column header and sheet names must match exactly.");
         }
-        private uint ReadIntAt(Dictionary<string, int> headerMap, string headerKey, bool acceptNull)
+        private uint ReadUIntAt(Dictionary<string, int> headerMap, string headerKey, bool acceptNull)
         {
             string resultString = ReadStringAt(headerMap, headerKey, acceptNull);
             if (resultString == null)
@@ -123,6 +123,19 @@ namespace McIntyreAFC
             else
             {
                 if (uint.TryParse(resultString, out uint n))
+                    return n;
+                else throw new FormatException($"Value \"{resultString}\" at \"{headerKey}\" in sheet \"{DataReader.Name}\" could not be converted to an integer. A number must be entered.");
+            }
+        }
+        private int ReadIntAt(Dictionary<string, int> headerMap, string headerKey, bool acceptNull)
+        {
+            string resultString = ReadStringAt(headerMap, headerKey, acceptNull);
+            if (resultString == null)
+                if (acceptNull) return 0;
+                else throw new FormatException($"Value at \"{headerKey}\" in sheet \"{DataReader.Name}\" not present. A value must be entered.");
+            else
+            {
+                if (int.TryParse(resultString, out int n))
                     return n;
                 else throw new FormatException($"Value \"{resultString}\" at \"{headerKey}\" in sheet \"{DataReader.Name}\" could not be converted to an integer. A number must be entered.");
             }
@@ -137,8 +150,8 @@ namespace McIntyreAFC
                 baseData.Sounds.Add(new Sound(ReadStringAt(headerMap, "Sound A", false)));
                 if (!DataReader.IsDBNull(headerMap["Sound B"]))
                     baseData.Sounds.Add(new Sound(ReadStringAt(headerMap, "Sound B", false)));
-                baseData.interval_min = ReadIntAt(headerMap, "Inter-sound Interval Minimum (ms)", false);
-                baseData.interval_max = ReadIntAt(headerMap, "Inter-sound Interval Maximum (ms)", false);
+                baseData.interval_min = ReadUIntAt(headerMap, "Inter-sound Interval Minimum (ms)", false);
+                baseData.interval_max = ReadUIntAt(headerMap, "Inter-sound Interval Maximum (ms)", false);
                 return true;
             }
             else return false;
@@ -150,9 +163,9 @@ namespace McIntyreAFC
                 if (!DataReader.IsDBNull(headerMap["Protocol"]))
                 {
                     Protocol protocol = GetOrCreateProtocol(ReadStringAt(headerMap, "Protocol", false));
-                    protocol.num_presounds = ReadIntAt(headerMap, "Number of Presounds (each)", true);
-                    protocol.num_exp_sounds = ReadIntAt(headerMap, "Number of Sounds (each)", false);
-                    protocol.pre_time = ReadIntAt(headerMap, "Pre-Time (ms)", true);
+                    protocol.num_presounds = ReadUIntAt(headerMap, "Number of Presounds (each)", true);
+                    protocol.num_exp_sounds = ReadUIntAt(headerMap, "Number of Sounds (each)", false);
+                    protocol.pre_time = ReadUIntAt(headerMap, "Pre-Time (ms)", true);
                 }
                 return true;
             }
@@ -173,12 +186,12 @@ namespace McIntyreAFC
                     stim.stim_sound_window = ReadStringAt(headerMap, "Stim-Sound Window", false);
                     stim.stim_delivery = ReadStringAt(headerMap, "Intra-Window Stim Delivery", false);
 
-                    stim.num_paired_sounds = ReadIntAt(headerMap, "Number of Paired Sounds", false);
-                    stim.stims_per_sound = ReadIntAt(headerMap, "Stim Repetitions Per Window", false);
-                    stim.dur_min = ReadIntAt(headerMap, "Stim Min Duration (ms)", false);
-                    stim.dur_max = ReadIntAt(headerMap, "Stim Max Duration (ms)", false);
-                    stim.interval_min = ReadIntAt(headerMap, "Time Between Stims Min", true);
-                    stim.interval_max = ReadIntAt(headerMap, "Time Between Stims Max", true);
+                    stim.num_paired_sounds = ReadUIntAt(headerMap, "Number of Paired Sounds", false);
+                    stim.stims_per_sound = ReadUIntAt(headerMap, "Stim Repetitions Per Window", false);
+                    stim.dur_min = ReadUIntAt(headerMap, "Stim Min Duration (ms)", false);
+                    stim.dur_max = ReadUIntAt(headerMap, "Stim Max Duration (ms)", false);
+                    stim.interval_min = ReadUIntAt(headerMap, "Time Between Stims Min", true);
+                    stim.interval_max = ReadUIntAt(headerMap, "Time Between Stims Max", true);
                     stim.delay_min = ReadIntAt(headerMap, "Stimulus Delay Min (ms)", true);
                     stim.delay_max = ReadIntAt(headerMap, "Stimulus Delay Max (ms)", true);
 
@@ -225,7 +238,7 @@ namespace McIntyreAFC
                         sound.duration_pin = ReadStringAt(headerMap, "Duration_Pin", false);
                         sound.sound_id = ReadStringAt(headerMap, "Sound_ID", true);
 
-                        sound.duration = ReadIntAt(headerMap, "Duration (ms)", true);
+                        sound.duration = ReadUIntAt(headerMap, "Duration (ms)", true);
                     }
                 }
                 return true;
