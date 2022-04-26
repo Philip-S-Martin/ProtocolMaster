@@ -12,6 +12,7 @@ This project is open source under the MIT license.
 
 Protocol Master is used to drive complex experiments that involve stimulus over time. It includes many features to ensure lab processes are done consistently and efficiency. Here are some of the key user-facing features:
 
+- Protocol schedule automation
 - Google Drive integration
 - Camera/Microphone Automation
 - Logging
