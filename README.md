@@ -2,7 +2,7 @@
 
 Website: http://protocolmaster.philipm.net/
 
-Author: Philip Martin philip@novorium.com
+Author: Philip Martin philip@philipm.net
 
 This project is open source under the MIT license.
 
