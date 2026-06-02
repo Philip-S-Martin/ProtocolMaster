@@ -3,6 +3,11 @@
 **ProtocolMaster** is a self-service scientific research execution platform for
 running, monitoring, and logging time-based neurobiology experiments.
 
+ProtocolMaster is an older research engineering project built for real laboratory workflows. While
+it is used in production research today, it should not be considered production quality software.
+The architecture is presented as an example of platform design for non-technical scientific users;
+the codebase would need modernization before broad reuse.
+
 It was designed for research labs where experimental workflows are owned by
 scientists, not software engineers. Researchers can define protocol schedules in
 spreadsheet-oriented workflows, select those protocols through a desktop
