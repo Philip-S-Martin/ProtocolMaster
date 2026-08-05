@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>SkyEasy Flights — Book a Flight</title>
+<style>
+  :root {
+    --blue: #0b4f8a;
+    --blue-dark: #073a66;
+    --green: #1a7a3c;
+    --bg: #ffffff;
+    --text: #111111;
+    --muted: #444444;
+    --border: #888888;
+    --focus: #d98c00;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #f2f2f2;
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    line-height: 1.5;
+  }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    box-shadow: 0 0 12px rgba(0,0,0,0.15);
+  }
+
+  header.top {
+    background: var(--blue);
+    color: #fff;
+    padding: 18px 16px;
+    text-align: center;
+  }
+
+  header.top h1 {
+    margin: 0;
+    font-size: 30px;
+  }
+
+  header.top p {
+    margin: 4px 0 0;
+    font-size: 17px;
+  }
+
+  .screen {
+    display: none;
+    padding: 20px 16px 40px;
+  }
+
+  .screen.active {
+    display: block;
+  }
+
+  h2.step-title {
+    font-size: 26px;
+    margin: 0 0 6px;
+    color: var(--blue-dark);
+  }
+
+  .step-sub {
+    font-size: 18px;
+    color: var(--muted);
+    margin: 0 0 20px;
+  }
+
+  label {
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 18px 0 6px;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="tel"],
+  input[type="email"],
+  select {
+    width: 100%;
+    font-size: 22px;
+    padding: 14px 12px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+  }
+
+  input:focus, select:focus, button:focus, .flight-card:focus {
+    outline: 4px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .swap-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .swap-row .field { flex: 1; }
+
+  .btn {
+    display: block;
+    width: 100%;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 18px 10px;
+    margin-top: 26px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    background: var(--green);
+    min-height: 64px;
+  }
+
+  .btn:active { transform: translateY(1px); }
+
+  .btn.secondary {
+    background: #ffffff;
+    color: var(--blue-dark);
+    border: 3px solid var(--blue-dark);
+  }
+
+  .btn.back {
+    background: #ffffff;
+    color: var(--muted);
+    border: 3px solid var(--border);
+    font-size: 20px;
+    min-height: 56px;
+    margin-top: 14px;
+  }
+
+  .error {
+    color: #a10000;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 14px;
+    display: none;
+  }
+
+  .flight-card {
+    border: 3px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .flight-card:hover { border-color: var(--blue); }
+
+  .flight-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--blue-dark);
+  }
+
+  .flight-mid {
+    font-size: 19px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .flight-price {
+    font-size: 26px;
+    font-weight: bold;
+    color: var(--green);
+    margin-top: 10px;
+    text-align: right;
+  }
+
+  .summary-box {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    background: #f7f9fb;
+    margin-bottom: 10px;
+  }
+
+  .summary-box .line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 19px;
+    padding: 4px 0;
+  }
+
+  .summary-box .line.total {
+    font-weight: bold;
+    font-size: 22px;
+    border-top: 2px solid var(--border);
+    margin-top: 8px;
+    padding-top: 10px;
+  }
+
+  .confirm-wrap {
+    text-align: center;
+    padding-top: 20px;
+  }
+
+  .check-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    font-size: 56px;
+    line-height: 100px;
+    margin: 0 auto 18px;
+  }
+
+  .confirm-code {
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--blue-dark);
+    letter-spacing: 2px;
+    margin: 10px 0 24px;
+  }
+
+  .progress {
+    font-size: 16px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .radio-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    margin: 10px 0;
+  }
+
+  .radio-row input {
+    width: 26px;
+    height: 26px;
+  }
+
+  .help {
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <h1>✈ SkyEasy Flights</h1>
+    <p>Simple flight booking — demo site</p>
+  </header>
+
+  <!-- SCREEN 1: SEARCH -->
+  <section id="screen-search" class="screen active">
+    <div class="progress">Step 1 of 4 — Search</div>
+    <h2 class="step-title">Where are you flying?</h2>
+    <p class="step-sub">Fill in your trip details, then press Search.</p>
+
+    <label for="from">Flying From</label>
+    <select id="from">
+      <option value="">Choose a city</option>
+    </select>
+
+    <label for="to">Flying To</label>
+    <select id="to">
+      <option value="">Choose a city</option>
+    </select>
+
+    <label for="depart">Departure Date</label>
+    <input type="date" id="depart">
+
+    <label for="passengers">Number of Passengers</label>
+    <select id="passengers">
+      <option value="1">1 Passenger</option>
+      <option value="2">2 Passengers</option>
+      <option value="3">3 Passengers</option>
+      <option value="4">4 Passengers</option>
+    </select>
+
+    <div class="error" id="search-error">Please choose a "From" city, a "To" city, and a date.</div>
+
+    <button class="btn" id="btn-search">Search Flights</button>
+  </section>
+
+  <!-- SCREEN 2: RESULTS -->
+  <section id="screen-results" class="screen">
+    <div class="progress">Step 2 of 4 — Choose a Flight</div>
+    <h2 class="step-title" id="results-title">Available Flights</h2>
+    <p class="step-sub" id="results-sub"></p>
+
+    <div id="flight-list"></div>
+
+    <button class="btn back" id="btn-back-to-search">&larr; Back to Search</button>
+  </section>
+
+  <!-- SCREEN 3: PASSENGER INFO -->
+  <section id="screen-passenger" class="screen">
+    <div class="progress">Step 3 of 4 — Your Information</div>
+    <h2 class="step-title">Passenger Details</h2>
+    <p class="step-sub" id="passenger-sub"></p>
+
+    <label for="pname">Full Name</label>
+    <input type="text" id="pname" placeholder="e.g. Jane Smith">
+
+    <label for="pphone">Phone Number</label>
+    <input type="tel" id="pphone" placeholder="e.g. 555-123-4567">
+
+    <label for="pemail">Email Address</label>
+    <input type="email" id="pemail" placeholder="e.g. jane@example.com">
+
+    <label>Seat Preference</label>
+    <fieldset>
+      <div class="radio-row">
+        <input type="radio" name="seat" id="seat-window" value="Window" checked>
+        <label for="seat-window" style="margin:0;font-weight:normal;">Window Seat</label>
+      </div>
+      <div class="radio-row">
+        <input type="radio" name="seat" id="seat-aisle" value="Aisle">
+        <label for="seat-aisle" style="margin:0;font-weight:normal;">Aisle Seat</label>
+      </div>
+    </fieldset>
+
+    <div class="error" id="passenger-error">Please fill in your name, phone, and email.</div>
+
+    <button class="btn" id="btn-review">Review Booking</button>
+    <button class="btn back" id="btn-back-to-results">&larr; Back to Flights</button>
+  </section>
+
+  <!-- SCREEN 4: REVIEW -->
+  <section id="screen-review" class="screen">
+    <div class="progress">Step 4 of 4 — Review &amp; Confirm</div>
+    <h2 class="step-title">Review Your Booking</h2>
+    <p class="step-sub">Please check everything looks correct.</p>
+
+    <div class="summary-box" id="review-summary"></div>
+
+    <button class="btn" id="btn-confirm">Confirm Booking</button>
+    <button class="btn back" id="btn-back-to-passenger">&larr; Back to Details</button>
+  </section>
+
+  <!-- SCREEN 5: CONFIRMATION -->
+  <section id="screen-confirm" class="screen">
+    <div class="confirm-wrap">
+      <div class="check-circle">&#10003;</div>
+      <h2 class="step-title" style="text-align:center;">Booking Confirmed!</h2>
+      <p class="step-sub" style="text-align:center;">Your confirmation number is:</p>
+      <div class="confirm-code" id="confirm-code">—</div>
+      <div class="summary-box" id="confirm-summary" style="text-align:left;"></div>
+      <button class="btn" id="btn-new-search">Book Another Flight</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var CITIES = [
+    "New York (JFK)",
+    "Los Angeles (LAX)",
+    "Chicago (ORD)",
+    "Dallas (DFW)",
+    "Miami (MIA)",
+    "Denver (DEN)",
+    "Seattle (SEA)",
+    "Atlanta (ATL)",
+    "Boston (BOS)",
+    "Phoenix (PHX)"
+  ];
+
+  var AIRLINES = ["SkyEasy Air", "Golden Wing Airlines", "BlueSky Express"];
+
+  var state = {
+    from: "",
+    to: "",
+    depart: "",
+    passengers: "1",
+    flight: null,
+    name: "",
+    phone: "",
+    email: "",
+    seat: "Window"
+  };
+
+  function $(id) { return document.getElementById(id); }
+
+  function populateCities() {
+    var fromSel = $("from");
+    var toSel = $("to");
+    CITIES.forEach(function (city) {
+      var o1 = document.createElement("option");
+      o1.value = city; o1.textContent = city;
+      fromSel.appendChild(o1);
+
+      var o2 = document.createElement("option");
+      o2.value = city; o2.textContent = city;
+      toSel.appendChild(o2);
+    });
+  }
+
+  function showScreen(id) {
+    var screens = document.querySelectorAll(".screen");
+    for (var i = 0; i < screens.length; i++) {
+      screens[i].classList.remove("active");
+    }
+    $(id).classList.add("active");
+    window.scrollTo(0, 0);
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return "";
+    var parts = dateStr.split("-");
+    var d = new Date(parts[0], parts[1] - 1, parts[2]);
+    var options = { weekday: "long", month: "long", day: "numeric", year: "numeric" };
+    return d.toLocaleDateString(undefined, options);
+  }
+
+  function randomTime() {
+    var hour = 6 + Math.floor(Math.random() * 14);
+    var minute = Math.random() < 0.5 ? "00" : "30";
+    var period = hour >= 12 ? "PM" : "AM";
+    var displayHour = hour > 12 ? hour - 12 : hour;
+    if (displayHour === 0) displayHour = 12;
+    return displayHour + ":" + minute + " " + period;
+  }
+
+  function generateFlights(from, to) {
+    var flights = [];
+    var count = 4;
+    for (var i = 0; i < count; i++) {
+      var airline = AIRLINES[i % AIRLINES.length];
+      var departTime = randomTime();
+      var durationHours = 1 + Math.floor(Math.random() * 5);
+      var durationMin = Math.random() < 0.5 ? 0 : 30;
+      var price = 89 + Math.floor(Math.random() * 350);
+      var stops = i === 0 ? "Nonstop" : (Math.random() < 0.5 ? "Nonstop" : "1 Stop");
+      flights.push({
+        id: "F" + (100 + i),
+        airline: airline,
+        departTime: departTime,
+        duration: durationHours + "h " + durationMin + "m",
+        stops: stops,
+        price: price,
+        from: from,
+        to: to
+      });
+    }
+    flights.sort(function (a, b) { return a.price - b.price; });
+    return flights;
+  }
+
+  function renderFlights(flights) {
+    var list = $("flight-list");
+    list.innerHTML = "";
+    flights.forEach(function (f) {
+      var card = document.createElement("div");
+      card.className = "flight-card";
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("role", "button");
+      card.innerHTML =
+        '<div class="flight-top"><span>' + f.airline + '</span><span>' + f.departTime + '</span></div>' +
+        '<div class="flight-mid">' + f.stops + ' &middot; ' + f.duration + ' flight</div>' +
+        '<div class="flight-price">$' + f.price + '</div>';
+      card.addEventListener("click", function () { selectFlight(f); });
+      card.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          selectFlight(f);
+        }
+      });
+      list.appendChild(card);
+    });
+  }
+
+  function selectFlight(f) {
+    state.flight = f;
+    $("passenger-sub").textContent = f.airline + " — " + f.departTime + " — $" + f.price + " per passenger";
+    showScreen("screen-passenger");
+  }
+
+  function buildReviewHTML(target) {
+    var f = state.flight;
+    var totalPrice = f.price * parseInt(state.passengers, 10);
+    var html =
+      '<div class="line"><span>From</span><span>' + state.from + '</span></div>' +
+      '<div class="line"><span>To</span><span>' + state.to + '</span></div>' +
+      '<div class="line"><span>Date</span><span>' + formatDate(state.depart) + '</span></div>' +
+      '<div class="line"><span>Airline</span><span>' + f.airline + '</span></div>' +
+      '<div class="line"><span>Departs</span><span>' + f.departTime + '</span></div>' +
+      '<div class="line"><span>Passengers</span><span>' + state.passengers + '</span></div>' +
+      '<div class="line"><span>Passenger Name</span><span>' + state.name + '</span></div>' +
+      '<div class="line"><span>Seat</span><span>' + state.seat + '</span></div>' +
+      '<div class="line total"><span>Total</span><span>$' + totalPrice + '</span></div>';
+    target.innerHTML = html;
+  }
+
+  function generateConfirmationCode() {
+    var letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+    var code = "";
+    for (var i = 0; i < 3; i++) {
+      code += letters.charAt(Math.floor(Math.random() * letters.length));
+    }
+    code += Math.floor(1000 + Math.random() * 9000);
+    return code;
+  }
+
+  // --- Event wiring ---
+
+  populateCities();
+
+  // default the date picker to today, min = today
+  var todayStr = new Date().toISOString().slice(0, 10);
+  $("depart").value = todayStr;
+  $("depart").min = todayStr;
+
+  $("btn-search").addEventListener("click", function () {
+    var from = $("from").value;
+    var to = $("to").value;
+    var depart = $("depart").value;
+
+    if (!from || !to || !depart) {
+      $("search-error").style.display = "block";
+      return;
+    }
+    if (from === to) {
+      $("search-error").textContent = 'Please choose two different cities.';
+      $("search-error").style.display = "block";
+      return;
+    }
+
+    $("search-error").style.display = "none";
+    state.from = from;
+    state.to = to;
+    state.depart = depart;
+    state.passengers = $("passengers").value;
+
+    var flights = generateFlights(from, to);
+    $("results-title").textContent = "Flights Found";
+    $("results-sub").textContent = from + " to " + to + " on " + formatDate(depart);
+    renderFlights(flights);
+    showScreen("screen-results");
+  });
+
+  $("btn-back-to-search").addEventListener("click", function () {
+    showScreen("screen-search");
+  });
+
+  $("btn-back-to-results").addEventListener("click", function () {
+    showScreen("screen-results");
+  });
+
+  $("btn-review").addEventListener("click", function () {
+    var name = $("pname").value.trim();
+    var phone = $("pphone").value.trim();
+    var email = $("pemail").value.trim();
+
+    if (!name || !phone || !email) {
+      $("passenger-error").style.display = "block";
+      return;
+    }
+
+    $("passenger-error").style.display = "none";
+    state.name = name;
+    state.phone = phone;
+    state.email = email;
+    state.seat = document.querySelector('input[name="seat"]:checked').value;
+
+    buildReviewHTML($("review-summary"));
+    showScreen("screen-review");
+  });
+
+  $("btn-back-to-passenger").addEventListener("click", function () {
+    showScreen("screen-passenger");
+  });
+
+  $("btn-confirm").addEventListener("click", function () {
+    var code = generateConfirmationCode();
+    $("confirm-code").textContent = code;
+    buildReviewHTML($("confirm-summary"));
+    showScreen("screen-confirm");
+  });
+
+  $("btn-new-search").addEventListener("click", function () {
+    state = { from: "", to: "", depart: "", passengers: "1", flight: null, name: "", phone: "", email: "", seat: "Window" };
+    $("from").value = "";
+    $("to").value = "";
+    $("depart").value = todayStr;
+    $("passengers").value = "1";
+    $("pname").value = "";
+    $("pphone").value = "";
+    $("pemail").value = "";
+    $("seat-window").checked = true;
+    showScreen("screen-search");
+  });
+
+})();
+</script>
+
+</body>
+</html>
