@@ -108,6 +108,100 @@
 
   .swap-row .field { flex: 1; }
 
+  .combo {
+    position: relative;
+  }
+
+  .combo-input {
+    padding-right: 50px !important;
+  }
+
+  .combo-clear {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    bottom: 4px;
+    width: 44px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .combo-list {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 4px);
+    z-index: 30;
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    max-height: 340px;
+    overflow-y: auto;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+  }
+
+  .combo-list.open {
+    display: block;
+  }
+
+  .combo-list .combo-heading {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 10px 12px 4px;
+  }
+
+  .combo-item {
+    padding: 12px 12px;
+    border-top: 1px solid #ddd;
+    cursor: pointer;
+  }
+
+  .combo-item:first-child { border-top: none; }
+
+  .combo-item:hover,
+  .combo-item.active {
+    background: #eaf2fb;
+  }
+
+  .combo-item .city-line {
+    font-size: 19px;
+    font-weight: bold;
+    color: var(--blue-dark);
+  }
+
+  .combo-item .sub-line {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .combo-empty {
+    padding: 14px 12px;
+    font-size: 16px;
+    color: var(--muted);
+  }
+
+  .btn-swap {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    background: #fff;
+    color: var(--blue-dark);
+    border: 2px solid var(--blue-dark);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
   .btn {
     display: block;
     width: 100%;
@@ -275,15 +369,21 @@
     <h2 class="step-title">Where are you flying?</h2>
     <p class="step-sub">Fill in your trip details, then press Search.</p>
 
-    <label for="from">Flying From</label>
-    <select id="from">
-      <option value="">Choose a city</option>
-    </select>
+    <label for="from-input">Flying From</label>
+    <div class="combo" id="from-combo">
+      <input type="text" id="from-input" class="combo-input" placeholder="Type a city, airport, or code" autocomplete="off">
+      <button type="button" class="combo-clear" id="from-clear" aria-label="Clear Flying From">&times;</button>
+      <div class="combo-list" id="from-list"></div>
+    </div>
 
-    <label for="to">Flying To</label>
-    <select id="to">
-      <option value="">Choose a city</option>
-    </select>
+    <button type="button" class="btn-swap" id="btn-swap">&#8645; Swap From and To</button>
+
+    <label for="to-input">Flying To</label>
+    <div class="combo" id="to-combo">
+      <input type="text" id="to-input" class="combo-input" placeholder="Type a city, airport, or code" autocomplete="off">
+      <button type="button" class="combo-clear" id="to-clear" aria-label="Clear Flying To">&times;</button>
+      <div class="combo-list" id="to-list"></div>
+    </div>
 
     <label for="depart">Departure Date</label>
     <input type="date" id="depart">
@@ -375,18 +475,275 @@
 (function () {
   "use strict";
 
-  var CITIES = [
-    "New York (JFK)",
-    "Los Angeles (LAX)",
-    "Chicago (ORD)",
-    "Dallas (DFW)",
-    "Miami (MIA)",
-    "Denver (DEN)",
-    "Seattle (SEA)",
-    "Atlanta (ATL)",
-    "Boston (BOS)",
-    "Phoenix (PHX)"
-  ];
+  // code, city, airport name, country
+  var AIRPORTS = [
+    ["JFK","New York","John F. Kennedy International Airport","USA"],
+    ["LGA","New York","LaGuardia Airport","USA"],
+    ["EWR","Newark","Newark Liberty International Airport","USA"],
+    ["LAX","Los Angeles","Los Angeles International Airport","USA"],
+    ["ORD","Chicago","O'Hare International Airport","USA"],
+    ["MDW","Chicago","Midway International Airport","USA"],
+    ["DFW","Dallas","Dallas/Fort Worth International Airport","USA"],
+    ["DAL","Dallas","Dallas Love Field","USA"],
+    ["ATL","Atlanta","Hartsfield-Jackson Atlanta International Airport","USA"],
+    ["MIA","Miami","Miami International Airport","USA"],
+    ["DEN","Denver","Denver International Airport","USA"],
+    ["SEA","Seattle","Seattle-Tacoma International Airport","USA"],
+    ["SFO","San Francisco","San Francisco International Airport","USA"],
+    ["OAK","Oakland","Oakland International Airport","USA"],
+    ["SJC","San Jose","Norman Y. Mineta San Jose International Airport","USA"],
+    ["BOS","Boston","Logan International Airport","USA"],
+    ["PHX","Phoenix","Phoenix Sky Harbor International Airport","USA"],
+    ["IAH","Houston","George Bush Intercontinental Airport","USA"],
+    ["HOU","Houston","William P. Hobby Airport","USA"],
+    ["LAS","Las Vegas","Harry Reid International Airport","USA"],
+    ["MCO","Orlando","Orlando International Airport","USA"],
+    ["CLT","Charlotte","Charlotte Douglas International Airport","USA"],
+    ["MSP","Minneapolis","Minneapolis-Saint Paul International Airport","USA"],
+    ["DTW","Detroit","Detroit Metropolitan Airport","USA"],
+    ["PHL","Philadelphia","Philadelphia International Airport","USA"],
+    ["BWI","Baltimore","Baltimore/Washington International Airport","USA"],
+    ["DCA","Washington","Ronald Reagan Washington National Airport","USA"],
+    ["IAD","Washington","Washington Dulles International Airport","USA"],
+    ["SAN","San Diego","San Diego International Airport","USA"],
+    ["TPA","Tampa","Tampa International Airport","USA"],
+    ["PDX","Portland","Portland International Airport","USA"],
+    ["STL","St. Louis","St. Louis Lambert International Airport","USA"],
+    ["HNL","Honolulu","Daniel K. Inouye International Airport","USA"],
+    ["AUS","Austin","Austin-Bergstrom International Airport","USA"],
+    ["SAT","San Antonio","San Antonio International Airport","USA"],
+    ["MSY","New Orleans","Louis Armstrong New Orleans International Airport","USA"],
+    ["SLC","Salt Lake City","Salt Lake City International Airport","USA"],
+    ["SMF","Sacramento","Sacramento International Airport","USA"],
+    ["RDU","Raleigh","Raleigh-Durham International Airport","USA"],
+    ["BNA","Nashville","Nashville International Airport","USA"],
+    ["CLE","Cleveland","Cleveland Hopkins International Airport","USA"],
+    ["CVG","Cincinnati","Cincinnati/Northern Kentucky International Airport","USA"],
+    ["CMH","Columbus","John Glenn Columbus International Airport","USA"],
+    ["IND","Indianapolis","Indianapolis International Airport","USA"],
+    ["MCI","Kansas City","Kansas City International Airport","USA"],
+    ["MKE","Milwaukee","Milwaukee Mitchell International Airport","USA"],
+    ["OMA","Omaha","Eppley Airfield","USA"],
+    ["PIT","Pittsburgh","Pittsburgh International Airport","USA"],
+    ["RIC","Richmond","Richmond International Airport","USA"],
+    ["JAX","Jacksonville","Jacksonville International Airport","USA"],
+    ["BUF","Buffalo","Buffalo Niagara International Airport","USA"],
+    ["ABQ","Albuquerque","Albuquerque International Sunport","USA"],
+    ["ANC","Anchorage","Ted Stevens Anchorage International Airport","USA"],
+    ["BOI","Boise","Boise Airport","USA"],
+    ["ELP","El Paso","El Paso International Airport","USA"],
+    ["OKC","Oklahoma City","Will Rogers World Airport","USA"],
+    ["TUL","Tulsa","Tulsa International Airport","USA"],
+    ["MEM","Memphis","Memphis International Airport","USA"],
+    ["SDF","Louisville","Louisville Muhammad Ali International Airport","USA"],
+    ["GEG","Spokane","Spokane International Airport","USA"],
+    ["RNO","Reno","Reno-Tahoe International Airport","USA"],
+    ["TUS","Tucson","Tucson International Airport","USA"],
+    ["ONT","Ontario","Ontario International Airport","USA"],
+    ["BUR","Burbank","Hollywood Burbank Airport","USA"],
+    ["SNA","Santa Ana","John Wayne Airport","USA"],
+
+    ["YYZ","Toronto","Toronto Pearson International Airport","Canada"],
+    ["YVR","Vancouver","Vancouver International Airport","Canada"],
+    ["YUL","Montreal","Montréal-Trudeau International Airport","Canada"],
+    ["YYC","Calgary","Calgary International Airport","Canada"],
+    ["YOW","Ottawa","Ottawa Macdonald-Cartier International Airport","Canada"],
+    ["YEG","Edmonton","Edmonton International Airport","Canada"],
+    ["YWG","Winnipeg","Winnipeg Richardson International Airport","Canada"],
+    ["YHZ","Halifax","Halifax Stanfield International Airport","Canada"],
+
+    ["MEX","Mexico City","Mexico City International Airport","Mexico"],
+    ["CUN","Cancún","Cancún International Airport","Mexico"],
+    ["GDL","Guadalajara","Guadalajara International Airport","Mexico"],
+    ["MTY","Monterrey","Monterrey International Airport","Mexico"],
+    ["SJD","Los Cabos","Los Cabos International Airport","Mexico"],
+    ["PVR","Puerto Vallarta","Puerto Vallarta International Airport","Mexico"],
+
+    ["SJU","San Juan","Luis Muñoz Marín International Airport","Puerto Rico"],
+    ["NAS","Nassau","Lynden Pindling International Airport","Bahamas"],
+    ["MBJ","Montego Bay","Sangster International Airport","Jamaica"],
+    ["PUJ","Punta Cana","Punta Cana International Airport","Dominican Republic"],
+    ["HAV","Havana","José Martí International Airport","Cuba"],
+    ["PTY","Panama City","Tocumen International Airport","Panama"],
+    ["SJO","San José","Juan Santamaría International Airport","Costa Rica"],
+
+    ["GRU","São Paulo","São Paulo–Guarulhos International Airport","Brazil"],
+    ["GIG","Rio de Janeiro","Rio de Janeiro–Galeão International Airport","Brazil"],
+    ["EZE","Buenos Aires","Ministro Pistarini International Airport","Argentina"],
+    ["SCL","Santiago","Arturo Merino Benítez International Airport","Chile"],
+    ["BOG","Bogotá","El Dorado International Airport","Colombia"],
+    ["LIM","Lima","Jorge Chávez International Airport","Peru"],
+    ["UIO","Quito","Mariscal Sucre International Airport","Ecuador"],
+    ["CCS","Caracas","Simón Bolívar International Airport","Venezuela"],
+    ["MVD","Montevideo","Carrasco International Airport","Uruguay"],
+    ["ASU","Asunción","Silvio Pettirossi International Airport","Paraguay"],
+
+    ["LHR","London","Heathrow Airport","United Kingdom"],
+    ["LGW","London","Gatwick Airport","United Kingdom"],
+    ["STN","London","Stansted Airport","United Kingdom"],
+    ["LTN","London","Luton Airport","United Kingdom"],
+    ["MAN","Manchester","Manchester Airport","United Kingdom"],
+    ["EDI","Edinburgh","Edinburgh Airport","United Kingdom"],
+    ["GLA","Glasgow","Glasgow Airport","United Kingdom"],
+    ["BHX","Birmingham","Birmingham Airport","United Kingdom"],
+    ["BRS","Bristol","Bristol Airport","United Kingdom"],
+    ["DUB","Dublin","Dublin Airport","Ireland"],
+    ["CDG","Paris","Charles de Gaulle Airport","France"],
+    ["ORY","Paris","Orly Airport","France"],
+    ["NCE","Nice","Nice Côte d'Azur Airport","France"],
+    ["LYS","Lyon","Lyon–Saint-Exupéry Airport","France"],
+    ["FRA","Frankfurt","Frankfurt Airport","Germany"],
+    ["MUC","Munich","Munich Airport","Germany"],
+    ["BER","Berlin","Berlin Brandenburg Airport","Germany"],
+    ["DUS","Düsseldorf","Düsseldorf Airport","Germany"],
+    ["HAM","Hamburg","Hamburg Airport","Germany"],
+    ["AMS","Amsterdam","Amsterdam Airport Schiphol","Netherlands"],
+    ["BRU","Brussels","Brussels Airport","Belgium"],
+    ["ZRH","Zurich","Zurich Airport","Switzerland"],
+    ["GVA","Geneva","Geneva Airport","Switzerland"],
+    ["VIE","Vienna","Vienna International Airport","Austria"],
+    ["MAD","Madrid","Adolfo Suárez Madrid–Barajas Airport","Spain"],
+    ["BCN","Barcelona","Barcelona–El Prat Airport","Spain"],
+    ["PMI","Palma de Mallorca","Palma de Mallorca Airport","Spain"],
+    ["LIS","Lisbon","Humberto Delgado Airport","Portugal"],
+    ["OPO","Porto","Porto Airport","Portugal"],
+    ["FCO","Rome","Leonardo da Vinci–Fiumicino Airport","Italy"],
+    ["MXP","Milan","Milan Malpensa Airport","Italy"],
+    ["VCE","Venice","Venice Marco Polo Airport","Italy"],
+    ["NAP","Naples","Naples International Airport","Italy"],
+    ["ATH","Athens","Athens International Airport","Greece"],
+    ["IST","Istanbul","Istanbul Airport","Turkey"],
+    ["SAW","Istanbul","Sabiha Gökçen International Airport","Turkey"],
+    ["CPH","Copenhagen","Copenhagen Airport","Denmark"],
+    ["ARN","Stockholm","Stockholm Arlanda Airport","Sweden"],
+    ["GOT","Gothenburg","Gothenburg Landvetter Airport","Sweden"],
+    ["OSL","Oslo","Oslo Airport, Gardermoen","Norway"],
+    ["BGO","Bergen","Bergen Airport, Flesland","Norway"],
+    ["HEL","Helsinki","Helsinki-Vantaa Airport","Finland"],
+    ["KEF","Reykjavík","Keflavík International Airport","Iceland"],
+    ["WAW","Warsaw","Warsaw Chopin Airport","Poland"],
+    ["PRG","Prague","Václav Havel Airport Prague","Czech Republic"],
+    ["BUD","Budapest","Budapest Ferenc Liszt International Airport","Hungary"],
+    ["OTP","Bucharest","Henri Coandă International Airport","Romania"],
+    ["SOF","Sofia","Sofia Airport","Bulgaria"],
+    ["ZAG","Zagreb","Franjo Tuđman Airport","Croatia"],
+    ["DBV","Dubrovnik","Dubrovnik Airport","Croatia"],
+    ["BEG","Belgrade","Belgrade Nikola Tesla Airport","Serbia"],
+    ["SVO","Moscow","Sheremetyevo International Airport","Russia"],
+    ["DME","Moscow","Domodedovo International Airport","Russia"],
+    ["LED","St. Petersburg","Pulkovo Airport","Russia"],
+    ["KBP","Kyiv","Boryspil International Airport","Ukraine"],
+    ["RIX","Riga","Riga International Airport","Latvia"],
+    ["TLL","Tallinn","Tallinn Airport","Estonia"],
+    ["VNO","Vilnius","Vilnius Airport","Lithuania"],
+    ["LUX","Luxembourg","Luxembourg Airport","Luxembourg"],
+
+    ["DXB","Dubai","Dubai International Airport","UAE"],
+    ["AUH","Abu Dhabi","Abu Dhabi International Airport","UAE"],
+    ["DOH","Doha","Hamad International Airport","Qatar"],
+    ["RUH","Riyadh","King Khalid International Airport","Saudi Arabia"],
+    ["JED","Jeddah","King Abdulaziz International Airport","Saudi Arabia"],
+    ["AMM","Amman","Queen Alia International Airport","Jordan"],
+    ["BEY","Beirut","Beirut–Rafic Hariri International Airport","Lebanon"],
+    ["TLV","Tel Aviv","Ben Gurion Airport","Israel"],
+    ["CAI","Cairo","Cairo International Airport","Egypt"],
+    ["KWI","Kuwait City","Kuwait International Airport","Kuwait"],
+    ["MCT","Muscat","Muscat International Airport","Oman"],
+    ["BAH","Manama","Bahrain International Airport","Bahrain"],
+
+    ["JNB","Johannesburg","OR Tambo International Airport","South Africa"],
+    ["CPT","Cape Town","Cape Town International Airport","South Africa"],
+    ["NBO","Nairobi","Jomo Kenyatta International Airport","Kenya"],
+    ["ADD","Addis Ababa","Addis Ababa Bole International Airport","Ethiopia"],
+    ["LOS","Lagos","Murtala Muhammed International Airport","Nigeria"],
+    ["ACC","Accra","Kotoka International Airport","Ghana"],
+    ["CMN","Casablanca","Mohammed V International Airport","Morocco"],
+    ["TUN","Tunis","Tunis–Carthage International Airport","Tunisia"],
+    ["ALG","Algiers","Houari Boumediene Airport","Algeria"],
+    ["DAR","Dar es Salaam","Julius Nyerere International Airport","Tanzania"],
+    ["MRU","Mauritius","Sir Seewoosagur Ramgoolam International Airport","Mauritius"],
+
+    ["NRT","Tokyo","Narita International Airport","Japan"],
+    ["HND","Tokyo","Haneda Airport","Japan"],
+    ["KIX","Osaka","Kansai International Airport","Japan"],
+    ["NGO","Nagoya","Chubu Centrair International Airport","Japan"],
+    ["FUK","Fukuoka","Fukuoka Airport","Japan"],
+    ["CTS","Sapporo","New Chitose Airport","Japan"],
+    ["ICN","Seoul","Incheon International Airport","South Korea"],
+    ["GMP","Seoul","Gimpo International Airport","South Korea"],
+    ["PUS","Busan","Gimhae International Airport","South Korea"],
+    ["PEK","Beijing","Beijing Capital International Airport","China"],
+    ["PKX","Beijing","Beijing Daxing International Airport","China"],
+    ["PVG","Shanghai","Shanghai Pudong International Airport","China"],
+    ["SHA","Shanghai","Shanghai Hongqiao International Airport","China"],
+    ["CAN","Guangzhou","Guangzhou Baiyun International Airport","China"],
+    ["SZX","Shenzhen","Shenzhen Bao'an International Airport","China"],
+    ["CTU","Chengdu","Chengdu Shuangliu International Airport","China"],
+    ["XIY","Xi'an","Xi'an Xianyang International Airport","China"],
+    ["HKG","Hong Kong","Hong Kong International Airport","Hong Kong"],
+    ["MFM","Macau","Macau International Airport","Macau"],
+    ["TPE","Taipei","Taiwan Taoyuan International Airport","Taiwan"],
+    ["TSA","Taipei","Taipei Songshan Airport","Taiwan"],
+    ["SIN","Singapore","Singapore Changi Airport","Singapore"],
+    ["KUL","Kuala Lumpur","Kuala Lumpur International Airport","Malaysia"],
+    ["BKK","Bangkok","Suvarnabhumi Airport","Thailand"],
+    ["DMK","Bangkok","Don Mueang International Airport","Thailand"],
+    ["HKT","Phuket","Phuket International Airport","Thailand"],
+    ["CNX","Chiang Mai","Chiang Mai International Airport","Thailand"],
+    ["MNL","Manila","Ninoy Aquino International Airport","Philippines"],
+    ["CEB","Cebu","Mactan-Cebu International Airport","Philippines"],
+    ["CGK","Jakarta","Soekarno–Hatta International Airport","Indonesia"],
+    ["DPS","Denpasar (Bali)","Ngurah Rai International Airport","Indonesia"],
+    ["SGN","Ho Chi Minh City","Tan Son Nhat International Airport","Vietnam"],
+    ["HAN","Hanoi","Noi Bai International Airport","Vietnam"],
+    ["RGN","Yangon","Yangon International Airport","Myanmar"],
+    ["PNH","Phnom Penh","Phnom Penh International Airport","Cambodia"],
+    ["VTE","Vientiane","Wattay International Airport","Laos"],
+    ["DEL","New Delhi","Indira Gandhi International Airport","India"],
+    ["BOM","Mumbai","Chhatrapati Shivaji Maharaj International Airport","India"],
+    ["BLR","Bengaluru","Kempegowda International Airport","India"],
+    ["MAA","Chennai","Chennai International Airport","India"],
+    ["CCU","Kolkata","Netaji Subhas Chandra Bose International Airport","India"],
+    ["HYD","Hyderabad","Rajiv Gandhi International Airport","India"],
+    ["COK","Kochi","Cochin International Airport","India"],
+    ["GOI","Goa","Goa International Airport","India"],
+    ["KTM","Kathmandu","Tribhuvan International Airport","Nepal"],
+    ["DAC","Dhaka","Hazrat Shahjalal International Airport","Bangladesh"],
+    ["CMB","Colombo","Bandaranaike International Airport","Sri Lanka"],
+    ["ISB","Islamabad","Islamabad International Airport","Pakistan"],
+    ["KHI","Karachi","Jinnah International Airport","Pakistan"],
+    ["LHE","Lahore","Allama Iqbal International Airport","Pakistan"],
+    ["TAS","Tashkent","Tashkent International Airport","Uzbekistan"],
+    ["ALA","Almaty","Almaty International Airport","Kazakhstan"],
+
+    ["SYD","Sydney","Sydney Kingsford Smith Airport","Australia"],
+    ["MEL","Melbourne","Melbourne Airport","Australia"],
+    ["BNE","Brisbane","Brisbane Airport","Australia"],
+    ["PER","Perth","Perth Airport","Australia"],
+    ["ADL","Adelaide","Adelaide Airport","Australia"],
+    ["OOL","Gold Coast","Gold Coast Airport","Australia"],
+    ["CNS","Cairns","Cairns Airport","Australia"],
+    ["DRW","Darwin","Darwin Airport","Australia"],
+    ["HBA","Hobart","Hobart Airport","Australia"],
+    ["AKL","Auckland","Auckland Airport","New Zealand"],
+    ["WLG","Wellington","Wellington Airport","New Zealand"],
+    ["CHC","Christchurch","Christchurch Airport","New Zealand"],
+    ["NAN","Nadi","Nadi International Airport","Fiji"],
+    ["POM","Port Moresby","Jacksons International Airport","Papua New Guinea"],
+    ["GUM","Guam","Antonio B. Won Pat International Airport","Guam"]
+  ].map(function (a) {
+    return { code: a[0], city: a[1], name: a[2], country: a[3] };
+  });
+
+  var CODE_MAP = {};
+  AIRPORTS.forEach(function (a) { CODE_MAP[a.code] = a; });
+
+  var POPULAR_CODES = ["JFK", "LAX", "ORD", "MIA", "LHR", "CDG", "DXB", "HND", "SYD", "SIN"];
+  var POPULAR = POPULAR_CODES.map(function (c) { return CODE_MAP[c]; });
+
+  function airportLabel(a) {
+    return a.city + " (" + a.code + ")";
+  }
 
   var AIRLINES = ["SkyEasy Air", "Golden Wing Airlines", "BlueSky Express"];
 
@@ -404,18 +761,128 @@
 
   function $(id) { return document.getElementById(id); }
 
-  function populateCities() {
-    var fromSel = $("from");
-    var toSel = $("to");
-    CITIES.forEach(function (city) {
-      var o1 = document.createElement("option");
-      o1.value = city; o1.textContent = city;
-      fromSel.appendChild(o1);
+  function searchAirports(query) {
+    var q = query.trim().toLowerCase();
+    if (!q) return POPULAR;
 
-      var o2 = document.createElement("option");
-      o2.value = city; o2.textContent = city;
-      toSel.appendChild(o2);
+    var scored = [];
+    AIRPORTS.forEach(function (a) {
+      var code = a.code.toLowerCase();
+      var city = a.city.toLowerCase();
+      var name = a.name.toLowerCase();
+      var country = a.country.toLowerCase();
+      var score = -1;
+      if (code === q) score = 0;
+      else if (code.indexOf(q) === 0) score = 1;
+      else if (city.indexOf(q) === 0) score = 2;
+      else if (city.indexOf(q) !== -1) score = 3;
+      else if (name.indexOf(q) !== -1 || country.indexOf(q) !== -1) score = 4;
+      if (score >= 0) scored.push({ a: a, score: score });
     });
+    scored.sort(function (x, y) {
+      if (x.score !== y.score) return x.score - y.score;
+      return x.a.city.localeCompare(y.a.city);
+    });
+    return scored.slice(0, 8).map(function (s) { return s.a; });
+  }
+
+  // Turns a text input + dropdown list into a searchable airport picker.
+  function setupAirportCombo(input, clearBtn, listEl) {
+    var currentItems = [];
+    var activeIndex = -1;
+    var selectedCode = null;
+
+    function renderList(items, heading) {
+      currentItems = items;
+      activeIndex = -1;
+      if (!items.length) {
+        listEl.innerHTML = '<div class="combo-empty">No airports match. Try a different city or code.</div>';
+        listEl.classList.add("open");
+        return;
+      }
+      var html = heading ? '<div class="combo-heading">' + heading + '</div>' : "";
+      html += items.map(function (a, i) {
+        return '<div class="combo-item" data-index="' + i + '">' +
+          '<div class="city-line">' + a.city + ' (' + a.code + ')</div>' +
+          '<div class="sub-line">' + a.name + ' &middot; ' + a.country + '</div>' +
+          '</div>';
+      }).join("");
+      listEl.innerHTML = html;
+      listEl.classList.add("open");
+    }
+
+    function openForQuery(q) {
+      if (!q.trim()) {
+        renderList(POPULAR, "Popular Airports");
+      } else {
+        renderList(searchAirports(q), "");
+      }
+    }
+
+    function highlight() {
+      var items = listEl.querySelectorAll(".combo-item");
+      items.forEach(function (el, i) {
+        el.classList.toggle("active", i === activeIndex);
+      });
+      if (items[activeIndex]) items[activeIndex].scrollIntoView({ block: "nearest" });
+    }
+
+    function pick(a) {
+      input.value = airportLabel(a);
+      selectedCode = a.code;
+      listEl.classList.remove("open");
+    }
+
+    input.addEventListener("focus", function () { openForQuery(input.value); });
+    input.addEventListener("input", function () {
+      selectedCode = null;
+      openForQuery(input.value);
+    });
+    input.addEventListener("keydown", function (e) {
+      if (!listEl.classList.contains("open")) return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        activeIndex = Math.min(activeIndex + 1, currentItems.length - 1);
+        highlight();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        activeIndex = Math.max(activeIndex - 1, 0);
+        highlight();
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (activeIndex >= 0 && currentItems[activeIndex]) pick(currentItems[activeIndex]);
+      } else if (e.key === "Escape") {
+        listEl.classList.remove("open");
+      }
+    });
+
+    listEl.addEventListener("mousedown", function (e) {
+      var item = e.target.closest ? e.target.closest(".combo-item") : null;
+      if (!item) return;
+      e.preventDefault();
+      var idx = parseInt(item.getAttribute("data-index"), 10);
+      if (currentItems[idx]) pick(currentItems[idx]);
+    });
+
+    clearBtn.addEventListener("click", function () {
+      input.value = "";
+      selectedCode = null;
+      input.focus();
+      openForQuery("");
+    });
+
+    document.addEventListener("click", function (e) {
+      if (e.target !== input && e.target !== clearBtn && !listEl.contains(e.target)) {
+        listEl.classList.remove("open");
+      }
+    });
+
+    return {
+      getCode: function () { return selectedCode; },
+      getLabel: function () { return input.value; },
+      clear: function () { input.value = ""; selectedCode = null; },
+      setAirport: function (a) { pick(a); }
+    };
   }
 
   function showScreen(id) {
@@ -526,7 +993,24 @@
 
   // --- Event wiring ---
 
-  populateCities();
+  var fromCombo = setupAirportCombo($("from-input"), $("from-clear"), $("from-list"));
+  var toCombo = setupAirportCombo($("to-input"), $("to-clear"), $("to-list"));
+
+  $("btn-swap").addEventListener("click", function () {
+    var fromCode = fromCombo.getCode();
+    var toCode = toCombo.getCode();
+    if (fromCode && toCode) {
+      fromCombo.setAirport(CODE_MAP[toCode]);
+      toCombo.setAirport(CODE_MAP[fromCode]);
+    } else {
+      var fromText = fromCombo.getLabel();
+      var toText = toCombo.getLabel();
+      fromCombo.clear();
+      toCombo.clear();
+      $("from-input").value = toText;
+      $("to-input").value = fromText;
+    }
+  });
 
   // default the date picker to today, min = today
   var todayStr = new Date().toISOString().slice(0, 10);
@@ -534,21 +1018,24 @@
   $("depart").min = todayStr;
 
   $("btn-search").addEventListener("click", function () {
-    var from = $("from").value;
-    var to = $("to").value;
+    var fromCode = fromCombo.getCode();
+    var toCode = toCombo.getCode();
     var depart = $("depart").value;
 
-    if (!from || !to || !depart) {
+    if (!fromCode || !toCode || !depart) {
+      $("search-error").textContent = 'Please pick a "From" airport and a "To" airport from the list, and choose a date.';
       $("search-error").style.display = "block";
       return;
     }
-    if (from === to) {
-      $("search-error").textContent = 'Please choose two different cities.';
+    if (fromCode === toCode) {
+      $("search-error").textContent = 'Please choose two different airports.';
       $("search-error").style.display = "block";
       return;
     }
 
     $("search-error").style.display = "none";
+    var from = fromCombo.getLabel();
+    var to = toCombo.getLabel();
     state.from = from;
     state.to = to;
     state.depart = depart;
@@ -602,8 +1089,8 @@
 
   $("btn-new-search").addEventListener("click", function () {
     state = { from: "", to: "", depart: "", passengers: "1", flight: null, name: "", phone: "", email: "", seat: "Window" };
-    $("from").value = "";
-    $("to").value = "";
+    fromCombo.clear();
+    toCombo.clear();
     $("depart").value = todayStr;
     $("passengers").value = "1";
     $("pname").value = "";
